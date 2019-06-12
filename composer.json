@@ -1,0 +1,29 @@
+{
+    "name": "miniorange/miniorange-saml",
+    "type": "typo3-cms-extension",
+    "description": "SAML SP Single Sign-On(SSO)",
+    "authors": [
+        {
+            "name": "miniOrange",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "typo3/cms-core": "^8.7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "MiniOrange\\MiniorangeSaml\\": "Classes",
+            "MiniOrange\\": "sso"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MiniOrange\\MiniorangeSaml\\Tests\\": "Tests"
+        }
+    },
+    "replace": {
+        "miniorange_saml": "self.version",
+        "typo3-ter/miniorange-saml": "self.version"
+    }
+}
