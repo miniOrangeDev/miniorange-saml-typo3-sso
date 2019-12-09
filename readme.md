@@ -5,6 +5,6 @@ This change in repository name is to match the naming standard of typo3.
 
 Some bugs are also fixed with some UI improvemnts and the version number is bumped to 1.2.* 
 
-So feel free to point out bugs or issues. For any query reach out to us at info@xecurify.com.
+So feel free to point out bugs or issues. For any query email at info@xecurify.com or visit https://www.miniorange.com/contact.
 
 
