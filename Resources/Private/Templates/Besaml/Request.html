@@ -1,0 +1,763 @@
+<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Essential javascripts for application to work-->
+    <script src="includes/js/jquery-3.2.1.min.js"></script>
+    <script src="includes/js/popper.min.js"></script>
+    <script src="includes/js/bootstrap.min.js"></script>
+    <script src="includes/js/main.js"></script>
+    <!-- The javascript plugin to display page loading on top-->
+    <script src="includes/js/plugins/pace.min.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/../../sso/includes/css/main.css">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
+    <!--<script>-->
+        <!--$(document).ready(function(){-->
+            <!--if(localStorage.selected) {-->
+                <!--$('#' + localStorage.selected ).attr('checked', true);-->
+            <!--}-->
+            <!--$('.inputabs').click(function(){-->
+                <!--localStorage.setItem("selected", this.id);-->
+            <!--});-->
+        <!--});-->
+    <!--</script>-->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+
+        html, body {
+            overflow: auto;
+            height: 100%;
+        }
+
+        .button {
+            display: inline-block;
+            border-radius: 2px;
+            background-color: #f2f2f2;
+            border: none;
+            color: white;
+            text-shadow: 2px 2px 4px #0f0e0e;
+            font-weight: bold;
+            text-align: center;
+            font-size: 28px;
+            padding: 5px;
+            width: 200px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .button span:after {
+            content: '\00bb';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -20px;
+            transition: 0.5s;
+        }
+
+        .button:hover span {
+            padding-right: 25px;
+        }
+
+        .button:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+    </style>
+
+    <style>
+        body {font-family: Arial;}
+
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            /*background-color: #f1f1f1;*/
+            background: #002b36;
+            box-shadow: 2px 2px 2px darkgrey;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 14px;
+            transition: 0.3s;
+            font-size: 18px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            /*background-color: #969cdb;*/
+            background: #afcee9;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #428bca; ;
+            color: white;
+            font-weight: bolder;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 3px 6px;
+            /*border: 1px solid #ccc;*/
+            border-top: none;
+        }
+    </style>
+
+    <style>
+
+        .profileTable{
+            width: 95%;
+            background: #f1f1f1;
+            border: solid 2px black;
+        }
+
+        .profileTable tbody td {
+            text-align: center;
+            padding: 15px;
+            border: solid 2px black;
+        }
+
+        #topContainer{
+            display: flex;
+            flex-flow: row wrap;
+            width: 100%;
+            justify-content: space-evenly           /*justify-content: space-between;*/
+        }
+
+        #leftContainer{
+            order: 1;
+            /*width: 52%;*/
+            flex: 0.2 1 45% ;
+        }
+
+        #rightContainer{
+            order: 2;
+            /*width: 35%;*/
+            flex: 0.2 1 30% ;
+        }
+
+        .hideElement{
+            display: none;
+        }
+
+        .showElement{
+            display: block;
+        }
+
+        hr{
+            border-top: 2px solid lightgrey ;
+        }
+
+        .helpButton{
+            background: #428bca;
+            color: white;
+            font-weight: bold;
+            /*width: 100px;*/
+            /*padding: 4px;*/
+            box-shadow: 2px 2px 2px darkgrey;
+            text-shadow: 2px 2px 4px black;
+            border-radius: 5px;
+        }
+
+        .premiumMessage{
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .premiumBox{
+            font-weight: bold;
+            background: #ffe6e6;
+        }
+
+
+    </style>
+
+</head>
+
+<body class="app sidebar-mini rtl">
+
+<div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+
+
+<div class="tab">
+    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
+    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
+    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
+    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
+    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event,'Support')">Support</button>
+</div>
+
+<input hidden name="taby" id="taby" value="{tab}">
+
+<div id="topContainer">
+<!--Left Container-->
+    <div id="leftContainer">
+
+    <!--   IDENTITY PROVIDER TAB-->
+        <div id="Identity_Provider" class="tabcontent"  >
+
+    <!--   IDENTITY PROVIDER SETTINGS    -->
+        <h3><strong>Identity Provider Settings</strong></h3>
+            <hr>
+            <div class="tile" >
+                <form method="POST" action="" id="saml_form">
+
+                    <input type="hidden" name="option" value="save_connector_settings">
+
+                            <div class="form-group" >
+                                <label for="idp_name"><b>Identity Provider Name</b></label>
+                                <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf.idp_name}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="idp_entity_id"><b>IDP Entity ID</b></label>
+                                <input class="form-control" {log} name="idp_entity_id" id="idp_entity_id" type="text"
+                                       required value="{conf.idp_entity_id}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="saml_login_url"><b>SAML Login URL</b></label>
+                                <input class="form-control" {log} name="saml_login_url" id="saml_login_url" type="text"
+                                       required value="{conf.saml_login_url}">
+                            </div>
+
+                            <div class="premiumBox" disabled >
+
+                                <label><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
+                                <table>
+                                    <f:if condition="{0: conf.login_binding_type} == {0: 'HttpRedirect'} or {0: conf.login_binding_type} == {0: ''} ">
+                                        <tr>
+                                            <td style="padding:10px;">
+                                                <div class="animated-radio-button">
+                                                    <label>
+                                                        <input class="inputabs" disabled checked type="radio" name="login_binding_type" id="http_redirect_binding1" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td style="padding:10px;">
+
+                                                <div class="animated-radio-button">
+                                                    <label>
+                                                        <input class="inputabs" disabled  type="radio" name="login_binding_type" id="http_post_binding1" value="HttpPost"><span class="label-text">Http-Post</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </f:if>
+                                    <f:if condition="{0: conf.login_binding_type} == {0: 'HttpPost'}">
+                                        <tr>
+                                            <td style="padding:10px;">
+                                                <div class="animated-radio-button">
+                                                    <label>
+                                                        <input class = inputabs disabled checked type="radio" name="login_binding_type" id="http_redirect_binding" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td style="padding:10px;">
+
+                                            <div class="animated-radio-button">
+                                                <label>
+                                                    <input class = inputabs disabled checked type="radio" name="login_binding_type" id="http_post_binding" value="HttpPost"><span class="label-text">Http-Post</span>
+                                                </label>
+                                            </div>
+                                            </td>
+                                        </tr>
+                                    </f:if>
+                                </table>
+                            </div>
+
+                            <div class="form-group" style= "border: black">
+                                <label for="x509_certificate"><b>SAML x509 Certificate</b></label>
+                                <textarea class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf.x509_certificate}</textarea>
+                                <small><b>NOTE:</b> Format of the certificate:<br/><b>-----BEGIN CERTIFICATE-----<br/>XXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>-----END CERTIFICATE-----</b></small><br/>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="saml_logout_url"><b>SAML Logout URL</b></label>
+                                <input class="form-control" {log} name="saml_logout_url" id="saml_logout_url" type="text" value="{conf.saml_logout_url}">
+                            </div>
+
+                            <label for="signing_info"><b>Signing</b></label>
+                    <p>Supports both Signed Assertion and Signed Response<i class="fa fa-question-circle" id="signing_info" style="padding-left:5px;"></i><br/></p>
+
+                            <div class="form-group">
+                                <div style="display:none;" class="help_desc" id="signing_help_desc">
+                                    Please make sure that your Identity Provider sign atleast one of them.
+                                </div>
+                            </div>
+
+                            <div class="premiumBox" disabled >
+                                <div class="animated-checkbox">
+                                    <input type="checkbox" disabled  id="force_authn"  name="force_authn" >
+                                    <label> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
+                                    &nbsp
+                                </div>
+                            </div>
+
+                    &nbsp
+                    <div class="tile-footer">
+                        <button class="btn btn-primary" type="button" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
+                        <a target="_blank" {log} style="text-decoration:none"><button onClick="window.open('{conf2.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
+                    </div>
+
+                </form>
+        </div>
+        </div>
+    <!--   SERVICE PROVIDER TAB -->
+        <div id="Service_Provider"  class="tabcontent"  >
+
+            <h3><strong>Service Provider Settings</strong></h3>
+            <hr>
+            <div class="tile">
+            <form action="" method="post" id="sp_settings">
+
+                        <input type="hidden" name="option" value="save_sp_settings"/>
+                    <!--<div style="width: 40%; display: inline-block">-->
+                        <div class="form-group">
+                            <label for="fesaml"><b> URL with fesaml</b></label>
+                               <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf2.fesaml}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="response"><b>URL with response</b></label>
+                            <input class="form-control" {log} id="response" name="response" type="text" value="{conf2.response}" >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="site_base_url"><b> Base URL</b></label>
+                            <input class="form-control" {log} id="site_base_url"
+                                   name="site_base_url" type="text" value="{conf2.site_base_url}" >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="acs_url"><b>ACS URL</b></label>
+                            <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf2.acs_url}" >
+                        </div>
+
+                        <div class="form-group" >
+                            <label for="sp_entity_id"><b>SP Entity ID</b></label>
+                            <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf2.sp_entity_id}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
+                            <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf2.slo_url}"  >
+                        </div>
+
+                        <div class="form-group" style="margin:20px 0">
+                            <label><b>  SP Certificate:</b></label>
+                            <a style="padding-left:5px;" href="/../../sso/resources/miniorange_sp_cert.cer" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
+                            <br/>
+                            <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
+                                Provide this certificate to your Identity Provider for encryption or signing.
+                            </div>
+                        </div>
+
+                        <div class="tile-footer form-group">
+                            <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();">Save</button>
+                            <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
+                        </div>
+
+            </form>
+            </div>
+        </div>
+
+    <!--   ATTRIBUTE MAPPING TAB-->
+        <div id="Attribute_Mapping" class="tabcontent"  >
+            <form id="attrs_form" method="post" action ="">
+                <input type="hidden" name="option" value="attribute_mapping">
+    <!--            <br>-->
+                <h3><strong>Attribute Mapping</strong> <span class="premiumMessage"> [Premium Feature ] </span></h3>
+                <hr>
+                <div class="tile">
+
+                <div class="form-group">
+                    <label for="saml_am_username"><strong>Username</strong><span class="premiumMessage"> * </span></label>
+                    <input class="form-control" disabled id="saml_am_username" name="saml_am_username" type="text" value = "NameID">
+                </div>
+
+                <div class="form-group">
+                    <label for="saml_am_email"><strong>Email</strong><span class="premiumMessage"> * </span></label>
+                    <input class="form-control"  disabled id="saml_am_email" name="saml_am_email" type="text" value="NameID">
+                </div>
+
+            <div disabled >
+
+                <div class="form-group">
+                    <label for="saml_am_fname"><b>First Name</b><span class="premiumMessage"> * </span></label>
+                    <input class="form-control" style="color: red" disabled id="saml_am_fname" name="saml_am_fname" type="text" >
+                </div>
+                <div class="form-group">
+                    <label for="saml_am_lname"><b>Last Name</b><span class="premiumMessage"> * </span></label>
+                    <input class="form-control" style="color: red" disabled id="saml_am_lname" name="saml_am_lname" type="text" >
+                </div>
+
+            </div>
+                </div>
+
+                <div class="form-inline">
+                </div>
+                <br/>
+                <button type="submit" disabled class="btn btn-primary" name="custom_attrs" id="custom_attrs" onClick="jQuery('#attrs_form').submit();">Save Attribute Mapping</button>
+                <!--</div>-->
+            </form>
+        </div>
+
+          <p id="saml_message"></p>
+
+    <!--   ACCOUNT TAB-->
+        <div id="Account" style="margin-left: 20px" class="tabcontent" >
+
+    <!--    IF USER NOT LOGGED IN -->
+            <f:if condition="{0: status} == {0: 'not_logged'}">
+                <form name="account" method="post" id="account_form">
+                <input type="hidden" name="option" value="mo_saml_verify_customer"/>
+
+                    <div id="toggle1" class="panel_toggle">
+                        <h3><strong>Register/Login with MiniOrange</strong></h3>
+                    </div>
+                    &nbsp;
+                    <h4 style=" color: #545454;"><strong>Why should I register?</strong></h4>
+
+                    <div style="background: aliceblue; padding: 10px 10px 10px 10px; border-radius: 10px; color: #545454;">
+                        You should register so that in case you need help, we can help you with step by step
+                        instructions. We support all known IdPs - ADFS, Okta, Salesforce, Shibboleth,
+                        SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2 etc.
+                        <b>You will also need a miniOrange account to upgrade to the premium version of this extension.</b>
+                        We do not store any information except the email that you will use to register with us.
+                    </div>
+
+                    <p id="att-map-tab-partial">If you already have a miniOrange account, submit your existing credentials.
+                        We will retrieve your existing account for you.</p>
+
+                    <hr>
+                    <div id="panel1" class="" style="height: 70%">
+                        <p><b>Please enter your miniOrange email and password.<br/> <a target="_blank" href="https://login.xecurify.com/moas/idp/resetpassword">Click
+                                here if you forgot your password?</a></b></p>
+
+                        <div class="col-lg-8 tile" style=" height: fit-content">
+
+                            <label color="#FF0000">Email:</label>
+                            <input class="form-control" type="email" name="email"
+                                   required placeholder="person@example.com"
+                                   value="
+                                    "/>
+                            <br>
+                            <label color="#FF0000">Password:</label>
+                            <input class="form-control" required type="password"
+                                   name="password" placeholder="Enter your password"
+                                   minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                   title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                            <br>
+
+                            <div>
+
+                                <label color="#FF0000">Confirm Password:</label>
+                                <input class="form-control" required type="password"
+                                           name="confirmPassword" placeholder="Confirm your password"
+                                           minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                           title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                            </div>
+                            <br>
+                            <button type="submit" class="btn btn-primary" name="submit" id="submit" onClick="jQuery('#account_form').submit();">Login</button>
+                        </div>
+                    </div>
+                </form>
+                </f:if>
+
+<!--    IF  USER LOGGED IN BUT NOT VERIFIED-->
+<!--            <f:if condition="{0: status} == {0: 'logged'}">-->
+<!--                <div id="toggle2" class="panel_toggle">-->
+<!--                    <h2><strong>License</strong></h2>-->
+<!--                </div>-->
+<!--                <hr>-->
+<!--                <div class="tile">-->
+<!--    &lt;!&ndash;    LICENSE VALIDATION&ndash;&gt;-->
+<!--                    <form name="license" method="post" id="license_form" action="" >-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="saml_license_key"><b><span style="color: #FF0000; ">*</span>Enter-->
+<!--                                your license key to activate the plugin:</b></label>-->
+<!--                            <input-->
+<!--                                class="form-control" required type="text"-->
+<!--                                style="margin-left: 40px; width: 300px;" name="saml_license_key"-->
+<!--                                id="saml_license_key"-->
+<!--                                placeholder="Enter your license key to activate the plugin" />-->
+<!--                        </div>-->
+
+<!--                        <ol>-->
+<!--                            <li>License key you have entered here is associated with this site-->
+<!--                                instance. In future, if you are re-installing the plugin or your-->
+<!--                                site for any reason, you should logout of your miniOrange account-->
+<!--                                from the plugin and then delete the plugin. So that you can-->
+<!--                                reuse the same license key.</li>-->
+<!--                            <br>-->
+<!--                            <li><b>This is not a developer's license.</b> Making any kind of-->
+<!--                                change to the plugin's code will delete all your configuration-->
+<!--                                and make the plugin unusable.</li>-->
+<!--                            <br>-->
+<!--                            <div class="animated-checkbox">-->
+<!--                                <label> <input type="checkbox" name="license_conditions"-->
+<!--                                               id="license_conditions" required> <span class="label-text"><strong>I-->
+<!--                                have read the above two conditions and I want to activate the-->
+<!--                                plugin.</strong></span>-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!--                        </ol>-->
+<!--                        <input type="submit"-->
+<!--                               name="submit"-->
+<!--                               value="Activate License"-->
+<!--                               class="btn btn-primary" onclick="jQuery('#license_form').submit();" />-->
+<!--                    </form>-->
+<!--                    &nbsp-->
+
+<!--    &lt;!&ndash;     CHANGE ACCOUNT &ndash;&gt;-->
+<!--                    <form name="change_account" method="post" id="change_account_form" action="">-->
+
+<!--                        <input type="hidden" name="option" value="logout">-->
+
+<!--                        <input type="submit"-->
+<!--                               name="submit"-->
+<!--                               value="Change Account"-->
+<!--                               class="btn btn-primary" onclick="jQuery('#change_account_form').submit();" />-->
+<!--                    </form>-->
+
+<!--                </div>-->
+
+<!--            </f:if>-->
+
+    <!--    IF  USER LOGGED AND VERIFIED-->
+            <f:if condition="{0: status} == {0: 'logged'}">
+                <div id="toggle3" class="panel_toggle">
+                    <h3 ><strong>Profile</strong></h3>
+                </div>
+                <hr>
+                <div class="tile">
+
+                    <!--    LICENSE VALIDATED-->
+                    <table class="profileTable" >
+                    <tr>
+                        <td><strong>Email : </strong></td>
+                        <td>{email}</td>
+                    </tr>
+                         &nbsp
+                    <tr>
+                        <td><strong>ID : </strong></td>
+                        <td>{key}</td>
+                    </tr>
+                        &nbsp
+                    <tr>
+                        <td><strong>Token : </strong></td>
+                        <td>{token}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Api Key : </strong></td>
+                        <td>{api_key}</td>
+                    </tr>
+                    </table>
+
+                    &nbsp
+
+                    <!--     CHANGE ACCOUNT -->
+                    <form name="log_out_form" id="log_out_form" method="post" action="">
+                        <input type="hidden" name="option" value="logout">
+
+                        <input type="submit"
+                               name="submit"
+                               value="Log out"
+                               class="btn btn-primary" onclick="jQuery('#log_out_form').submit();" />
+                    </form>
+
+                </div>
+
+            </f:if>
+
+        </div>
+
+
+    </div>
+
+<!-- Right Container - SUPPORT TAB-->
+    <div id="rightContainer">
+        <div id="Support" class="tabcontent" >
+            <h3><strong>Support</strong></h3>
+            <hr>
+            &nbsp;
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tile">
+                        <div class="row ">
+                            <div class="col-lg-10">
+                                <form method="post" action="">
+                                    <p><b>Need any help? Just send us a query and we will get back to you soon.</b></p>
+<!--                                    We can help you in configuring the connector with your Identity Provider. -->
+                                    <input type="hidden" name="option" value="mo_saml_contact_us_query_option"/>
+                                    &nbsp;
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="mo_saml_contact_us_email" placeholder="Enter your email" value="{email}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="form-control" type="tel" name="mo_saml_contact_us_phone" placeholder="Enter your phone number">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="6" name="mo_saml_contact_us_query" placeholder="Enter your query here"></textarea>
+                                    </div>
+                                    <div class="tile-footer">
+                                        <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function mo_saml_valid_query(f) {
+        !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(
+            /[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
+    }
+</script>
+
+<script>
+
+    $(document).ready(function() {
+        var session = document.getElementById('taby').value;
+        console.log("Session in start : in ready(): "+session);
+
+        // document.querySelectorAll('.typo3-messages').forEach(function(a){
+        //     a.remove();
+        // });
+
+        if (session == "Service_Provider")
+        {
+            openTab(event, 'Service_Provider');
+        }
+
+        if (session == "Identity_Provider"){
+            openTab(event, 'Identity_Provider');
+        }
+
+        if (session == "Support"){
+
+            openTab(event, 'Support');
+        }
+
+        if (session == "Attribute_Mapping")
+        {
+            openTab(event, 'Attribute_Mapping');
+        }
+
+        if(session == "" || session == "Account" || session===null)
+        {
+            // document.getElementById('Account').style.display = "block";
+            openTab(event, 'Account');
+            session = "Account";
+        }
+
+        if(document.getElementsByClassName("active").length === 0){
+            document.getElementById(session).className  += " active";
+        }
+        // evt.currentTarget.className += " active ";
+        console.log("Session in end : ".session);
+        document.getElementById(session).className  += " active";
+
+    });
+
+    function openTab(evt, cityName) {
+
+        console.log("inside openTab ".cityname);
+        document.getElementById("leftContainer").classList.add("showElement");
+        document.getElementById("leftContainer").classList.remove("hideElement");
+
+        let i, tabcontent, tablinks;
+        // document.getElementsByClassName("leftContainer").style.display="block";
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        if(cityName!=="Support"){
+            document.getElementById(cityName).style.display = "block";
+            document.getElementById("Support").style.display = "block";
+        }else{
+            document.getElementById(cityName).style.display = "block";
+            document.getElementById("leftContainer").classList.replace("showElement","hideElement");
+        }
+
+        evt.currentTarget.className += " active";
+
+    }
+
+    function removeFlashMessage(){
+
+        document.querySelectorAll('.typo3-messages').forEach(function(a){
+            a.remove();
+            console.log("remove typo3 messages.");
+        });
+    }
+
+</script>
+
+<script>
+
+    var getid = document.getElementsByName("attribute_name1");
+    function myFunction() {
+        getid.setAttribute("disabled", false);
+    }
+
+    $.ajax({
+        url: "BesamlController.php",
+        type : "POST",
+        data : $myjson,
+        crossDomain: true,
+        dataType : "json",
+        contentType : "application/json; charset=utf-8",
+        success: function(results){
+            console.log(results);
+        }
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+    "name": "miniorange/miniorange_saml",
+    "type": "typo3-cms-extension",
+    "description": "miniOrange SAML SP",
+    "authors": [
+        {
+            "name": "Miniorange",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "typo3/cms-core": "^8.7.1",
+        "ext-json": "*",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Miniorange\\MiniorangeSaml\\": "Classes",
+            "MiniOrange\\": "sso"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Miniorange\\MiniorangeSaml\\Tests\\": "Tests"
+        }
+    },
+    "replace": {
+        "miniorange_saml": "self.version",
+        "typo3-ter/miniorange_saml": "self.version"
+    }
+}
