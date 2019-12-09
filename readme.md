@@ -1,4 +1,4 @@
-This is a Typo3 plugin from miniOrange Inc. for single sign on using(sso) via SAML protocol. 
+This is a Typo3 plugin from miniOrange Inc. for Single-Sign-On(SSO) via SAML protocol. 
 
 This is continued work from previous plugin with different repo name "typo3-saml-sso". 
 This change in repository name is to match the naming standard of typo3. 
