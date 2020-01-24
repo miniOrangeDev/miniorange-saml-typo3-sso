@@ -21,7 +21,7 @@ call_user_func(
             'Miniorange.MiniorangeSaml',
             'Responsekey',
             [
-                'response' => 'check'
+                'Response' => 'check'
             ],
             // non-cacheable actions
             [

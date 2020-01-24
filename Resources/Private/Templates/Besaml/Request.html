@@ -221,16 +221,12 @@
     <div id="leftContainer">
 
     <!--   IDENTITY PROVIDER TAB-->
-        <div id="Identity_Provider" class="tabcontent"  >
-
-    <!--   IDENTITY PROVIDER SETTINGS    -->
-        <h3><strong>Identity Provider Settings</strong></h3>
-            <hr>
+     <div id="Identity_Provider" class="tabcontent"  >
+        <h3><strong>Identity Provider Settings</strong></h3>  <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>
+         <hr>
             <div class="tile" >
-                <form method="POST" action="" id="saml_form">
-
+                <form method="POST" action="" id="saml_form" >
                     <input type="hidden" name="option" value="save_connector_settings">
-
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b></label>
                                 <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf.idp_name}">
@@ -305,7 +301,7 @@
                             </div>
 
                             <label for="signing_info"><b>Signing</b></label>
-                    <p>Supports both Signed Assertion and Signed Response<i class="fa fa-question-circle" id="signing_info" style="padding-left:5px;"></i><br/></p>
+                            <p>Supports both Signed Assertion and Signed Response<i class="fa fa-question-circle" id="signing_info" style="padding-left:5px;"></i><br/></p>
 
                             <div class="form-group">
                                 <div style="display:none;" class="help_desc" id="signing_help_desc">
@@ -324,68 +320,68 @@
                     &nbsp
                     <div class="tile-footer">
                         <button class="btn btn-primary" type="button" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
-                        <a target="_blank" {log} style="text-decoration:none"><button onClick="window.open('{conf2.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
+                        <a  {log} style="text-decoration:none"><button onClick="window.open('{conf2.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
                     </div>
 
                 </form>
         </div>
         </div>
+
     <!--   SERVICE PROVIDER TAB -->
         <div id="Service_Provider"  class="tabcontent"  >
-
-            <h3><strong>Service Provider Settings</strong></h3>
+            <h3><strong>Service Provider Settings</strong></h3> <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>
             <hr>
             <div class="tile">
-            <form action="" method="post" id="sp_settings">
+            <form action="" method="post" id="sp_settings"  >
 
-                        <input type="hidden" name="option" value="save_sp_settings"/>
-                    <!--<div style="width: 40%; display: inline-block">-->
-                        <div class="form-group">
-                            <label for="fesaml"><b> URL with fesaml</b></label>
-                               <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf2.fesaml}"
-                            >
-                        </div>
+                <input type="hidden" name="option" value="save_sp_settings"/>
+                <!--<div style="width: 40%; display: inline-block">-->
+                <div class="form-group">
+                    <label for="fesaml"><b> URL with fesaml</b></label>
+                       <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf2.fesaml}"
+                    >
+                </div>
 
-                        <div class="form-group">
-                            <label for="response"><b>URL with response</b></label>
-                            <input class="form-control" {log} id="response" name="response" type="text" value="{conf2.response}" >
-                        </div>
+                <div class="form-group">
+                    <label for="response"><b>URL with response</b></label>
+                    <input class="form-control" {log} id="response" name="response" type="text" value="{conf2.response}" >
+                </div>
 
-                        <div class="form-group">
-                            <label for="site_base_url"><b> Base URL</b></label>
-                            <input class="form-control" {log} id="site_base_url"
-                                   name="site_base_url" type="text" value="{conf2.site_base_url}" >
-                        </div>
+                <div class="form-group">
+                    <label for="site_base_url"><b> Base URL</b></label>
+                    <input class="form-control" {log} id="site_base_url"
+                           name="site_base_url" type="text" value="{conf2.site_base_url}" >
+                </div>
 
-                        <div class="form-group">
-                            <label for="acs_url"><b>ACS URL</b></label>
-                            <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf2.acs_url}" >
-                        </div>
+                <div class="form-group">
+                    <label for="acs_url"><b>ACS URL</b></label>
+                    <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf2.acs_url}" >
+                </div>
 
-                        <div class="form-group" >
-                            <label for="sp_entity_id"><b>SP Entity ID</b></label>
-                            <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf2.sp_entity_id}"
-                            >
-                        </div>
+                <div class="form-group" >
+                    <label for="sp_entity_id"><b>SP Entity ID</b></label>
+                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf2.sp_entity_id}"
+                    >
+                </div>
 
-                        <div class="form-group">
-                            <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
-                            <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf2.slo_url}"  >
-                        </div>
+                <div class="form-group">
+                    <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
+                    <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf2.slo_url}"  >
+                </div>
 
-                        <div class="form-group" style="margin:20px 0">
-                            <label><b>  SP Certificate:</b></label>
-                            <a style="padding-left:5px;" href="/../../sso/resources/miniorange_sp_cert.cer" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
-                            <br/>
-                            <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
-                                Provide this certificate to your Identity Provider for encryption or signing.
-                            </div>
-                        </div>
+                <div class="form-group" style="margin:20px 0">
+                    <label><b>  SP Certificate:</b></label>
+                    <a style="padding-left:5px;" target="_blank" href="{extPath}sso/resources/miniorange_sp_cert.cer" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
+                    <br/>
+                    <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
+                        Provide this certificate to your Identity Provider for encryption or signing.
+                    </div>
+                </div>
 
-                        <div class="tile-footer form-group">
-                            <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();">Save</button>
-                            <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
-                        </div>
+                <div class="tile-footer form-group">
+                    <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
+                    <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
+                </div>
 
             </form>
             </div>
@@ -443,7 +439,7 @@
                 <input type="hidden" name="option" value="mo_saml_verify_customer"/>
 
                     <div id="toggle1" class="panel_toggle">
-                        <h3><strong>Register/Login with MiniOrange</strong></h3>
+                        <h3><strong>Register/Login with Miniorange</strong></h3>
                     </div>
                     &nbsp;
                     <h4 style=" color: #545454;"><strong>Why should I register?</strong></h4>
@@ -463,6 +459,10 @@
                     <div id="panel1" class="" style="height: 70%">
                         <p><b>Please enter your miniOrange email and password.<br/> <a target="_blank" href="https://login.xecurify.com/moas/idp/resetpassword">Click
                                 here if you forgot your password?</a></b></p>
+                        <div>
+                        <input type="checkbox" id="registered" name="registered" value="isChecked" onclick="ifUserRegistered()"/> Already Registered<br>
+                        <br>
+                        </div>
 
                         <div class="col-lg-8 tile" style=" height: fit-content">
 
@@ -479,82 +479,35 @@
                                    title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
                             <br>
 
-                            <div>
+                            <div id="confirmPasswordDiv">
 
                                 <label color="#FF0000">Confirm Password:</label>
-                                <input class="form-control" required type="password"
+                                <input class="form-control" type="password"
                                            name="confirmPassword" placeholder="Confirm your password"
                                            minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
                                            title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
                             </div>
                             <br>
-                            <button type="submit" class="btn btn-primary" name="submit" id="submit" onClick="jQuery('#account_form').submit();">Login</button>
+
+                            <button type="submit" class="btn btn-primary" value="submit" onClick="jQuery('#account_form').submit();"> Login </button>
+                            <br>
+                            &nbsp;
+                            &nbsp;
                         </div>
+                        <br>
                     </div>
+                    <br>
+                    &nbsp;
+
+                    &nbsp;
                 </form>
+                <br>
+                <br>
                 </f:if>
 
-<!--    IF  USER LOGGED IN BUT NOT VERIFIED-->
-<!--            <f:if condition="{0: status} == {0: 'logged'}">-->
-<!--                <div id="toggle2" class="panel_toggle">-->
-<!--                    <h2><strong>License</strong></h2>-->
-<!--                </div>-->
-<!--                <hr>-->
-<!--                <div class="tile">-->
-<!--    &lt;!&ndash;    LICENSE VALIDATION&ndash;&gt;-->
-<!--                    <form name="license" method="post" id="license_form" action="" >-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="saml_license_key"><b><span style="color: #FF0000; ">*</span>Enter-->
-<!--                                your license key to activate the plugin:</b></label>-->
-<!--                            <input-->
-<!--                                class="form-control" required type="text"-->
-<!--                                style="margin-left: 40px; width: 300px;" name="saml_license_key"-->
-<!--                                id="saml_license_key"-->
-<!--                                placeholder="Enter your license key to activate the plugin" />-->
-<!--                        </div>-->
+            <br>
 
-<!--                        <ol>-->
-<!--                            <li>License key you have entered here is associated with this site-->
-<!--                                instance. In future, if you are re-installing the plugin or your-->
-<!--                                site for any reason, you should logout of your miniOrange account-->
-<!--                                from the plugin and then delete the plugin. So that you can-->
-<!--                                reuse the same license key.</li>-->
-<!--                            <br>-->
-<!--                            <li><b>This is not a developer's license.</b> Making any kind of-->
-<!--                                change to the plugin's code will delete all your configuration-->
-<!--                                and make the plugin unusable.</li>-->
-<!--                            <br>-->
-<!--                            <div class="animated-checkbox">-->
-<!--                                <label> <input type="checkbox" name="license_conditions"-->
-<!--                                               id="license_conditions" required> <span class="label-text"><strong>I-->
-<!--                                have read the above two conditions and I want to activate the-->
-<!--                                plugin.</strong></span>-->
-<!--                                </label>-->
-<!--                            </div>-->
-<!--                        </ol>-->
-<!--                        <input type="submit"-->
-<!--                               name="submit"-->
-<!--                               value="Activate License"-->
-<!--                               class="btn btn-primary" onclick="jQuery('#license_form').submit();" />-->
-<!--                    </form>-->
-<!--                    &nbsp-->
-
-<!--    &lt;!&ndash;     CHANGE ACCOUNT &ndash;&gt;-->
-<!--                    <form name="change_account" method="post" id="change_account_form" action="">-->
-
-<!--                        <input type="hidden" name="option" value="logout">-->
-
-<!--                        <input type="submit"-->
-<!--                               name="submit"-->
-<!--                               value="Change Account"-->
-<!--                               class="btn btn-primary" onclick="jQuery('#change_account_form').submit();" />-->
-<!--                    </form>-->
-
-<!--                </div>-->
-
-<!--            </f:if>-->
-
-    <!--    IF  USER LOGGED AND VERIFIED-->
+    <!--    IF  USER LOGGED-->
             <f:if condition="{0: status} == {0: 'logged'}">
                 <div id="toggle3" class="panel_toggle">
                     <h3 ><strong>Profile</strong></h3>
@@ -562,7 +515,6 @@
                 <hr>
                 <div class="tile">
 
-                    <!--    LICENSE VALIDATED-->
                     <table class="profileTable" >
                     <tr>
                         <td><strong>Email : </strong></td>
@@ -736,11 +688,51 @@
         });
     }
 
+    function ifUserRegistered(){
+        if (document.getElementById('registered').checked)
+        {
+            document.getElementById('confirmPasswordDiv').style.display = "none";
+        } else {
+            document.getElementById('confirmPasswordDiv').style.display = "block";
+        }
+    }
+
+    // function onIdpSettingsSubmit( Event ){
+    //     console.log("saml form submitted");
+    //     if( (document.getElementById("idp_name").value === "") || (document.getElementById("x509_certificate").value !== "")
+    //         || (document.getElementById("idp_entity_id").value !== "") || (document.getElementById("saml_login_url").value !== "") ){
+    //
+    //         Event.preventDefault();
+    //         window.alert("Please fill all the fields.");
+    //     }
+    // }
+
+    // $("#saml_form").submit(function(e){
+    //     console.log("saml form submitted");
+    //     if( ($("#idp_name").val() === "") || ($("#x509_certificate").val() !== "")
+    //         || ($("#idp_entity_id").val() !== "") || ($("#saml_login_url").val() !== "") ){
+    //         e.preventDefault();
+    //         window.alert("Please fill all the fields.");
+    //     }
+    // })
+
+    // function onSpSettingsSubmit(Event){
+    //     console.log("sp settings form submitted");
+    //     if( (document.getElementById("fesaml").value === "") || (document.getElementById("response").value !== "")
+    //         || (document.getElementById("sp_entity_id").value !== "") || (document.getElementById("acs_url").value !== "")
+    //         || (document.getElementById("site_base_url").value !== "")){
+    //
+    //         Event.preventDefault();
+    //         window.alert("Please fill all the fields.");
+    //     }
+    // }
+
 </script>
 
 <script>
 
     var getid = document.getElementsByName("attribute_name1");
+
     function myFunction() {
         getid.setAttribute("disabled", false);
     }

@@ -1,22 +1,23 @@
 <?php
 
-    namespace MiniOrange\Helper;
+    namespace Miniorange\Helper;
 
     use Exception;
-    use MiniOrange\Helper\Exception\NotRegisteredException;
-		use PDO;
-		use TYPO3\CMS\Core\Database\ConnectionPool;
-		use TYPO3\CMS\Core\Messaging\FlashMessage;
-		use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
-		use TYPO3\CMS\Core\Messaging\FlashMessageService;
-		use TYPO3\CMS\Core\Messaging\Renderer\ListRenderer;
-		use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-		use TYPO3\CMS\Core\Utility\GeneralUtility;
+    use Miniorange\Helper\Exception\NotRegisteredException;
+    use PDO;
+    use TYPO3\CMS\Core\Database\ConnectionPool;
+    use TYPO3\CMS\Core\Messaging\FlashMessage;
+    use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
+    use TYPO3\CMS\Core\Messaging\FlashMessageService;
+    use TYPO3\CMS\Core\Messaging\Renderer\ListRenderer;
+    use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+    use TYPO3\CMS\Core\Utility\GeneralUtility;
+    use TYPO3\CMS\Core\Utility\PathUtility;
 
-		const SEP = DIRECTORY_SEPARATOR;
+    const SEP = DIRECTORY_SEPARATOR;
 
 
-		class Utilities
+	class Utilities
     {
 
 			/**
@@ -25,23 +26,11 @@
 			 */
 			public static function getResourceDir()
 			{
-
-
-					error_log("<br>in getResourceDir : ");
-
 					$baseUrl = self::getBaseUrl();
-					error_log("baseUrl : ".$baseUrl);
-					error_log("Path_site : ".PATH_site);
-					error_log("path_thisScript : ".PATH_thisScript);
-					error_log("PATH_typo3 : ".PATH_typo3);
-					error_log("PATH_typo3conf : ".PATH_typo3conf);
-					error_log("extAbsolutePath: ".self::getExtensionAbsolutePath());
-					error_log("extRelativePath: ".self::getExtensionRelativePath());
-
-					error_log("DirectorySeparator : ".SEP. "<br><br>");
-
-
-					$resFolder = self::getExtensionAbsolutePath().SEP.'sso'.SEP.'resource'.SEP;
+//					error_log("baseUrl : ".$baseUrl);
+					$resFolder = self::getExtensionAbsolutePath().'sso'.SEP.'resources'.SEP;
+//                  $resFolder = self::getExtensionRelativePath().'sso'.SEP.'resources'.SEP;
+//					error_log("resDir mo_saml : ".$resFolder);
 					return $resFolder;
 			}
 
@@ -50,7 +39,10 @@
 			}
 
 			public static function getExtensionRelativePath(){
-				return ExtensionManagementUtility::extRelPath('miniorange_saml');
+
+                $extRelativePath= PathUtility::getAbsoluteWebPath(self::getExtensionAbsolutePath());
+                error_log("AbsoluteWebPath : ".$extRelativePath);
+                return $extRelativePath;
 			}
 
 			/**
@@ -125,12 +117,11 @@
 			 */
 			public static function getImageUrl($imgFileName)
 			{
-					$baseUrl = self::getBaseUrl();
-					error_log("baseUrl : ".$baseUrl);
-					$resDir  = self::getResourceDir();
-					error_log("resDir : ".$resDir);
-
-					return self::getResourceDir().SEP.'images'.SEP.$imgFileName;
+					$imageDir  = self::getResourceDir().SEP.'images'.SEP;
+					error_log("resDir : ".$imageDir);
+                    $iconDir = self::getExtensionRelativePath().SEP.'Resources'.SEP.'Public'.SEP.'Icons'.SEP;
+                    error_log("iconDir : ".$iconDir);
+					return $iconDir.$imgFileName;
 			}
 
 			/**
@@ -249,10 +240,10 @@
 
 			public static function showErrorFlashMessage($message, $header="ERROR"){
 				$message = GeneralUtility::makeInstance(FlashMessage::class,$message,$header,FlashMessage::ERROR);
-					$flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-//					$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
-//					$messageQueue->addMessage($message);
-//				  $messageQueue->renderFlashMessages();
+                $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
+//				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
+//				$messageQueue->addMessage($message);
+//	            $messageQueue->renderFlashMessages();
 				$out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
 				echo $out;
 			}
@@ -263,9 +254,8 @@
 //				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
 //				$messageQueue->addMessage($message);
 //				$messageQueue->renderFlashMessages();
-
-					$out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
-					echo $out;
+                $out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
+                echo $out;
 			}
 
 			public static function clearFlashMessages(){

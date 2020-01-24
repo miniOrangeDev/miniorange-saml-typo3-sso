@@ -1,38 +1,28 @@
 <?php
 namespace Miniorange\MiniorangeSaml\Controller;
 
-use MiniOrange\Classes\SamlResponse;
-use MiniOrange\Classes\Actions;
-use MiniOrange\Classes\Actions\ProcessResponseAction;
-use MiniOrange\Classes\Actions\ProcessUserAction;
-use MiniOrange\Classes\Actions\ReadResponseAction;
-use MiniOrange\Classes\Actions\TestResultActions;
+use Exception;
+use Miniorange\classes\actions\ProcessResponseAction;
+use Miniorange\classes\actions\ReadResponseAction;
+use Miniorange\classes\actions\TestResultActions;
+use Miniorange\helper\Exception\InvalidAudienceException;
+use Miniorange\helper\Exception\InvalidDestinationException;
+use Miniorange\helper\Exception\InvalidIssuerException;
+use Miniorange\helper\Exception\InvalidSamlStatusCodeException;
+use Miniorange\helper\Exception\InvalidSignatureInResponseException;
 use ReflectionClass;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use TYPO3\CMS\Felogin\Controller\FrontendLoginController;
-use MiniOrange\Helper\Lib\XMLSecLibs;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityDSig;
-use MiniOrange\Helper\Utilities;
-use TYPO3\CMS\Core\Database\Connection;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityDSig;
 use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
-use TYPO3\CMS\Extbase\Domain\Model\FrontendUserGroup;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Persistence\Generic\Session;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
-use TYPO3\CMS\Extbase\Property\TypeConverter\ObjectConverter;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
-use TYPO3\CMS\Frontend\Authentication\FrontenduserAuthentication;
-use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
-use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserGroupRepository;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
 
 /***
  *
- * This file is part of the "etitle" Extension for TYPO3 CMS.
+ * This file is part of the "miniorange_saml" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
@@ -44,7 +34,7 @@ use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
 /**
  * ResponseController
  */
-class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class ResponseController extends ActionController
 {
     /**
      * responseRepository
@@ -88,11 +78,11 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
 
     private $ses_id = null;
 
+    private $x509_certificate;
+
     /**
-     * @var \TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository
-     * @var ProductRepository
      * @inject
-     * @param TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository $frontendUserRepository
+     * @param FrontendUserRepository $frontendUserRepository
      */
     public function injectFrontendUserRepository(FrontendUserRepository $frontendUserRepository)
     {
@@ -101,8 +91,14 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
 
     /**
      * action check
-     * 
+     *
      * @return void
+     * @throws InvalidAudienceException
+     * @throws InvalidDestinationException
+     * @throws InvalidIssuerException
+     * @throws InvalidSamlStatusCodeException
+     * @throws InvalidSignatureInResponseException
+     * @throws \ReflectionException
      */
     public function checkAction()
     {
@@ -153,17 +149,7 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
                     $user = $this->create($username);
                     $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
                 }
-//                               $session = $GLOBALS['TSFE']->fe_user->user['ses_id'];
-//                                setcookie('fe_typo_user', $session, NULL, "/typo1");
-//                                $GLOBALS['TSFE']->fe_user->checkPid = 0;
-//                                $GLOBALS['TSFE']->fe_user->dontSetCookie = FALSE;
-//                                $GLOBALS['TSFE']->fe_user->user = $GLOBALS['TSFE']->fe_user->fetchUserSession();
-//                                $GLOBALS['TSFE']->loginUser = 1;
-//                                $GLOBALS['TSFE']->fe_user->start();
-//                                $GLOBALS['TSFE']->fe_user->createUserSession($user);
-//                                $GLOBALS['TSFE']->initUserGroups();
-//                                $GLOBALS['TSFE']->fe_user->loginSessionStarted = TRUE;
-//                                $GLOBALS['TSFE']->storeSessionData();
+
                 $GLOBALS['TSFE']->fe_user->forceSetCookie = TRUE;
                 $GLOBALS['TSFE']->fe_user->loginUser = 1;
                 $GLOBALS['TSFE']->fe_user->start();
@@ -221,9 +207,10 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
 
     /**
      * @param $ses_id
-     * @param $ssoemail
+     *
+     * @throws Exception
      */
-    public function logout($ses_id, $ssoemail)
+    public function logout($ses_id)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $logout_url = $queryBuilder->select('saml_logout_url')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
@@ -278,10 +265,11 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
 
     /**
      * @param $nameId
-     * @param $sessionIndex
+     * @param string $sessionIndex
      * @param $issuer
      * @param $destination
-     * @param $slo_binding_type
+     * @param string $slo_binding_type
+     * @return string
      */
     public function createLogoutRequest($nameId, $sessionIndex = '', $issuer, $destination, $slo_binding_type = 'HttpRedirect')
     {
@@ -302,7 +290,9 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
     }
 
     /**
-     * @param $instant
+     *
+     * @param null $instant
+     * @return false|string
      */
     function generateTimestamp($instant = NULL)
     {
@@ -318,7 +308,9 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
     }
 
     /**
+     *
      * @param $bytes
+     * @return string
      */
     function stringToHex($bytes)
     {
@@ -331,37 +323,24 @@ class ResponseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControl
 
     /**
      * @param $length
-     * @param $fallback
+     * @return false|string
      */
-    function generateRandomBytes($length, $fallback = TRUE)
+    function generateRandomBytes($length)
     {
         return openssl_random_pseudo_bytes($length);
     }
 
-	/**
-	 * @param $username
-	 * @return FrontendUser
-	 */
+    /**
+     *
+     * @param $username
+     * @return FrontendUser
+     */
     public function create($username)
     {
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-//
-//        //$newUser = $this->objectManager->get('Fhk\\Feusersplus\\Domain\\Repository\\UserRepository');
-//
-//        $userModel = $this->objectManager->get('Fhk\\Feusersplus\\Domain\\Model\\User');
-          $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository');
 
-//        $userModel = new \Typo3\CMS\Extbase\Domain\Model\FrontendUser();
-//
-//        $userModel->setUsername("sdfdsfdsfs");
-//        $userModel->setEmail($this->ssoemail);
-//        $gender = 0;
-//        $password = rand(99999999,9999999999999);
-//        $userModel->setPassword($password);
-//        $userModel->setPid(3);
-//
-//
-//        $this->FrontendUserRepository->add($userModel);
+        $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository');
+
         $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $frontendUser = new FrontendUser();
         $frontendUser->setUsername($username);

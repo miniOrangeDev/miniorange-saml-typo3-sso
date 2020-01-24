@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniOrange\Helper;
+namespace Miniorange\helper;
 
 /**
  * This class lists down all of our messages to be shown to the admin or

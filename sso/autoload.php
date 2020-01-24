@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniOrange ;
+namespace Miniorange ;
 
 /** Some common constant variables to be used throughout the plugin */
 define('MSSP_VERSION', '1.0.0');
@@ -72,5 +72,5 @@ class SplClassLoader
     }
 }
 
-$idpClassLoader = new SplClassLoader('MiniOrange', realpath(__DIR__ . DIRECTORY_SEPARATOR . ".."));
+$idpClassLoader = new SplClassLoader('Miniorange', realpath(__DIR__ . DIRECTORY_SEPARATOR . ".."));
 $idpClassLoader->register();

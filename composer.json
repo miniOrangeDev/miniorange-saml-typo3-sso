@@ -1,22 +1,21 @@
 {
-    "name": "miniorange/miniorange_saml",
+    "name": "miniorange/miniorange-saml",
     "type": "typo3-cms-extension",
-    "description": "miniOrange SAML SP",
+    "description": "Miniorange Saml (SSO) provides SSO/Login to your TYPO3 site with any SAML compliant Identity Provider (ACTIVE SUPPORT for IdP config). It allows users residing at SAML 2.0 capable Identity Provider to login to your TYPO3 website. We support all known IdPs – Google Apps, ADFS, Azure AD, Okta, Salesforce, Shibboleth, SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2, NetIQ etc.",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Miniorange",
-            "role": "Developer"
+            "role": "developer"
         }
     ],
     "require": {
-        "typo3/cms-core": "^8.7.1",
-        "ext-json": "*",
-        "ext-curl": "*"
+        "typo3/cms-core": "^9.5.13"
     },
     "autoload": {
         "psr-4": {
             "Miniorange\\MiniorangeSaml\\": "Classes",
-            "MiniOrange\\": "sso"
+            "Miniorange\\": "sso"
         }
     },
     "autoload-dev": {
@@ -25,7 +24,7 @@
         }
     },
     "replace": {
-        "miniorange_saml": "self.version",
+        "miniorange/miniorange_saml": "self.version",
         "typo3-ter/miniorange_saml": "self.version"
     }
 }

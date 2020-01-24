@@ -1,8 +1,8 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
-use MiniOrange\Helper\PluginSettings;
+use Miniorange\helper\PluginSettings;
 
 class ProcessUserAction
 {

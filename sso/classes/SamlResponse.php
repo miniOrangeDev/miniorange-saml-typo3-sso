@@ -1,10 +1,10 @@
 <?php
 
-namespace MiniOrange\Classes;
+namespace Miniorange\classes;
 
 use DOMDocument;
 use DOMElement;
-use MiniOrange\Helper\SAMLUtilities;
+use Miniorange\helper\SAMLUtilities;
 
 /**
  * This class takes DomElement XML as an input and converts it to

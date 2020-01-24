@@ -1,5 +1,5 @@
 <?php
-namespace MiniOrange\Helper\Lib\XMLSecLibs;
+namespace Miniorange\helper\lib\XMLSecLibs;
 
 use DOMDocument;
 use DOMNode;

@@ -1,10 +1,10 @@
 <?php
 
-namespace MiniOrange\Classes;
+namespace Miniorange\classes;
 
-use MiniOrange\Helper\Constants;
-use MiniOrange\Helper\PluginSettings;
-use MiniOrange\Helper\SAMLUtilities;
+use Miniorange\helper\Constants;
+use Miniorange\helper\PluginSettings;
+use Miniorange\helper\SAMLUtilities;
 
 /**
  * This class is used to generate our AuthnRequest object.

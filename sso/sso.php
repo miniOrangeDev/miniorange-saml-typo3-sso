@@ -1,17 +1,17 @@
 <?php
 
-namespace MiniOrange;
+namespace Miniorange;
 
 include_once 'autoload.php';
 
-use MiniOrange\Classes\Actions\ProcessResponseAction;
-use MiniOrange\Classes\Actions\ProcessUserAction;
-use MiniOrange\Classes\Actions\ReadResponseAction;
-use MiniOrange\Classes\Actions\TestResultActions;
-use MiniOrange\Helper\Constants;
-use MiniOrange\Helper\Messages;
-use MiniOrange\Helper\Utilities;
-use MiniOrange\Helper\PluginSettings;
+use Miniorange\classes\actions\ProcessResponseAction;
+use Miniorange\classes\actions\ProcessUserAction;
+use Miniorange\classes\actions\ReadResponseAction;
+use Miniorange\classes\actions\TestResultActions;
+use Miniorange\helper\Constants;
+use Miniorange\helper\Messages;
+use Miniorange\helper\Utilities;
+use Miniorange\helper\PluginSettings;
 
 final class SSO
 {

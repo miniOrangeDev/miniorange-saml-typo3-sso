@@ -1,26 +1,27 @@
 <?php
 namespace Miniorange\MiniorangeSaml\Controller;
 
-use MiniOrange\Classes\Actions\ProcessResponseAction;
-use MiniOrange\Classes\Actions\ProcessUserAction;
-use MiniOrange\Classes\Actions\ReadResponseAction;
-use MiniOrange\Classes\Actions\TestResultActions;
-use MiniOrange\Helper\Constants;
-use MiniOrange\Helper\Messages;
-use MiniOrange\Helper\PluginSettings;
+use Miniorange\classes\actions\ProcessResponseAction;
+use Miniorange\classes\actions\ProcessUserAction;
+use Miniorange\classes\actions\ReadResponseAction;
+use Miniorange\classes\actions\TestResultActions;
+use Miniorange\helper\Constants;
+use Miniorange\helper\Messages;
+use Miniorange\helper\PluginSettings;
 use Miniorange\MiniorangeSaml\Domain\Model\Fesaml;
-use MiniOrange\SSO;
+use Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository;
+use Miniorange\SSO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use MiniOrange\Helper\SAMLUtilities;
+use Miniorange\helper\SAMLUtilities;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
-use MiniOrange\Classes\Actions;
-use MiniOrange\Classes;
-use MiniOrange\Classes\SamlResponse;
-use MiniOrange\Helper;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use MiniOrange\Helper\Utilities;
+use Miniorange\classes\actions;
+use Miniorange\classes;
+use Miniorange\classes\SamlResponse;
+use Miniorange\helper;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\Utilities;
 use TYPO3\CMS\Core\Database\Connection;
 /***
  *
@@ -40,7 +41,7 @@ class FesamlController extends ActionController
 {
     /**
      * fesamlRepository
-     * 
+     *
      * @var \Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository
      * @inject
      */
@@ -55,6 +56,8 @@ class FesamlController extends ActionController
     protected $force_authn = null;
 
     protected $saml_login_url = null;
+
+    protected $destination = null;
 
     private $idp_entity_id = null;
 
@@ -86,8 +89,8 @@ class FesamlController extends ActionController
 
     /**
      * action show
-     * 
-     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
+     *
+     * @param Fesaml $fesaml
      * @return void
      */
     public function showAction(Fesaml $fesaml)
@@ -98,9 +101,10 @@ class FesamlController extends ActionController
 
     /**
      * action print
-     * 
+     *
      * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
      * @return void
+     * @throws \Exception
      */
     public function printAction()
     {
@@ -110,35 +114,45 @@ class FesamlController extends ActionController
 
         $this->controlAction();
 
-        error_log("in FesamlController : relayState = ".$_REQUEST['RelayState']);
+//        error_log("in FesamlController : relayState = ".$_REQUEST['RelayState']);
+//        error_log("FesamlController : idpname : ".$this->idp_name);
+//        error_log("FesamlController : idp entity id : ".$this->idp_entity_id);
+//        error_log("FesamlController : acs url : ".$this->acs_url);
+//        error_log("FesamlController : saml login url : ".$this->saml_login_url);
+//        error_log("FesamlController : signed assertion : ".$this->signedAssertion);
+//        error_log("FesamlController : force-authn : ".$this->force_authn);
+//        error_log("FesamlController : x509-certificate : ".$this->x509_certificate);
+//        error_log("FesamlController : sp-entity-id : ".$this->sp_entity_id);
+
         $this->bindingType = $this->fetchBindingType();
+        error_log("FesamlController : binding type : ".$this->bindingType);
 
         $samlRequest = $this->build();
 
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
+        error_log("relaystate :  ".$relayState);
 
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
 
-        if (empty($this->bindingType) || $this->bindingType == Constants::HTTP_REDIRECT) {
+        if (empty($this->bindingType) || ($this->bindingType == Constants::HTTP_REDIRECT)) {
             $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
         } else {
             $this->sendHTTPPostRequest($samlRequest, $relayState, $this->saml_login_url);
         }
 
-			error_log("in FesamlController : bindingType = ".$this->bindingType);
-
-		}
+    }
 
     /**
      * @param $request
+     * @return int
      */
     public function findSubstring($request)
     {
         if (strpos($request["id"], 'RelayState') !== false) {
             return 1;
-        } else {
+        }else{
             return 0;
         }
     }
@@ -164,10 +178,10 @@ class FesamlController extends ActionController
         $this->force_authn = $queryBuilder->select('force_authn')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
         $this->x509_certificate = $queryBuilder->select('x509_certificate')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
         $this->idp_entity_id = $queryBuilder->select('idp_entity_id')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $signedAssertion = true;
-        $signedResponse = true;
+        $this->signedAssertion = true;
+        $this->signedResponse = true;
+        $this->destination = $this->saml_login_url;
     }
-
 
     public function build()
     {
@@ -212,6 +226,7 @@ class FesamlController extends ActionController
      * @param $samlRequest
      * @param $sendRelayState
      * @param $idpUrl
+     * @throws \Exception
      */
     public function sendHTTPRedirectRequest($samlRequest, $sendRelayState, $idpUrl)
     {
@@ -251,6 +266,7 @@ class FesamlController extends ActionController
 
     /**
      * @param $instant
+     * @return false|string
      */
     public function generateTimestamp($instant = NULL)
     {
@@ -268,6 +284,7 @@ class FesamlController extends ActionController
 
     /**
      * @param $bytes
+     * @return string
      */
     public static function stringToHex($bytes)
     {
@@ -281,6 +298,7 @@ class FesamlController extends ActionController
     /**
      * @param $length
      * @param $fallback
+     * @return string
      */
     public function generateRandomBytes($length, $fallback = TRUE)
     {

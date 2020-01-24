@@ -1,8 +1,8 @@
 <?php
 
-namespace  MiniOrange\Helper;
+namespace  Miniorange\helper;
 
-use MiniOrange\Helper\Utilities;
+use Miniorange\helper\Utilities;
 /**
  * This class contains some constant variables to be used
  * across the plugin. All the SP settings are done here.

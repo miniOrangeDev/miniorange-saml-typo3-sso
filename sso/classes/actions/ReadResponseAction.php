@@ -1,9 +1,9 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
-use MiniOrange\Classes\SamlResponse;
-use MiniOrange\Helper\Utilities;
+use Miniorange\classes\SamlResponse;
+use Miniorange\helper\Utilities;
 
 /**
  * Handles reading of SAML Responses from the IDP. Read the SAML Response

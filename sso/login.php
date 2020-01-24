@@ -1,9 +1,9 @@
 <?php
 
-namespace MiniOrange;
+namespace Miniorange;
 
-use MiniOrange\Classes\Actions\SendAuthnRequest;
-use MiniOrange\Helper\Utilities;
+use Miniorange\classes\actions\SendAuthnRequest;
+use Miniorange\helper\Utilities;
 
 include_once 'autoload.php';
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
 
-use MiniOrange\Classes\AuthnRequest;
-use MiniOrange\Helper\Constants;
-use MiniOrange\Helper\Exception\NoIdentityProviderConfiguredException;
-use MiniOrange\Helper\PluginSettings;
-use MiniOrange\Helper\Utilities;
+use Miniorange\classes\AuthnRequest;
+use Miniorange\helper\Constants;
+use Miniorange\helper\Exception\NoIdentityProviderConfiguredException;
+use Miniorange\helper\PluginSettings;
+use Miniorange\helper\Utilities;
 
 class SendAuthnRequest
 {

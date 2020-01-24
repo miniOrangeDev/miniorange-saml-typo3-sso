@@ -1,15 +1,15 @@
 <?php
-namespace MiniOrange\Classes;
+namespace Miniorange\classes;
 
 //if(!class_exists("DB")){
 //    require_once dirname(__FILE__) . '/helper/DB.php';
 //}
-use MiniOrange\Helper\Constants;
+use Miniorange\helper\Constants;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Messaging\Renderer\ListRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-USE MiniOrange\Helper\Utilities;
+USE Miniorange\helper\Utilities;
 
 class CustomerSaml{
 
@@ -63,10 +63,10 @@ class CustomerSaml{
         {
             $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 
-					  error_log(" TYPO3 SUPPORT QUERY : ");
+					error_log(" TYPO3 SUPPORT QUERY : ");
 
 				  	sendMail:
-            $url = 'https://login.xecurify.com/moas/api/notify/send';
+                         $url = 'https://login.xecurify.com/moas/api/notify/send';
 					  $ch = curl_init($url);
 
 				  	$subject = "TYPO3 miniOrange SAML SP Plugin Support Query";
@@ -86,7 +86,7 @@ class CustomerSaml{
             $timestampHeader = "Timestamp: " . number_format($currentTimeInMillis, 0, '', '');
             $authorizationHeader = "Authorization: " . $hashValue;
 
-					  $content = '<div >Hello, <br><br><b>Company :</b><a href="' . $_SERVER['SERVER_NAME'] . '" target="_blank" >' . $_SERVER['SERVER_NAME'] . '</a><br><br><b>Phone Number :</b>' . $phone . '<br><br><b>Email :<a href="mailto:' . $email . '" target="_blank">' . $email . '</a></b><br><br><b>Query: ' . $query . '</b></div>';
+			$content = '<div >Hello, <br><br><b>Company :</b><a href="' . $_SERVER['SERVER_NAME'] . '" target="_blank" >' . $_SERVER['SERVER_NAME'] . '</a><br><br><b>Phone Number :</b>' . $phone . '<br><br><b>Email :<a href="mailto:' . $email . '" target="_blank">' . $email . '</a></b><br><br><b>Query: ' . $query . '</b></div>';
 
             $support_email_id = 'info@xecurify.com';
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniOrange\Helper;
+namespace Miniorange\helper;
 
 class Constants
 {
