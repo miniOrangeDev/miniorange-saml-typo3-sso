@@ -1,11 +1,11 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
-use MiniOrange\Helper\Constants;
-use MiniOrange\Helper\Exception\SAMLResponseException;
-use MiniOrange\Helper\SAMLUtilities;
-use MiniOrange\Helper\Utilities;
+use Miniorange\helper\Constants;
+use Miniorange\helper\Exception\SAMLResponseException;
+use Miniorange\helper\SAMLUtilities;
+use Miniorange\helper\Utilities;
 
 /**
  * This action class shows the attributes coming in the SAML
@@ -21,16 +21,17 @@ class TestResultActions
     private $samlException;
     private $hasExceptionOccurred;
     private $nameId;
+    protected $resFolder;
 
     private $template = '<div style="font-family:Calibri;padding:0 3%%;">{{header}}{{commonbody}}{{footer}}</div>';
     private $successHeader  = ' <div style="color: #3c763d;background-color: #dff0d8; padding:2%%;margin-bottom:20px;text-align:center; 
                                     border:1px solid #AEDB9A; font-size:18pt;">TEST SUCCESSFUL
                                 </div>
-                                <div style="display:block;text-align:center;margin-bottom:4%%;"><img style="width:15%%;" src="typo3conf/ext/miniorange_saml/Resources/Public/Icons/right.png"></div>';
+                                <div style="display:block;text-align:center;margin-bottom:4%%;"><img style="width:15%%;" src="{{right}}"></div>';
 
     private $errorHeader    = ' <div style="color: #a94442;background-color: #f2dede;padding: 15px;margin-bottom: 20px;text-align:center;
                                     border:1px solid #E6B3B2;font-size:18pt;">TEST FAILED
-                                </div><div style="display:block;text-align:center;margin-bottom:4%%;"><img style="width:15%%;" src="typo3conf/ext/miniorange_saml/Resources/Public/Icons/wrong.png"></div>';
+                                </div><div style="display:block;text-align:center;margin-bottom:4%%;"><img style="width:15%%;" src="{{wrong}}"></div>';
 
     private $commonBody  = '<span style="font-size:14pt;"><b>Hello</b>, {{email}}</span><br/>
                                 <p style="font-weight:bold;font-size:14pt;margin-left:1%%;">ATTRIBUTES RECEIVED:</p>
@@ -88,6 +89,7 @@ class TestResultActions
         ob_clean();
 
         $this->processTemplateHeader();
+        $this->resFolder = Utilities::getExtensionRelativePath();
 
         if(!$this->hasExceptionOccurred)
         			$this->processTemplateContent();

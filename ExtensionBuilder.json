@@ -179,7 +179,7 @@
             },
             {
                 "actions": {
-                    "controllerActionCombinations": "response=>check",
+                    "controllerActionCombinations": "Response=>check",
                     "noncacheableActions": "",
                     "switchableActions": ""
                 },

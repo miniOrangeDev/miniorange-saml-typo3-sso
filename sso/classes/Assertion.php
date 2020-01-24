@@ -1,18 +1,18 @@
 <?php
 
-namespace MiniOrange\Classes;
+namespace Miniorange\classes;
 
 use DOMElement;
 use Exception;
 use DOMText;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use MiniOrange\Helper\SAMLUtilities;
-use MiniOrange\Helper\Utilities;
-use MiniOrange\Helper\Exception\InvalidSAMLVersionException;
-use MiniOrange\Helper\Exception\MissingIDException;
-use MiniOrange\Helper\Exception\MissingIssuerValueException;
-use MiniOrange\Helper\Exception\InvalidNumberOfNameIDsException;
-use MiniOrange\Helper\Exception\MissingNameIdException;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\SAMLUtilities;
+use Miniorange\helper\Utilities;
+use Miniorange\helper\Exception\InvalidSAMLVersionException;
+use Miniorange\helper\Exception\MissingIDException;
+use Miniorange\helper\Exception\MissingIssuerValueException;
+use Miniorange\helper\Exception\InvalidNumberOfNameIDsException;
+use Miniorange\helper\Exception\MissingNameIdException;
 
 /**
  * This is the Assertion Class. It reads the Assertion coming in the SAML

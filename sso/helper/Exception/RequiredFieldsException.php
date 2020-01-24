@@ -1,8 +1,8 @@
 <?php
 
-namespace MiniOrange\Helper\Exception;
+namespace Miniorange\helper\Exception;
 
-use MiniOrange\Helper\Messages;
+use Miniorange\helper\Messages;
 
 /**
  * Exception denotes that user has not entered all the requried fields.

@@ -23,7 +23,7 @@ As you have to configure it and save it.
 
 For Example:
 
-	*URL with FESAML - http://--------/typo/index.php?id=4
+	*URL with FESAML - http://--------/typo/index.php?id=3
 
 	*URL with response - http://--------/typo/index.php?id=4
 

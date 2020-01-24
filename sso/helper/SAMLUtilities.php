@@ -1,15 +1,15 @@
 <?php
 
-namespace MiniOrange\Helper;
+namespace Miniorange\helper;
 
 use DOMElement;
 use DOMNode;
 use DOMDocument;
 use Exception;
 
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecEnc;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityDSig;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecEnc;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityDSig;
 
 /** @todo - optimize this class  */
 class SAMLUtilities

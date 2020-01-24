@@ -1,17 +1,17 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
 use Exception;
-use MiniOrange\Classes\SamlResponse;
-use MiniOrange\Helper\Exception\InvalidAudienceException;
-use MiniOrange\Helper\Exception\InvalidDestinationException;
-use MiniOrange\Helper\Exception\InvalidIssuerException;
-use MiniOrange\Helper\Exception\InvalidSamlStatusCodeException;
-use MiniOrange\Helper\Exception\InvalidSignatureInResponseException;
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use MiniOrange\Helper\PluginSettings;
-use MiniOrange\Helper\SAMLUtilities;
+use Miniorange\classes\SamlResponse;
+use Miniorange\helper\Exception\InvalidAudienceException;
+use Miniorange\helper\Exception\InvalidDestinationException;
+use Miniorange\helper\Exception\InvalidIssuerException;
+use Miniorange\helper\Exception\InvalidSamlStatusCodeException;
+use Miniorange\helper\Exception\InvalidSignatureInResponseException;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\PluginSettings;
+use Miniorange\helper\SAMLUtilities;
 use Miniorange\MiniorangeSaml\Controller\FesamlController;
 
 /**

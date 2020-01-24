@@ -1,9 +1,9 @@
 <?php
 
 	include_once "autoload.php";
-	use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-	use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityDSig;
-    use MiniOrange\Helper\PluginSettings;
+	use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+	use Miniorange\helper\lib\XMLSecLibs\XMLSecurityDSig;
+    use Miniorange\helper\PluginSettings;
     
     $pluginSettings = PluginSettings::getPluginSettings();
 	$logout_url = $pluginSettings->getSiteLogoutUrl();

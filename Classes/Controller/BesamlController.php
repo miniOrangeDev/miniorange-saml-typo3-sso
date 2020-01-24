@@ -1,18 +1,19 @@
 <?php
-namespace Miniorange\MiniorangeSaml\Controller;
 
+namespace Miniorange\MiniorangeSaml\Controller;
 
 use Exception;
 use Miniorange\MiniorangeSaml\Domain\Model\Besaml;
 use PDO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use MiniOrange\Classes\CustomerSaml;
+use Miniorange\classes\CustomerSaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use MiniOrange\Helper\Utilities;
-use MiniOrange\Helper\PluginSettings;
+use Miniorange\helper\Utilities;
+use Miniorange\helper\PluginSettings;
+
 /***
  *
  * This file is part of the "etitle" Extension for TYPO3 CMS.
@@ -35,7 +36,7 @@ class BesamlController extends ActionController
      * @var \Miniorange\MiniorangeSaml\Domain\Repository\BesamlRepository
      * @inject
      */
-    protected $besamlRepository = null;
+    public $besamlRepository = null;
 
     private $myjson = null;
 
@@ -86,45 +87,62 @@ class BesamlController extends ActionController
 	 */
     public function requestAction()
     {
-//   			    Utilities::clearFlashMessages();
+
+        error_log("inside showAction : BeSamlController : ");
+        error_log("REQUEST : ".$_POST['option']);
+
 //------------ IDENTITY PROVIDER SETTINGS---------------
-        if($_POST['idp_name'] != null || $_POST['idp_entity_id'] != null
-						                           || $_POST['saml_login_url'] != null
-						                           || $_POST['saml_logout_url'] != null){
+        if( !empty($_POST['idp_name']) and isset($_POST['idp_entity_id']) and isset($_POST['saml_login_url']) and isset($_POST['saml_logout_url'])){
 
-        	  error_log("Received IdP Settings : ");
-        	  $value1 = $this->validateURL($_POST['saml_login_url']);
+
+
+        	error_log("Received IdP Settings - : \n Name :".$_POST['idp_name'].
+                                                        " \n Entity ID :".$_POST['idp_entity_id'].
+                                                        " \n SSO Url :".$_POST['saml_login_url']);
+
+        	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
-					  $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-					  $value4 = $this->validateURL($_POST['saml_logout_url']);
-
-					  error_log("Check_certificate_format: ".$value3);
+            $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
+            $value4 = $this->validateURL($_POST['saml_logout_url']);
+            error_log("Check_certificate_format: ".$value3);
 
             if($value1 == 1 && $value2 == 1 && $value3 == 1 && $value4 = 1)
             {
                 $obj = new BesamlController();
                 $obj->storeToDatabase($_POST);
-							  Utilities::showSuccessFlashMessage('IdP Setting saved successfully.');
+				Utilities::showSuccessFlashMessage('IdP Setting saved successfully.');
             }else{
                 if ($value3 == 0) {
                 	  Utilities::showErrorFlashMessage('Incorrect Certificate Format');
-
-                } else {
-                	 Utilities::showErrorFlashMessage('Incorrect Input');
+                }else {
+                	 Utilities::showErrorFlashMessage('Blank Field or Invalid input');
                 }
             }
         }
 
 //------------ HANDLING SUPPORT QUERY---------------
         if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_contact_us_query_option" ) {
-					  error_log('Received support query.  ');
+			 error_log('Received support query.  ');
             $this->support();
         }
 
 //------------ VERIFY CUSTOMER---------------
         if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
-					  error_log('Received verify customer request(login). ');
-            $this->account($_POST);
+			error_log('Received verify customer request(login). ');
+
+			if($_POST['registered'] =='isChecked'){
+                $this->account($_POST);
+                error_log("registered is checked");
+            }else{
+			    if($_POST['password'] == $_POST['confirmPassword']){
+                    $this->account($_POST);
+                    error_log("both passwords are equal.");
+			    }else{
+                    Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
+                    error_log("both passwords are not same.");
+                }
+            }
+
         }
 
 //------------ HANDLE LOG OUT ACTION---------------
@@ -143,8 +161,6 @@ class BesamlController extends ActionController
 						                                || $_POST['sp_entity_id'] != null
 						                                || $_POST['slo_url'] != null) {
 
-//					error_log("slo_url : ".$_POST['slo_url']);
-
 					  $value1 = $this->validateURL($_POST['site_base_url']);
 						$value2 = $this->validateURL($_POST['acs_url']);
 						$value3 = $this->validateURL($_POST['sp_entity_id']);
@@ -154,11 +170,11 @@ class BesamlController extends ActionController
 
 						if($value1 == 1 && $value2 == 1 && $value3 == 1 && $value4 == 1)
 						{
-								if($this->fetch('uid') == null){
-									$this->save('uid',1,'saml');
-								}
-								$this->defaultSettings($_POST);
-							  Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
+                            if($this->fetch('uid') == null){
+                                $this->save('uid',1,'saml');
+                            }
+							$this->defaultSettings($_POST);
+							Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
 
 						}else{
 							  Utilities::showErrorFlashMessage('Incorrect Input');
@@ -199,16 +215,19 @@ class BesamlController extends ActionController
         if($this->fetch_cust('cust_reg_status') == 'logged'){
 					$this->view->assign('status','logged');
 					$this->view->assign('log', '');
+                    $this->view->assign('nolog', 'display:none');
 					$this->view->assign('email',$this->fetch_cust('cust_email'));
 					$this->view->assign('key',$this->fetch_cust('cust_key'));
 					$this->view->assign('token',$this->fetch_cust('cust_token'));
 					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
         }else{
 					$this->view->assign('log', 'disabled');
+                    $this->view->assign('nolog', 'display:block');
 					$this->view->assign('status','not_logged');
         }
 
         $this->view->assign('tab', $this->tab);
+        $this->view->assign('extPath',Utilities::getExtensionRelativePath());
 
         $caches = new TypoScriptTemplateModuleController();
         $caches->clearCache();
@@ -231,11 +250,11 @@ class BesamlController extends ActionController
 
         $this->update_saml_setting('idp_name',"");
         $this->update_saml_setting('idp_entity_id',"");
-				$this->update_saml_setting('saml_login_url',"");
-				$this->update_saml_setting('saml_logout_url',"");
-			  $this->update_saml_setting('x509_certificate',"");
-			  $this->update_saml_setting('login_binding_type',"");
-			  $this->update_saml_setting('object',"");
+        $this->update_saml_setting('saml_login_url',"");
+		$this->update_saml_setting('saml_logout_url',"");
+        $this->update_saml_setting('x509_certificate',"");
+        $this->update_saml_setting('login_binding_type',"");
+        $this->update_saml_setting('object',"");
     }
 
 //    VALIDATE CERTIFICATE
@@ -291,7 +310,7 @@ class BesamlController extends ActionController
         $password = $post['password'];
         $customer = new CustomerSaml();
         $customer->email = $email;
-        $this->update_cust('cust_email',$email);
+        $this->update_cust('cust_email', $email);
         $check_content = json_decode($customer->check_customer($email,$password), true);
 
         if($check_content['status'] == 'CUSTOMER_NOT_FOUND'){
@@ -414,12 +433,12 @@ class BesamlController extends ActionController
      */
     public function defaultSettings($postArray)
     {
-			  $this->spobject = json_encode($postArray);
+		$this->spobject = json_encode($postArray);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('sp_entity_id', $postArray['sp_entity_id'])->execute();
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('site_base_url', $postArray['site_base_url'])->execute();
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('acs_url', $postArray['acs_url'])->execute();
-			  $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('slo_url', $postArray['slo_url'])->execute();
+		$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('slo_url', $postArray['slo_url'])->execute();
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('fesaml', $postArray['fesaml'])->execute();
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('response', $postArray['response'])->execute();
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('spobject', $this->spobject)->execute();
@@ -434,24 +453,43 @@ class BesamlController extends ActionController
         $this->myjson = json_encode($creds);
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $idp_name = $queryBuilder->select('idp_name')->from('saml')
+        $uid = $queryBuilder->select('uid')->from('saml')
 						                     ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
 						                     ->execute()->fetchColumn(0);
 
-        	error_log("No Previous_IdP found : ".$idp_name);
+        error_log("If Previous_IdP configured : ".$uid);
 
-					$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-					$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-							                          ->set('idp_name', $creds['idp_name'])->execute();
-					$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-							                         ->set('idp_entity_id', $creds['idp_entity_id'])->execute();
-				  $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-				                         			 ->set('saml_login_url', $creds['saml_login_url'])->execute();
-					$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-						                           ->set('saml_logout_url', $creds['saml_logout_url'])->execute();
-					$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-							                         ->set('x509_certificate', $creds['x509_certificate'])->execute();
-					$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-							                         ->set('object', $this->myjson)->execute();
+        if ($uid == null) {
+            error_log("No Previous_IdP found : ".$uid);
+            $affectedRows = $queryBuilder
+                ->insert('saml')
+                ->values([
+                    'uid' => $queryBuilder->createNamedParameter(1, PDO::PARAM_INT),
+                    'idp_name' => $creds['idp_name'],
+                    'idp_entity_id' => $creds['idp_entity_id'],
+                    'saml_login_url' => $creds['saml_login_url'],
+                    'saml_logout_url' => $creds['saml_logout_url'],
+                    'x509_certificate' => $creds['x509_certificate'],
+                    'force_authn' => $creds['force_authn'],
+                    'login_binding_type' => $creds['login_binding_type'],
+                    'object' => $this->myjson,])
+                ->execute();
+            error_log("affected rows ".$affectedRows);
+        }else {
+
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('idp_name', $creds['idp_name'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('idp_entity_id', $creds['idp_entity_id'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('saml_login_url', $creds['saml_login_url'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('saml_logout_url', $creds['saml_logout_url'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('x509_certificate', $creds['x509_certificate'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('object', $this->myjson)->execute();
+        }
     }
 }

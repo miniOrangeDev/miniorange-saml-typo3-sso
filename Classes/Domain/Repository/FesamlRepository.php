@@ -1,6 +1,8 @@
 <?php
 namespace Miniorange\MiniorangeSaml\Domain\Repository;
 
+use TYPO3\CMS\Extbase\Persistence\Repository;
+
 /***
  *
  * This file is part of the "etitle" Extension for TYPO3 CMS.
@@ -15,6 +17,6 @@ namespace Miniorange\MiniorangeSaml\Domain\Repository;
 /**
  * The repository for Besamls
  */
-class FesamlRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class FesamlRepository extends Repository
 {
     }

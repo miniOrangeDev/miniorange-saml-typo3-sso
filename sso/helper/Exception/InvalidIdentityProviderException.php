@@ -1,8 +1,8 @@
 <?php
 
-namespace MiniOrange\Helper\Exception;
+namespace Miniorange\helper\Exception;
 
-use MiniOrange\Helper\Messages;
+use Miniorange\helper\Messages;
 
 /**
  * Exception denotes that IDP is not valid as it maynot 

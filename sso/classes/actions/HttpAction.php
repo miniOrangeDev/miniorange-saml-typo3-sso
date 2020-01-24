@@ -1,10 +1,10 @@
 <?php
 
-namespace MiniOrange\Classes\Actions;
+namespace Miniorange\classes\actions;
 
-use MiniOrange\Helper\Lib\XMLSecLibs\XMLSecurityKey;
-use MiniOrange\Helper\SAMLUtilities;
-use MiniOrange\Helper\Utilities;
+use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\helper\SAMLUtilities;
+use Miniorange\helper\Utilities;
 
 class HttpAction
 {
@@ -38,6 +38,7 @@ class HttpAction
      * @param $samlRequest
      * @param $sendRelayState
      * @param $idpUrl
+     * @throws \Exception
      */
     public function sendHTTPRedirectRequest($samlRequest,$sendRelayState,$idpUrl)
     {
