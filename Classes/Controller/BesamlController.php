@@ -131,12 +131,12 @@ class BesamlController extends ActionController
 			error_log('Received verify customer request(login). ');
 
 			if($_POST['registered'] =='isChecked'){
-                $this->account($_POST);
-                error_log("registered is checked");
+                error_log("registered is checked. Registering User : ");
+			    $this->account($_POST);
             }else{
 			    if($_POST['password'] == $_POST['confirmPassword']){
                     $this->account($_POST);
-                    error_log("both passwords are equal.");
+//                    error_log("both passwords are equal.");
 			    }else{
                     Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
                     error_log("both passwords are not same.");
@@ -314,11 +314,9 @@ class BesamlController extends ActionController
         $check_content = json_decode($customer->check_customer($email,$password), true);
 
         if($check_content['status'] == 'CUSTOMER_NOT_FOUND'){
-
         	   $customer = new CustomerSaml();
-
+               error_log("CUSTOMER_NOT_FOUND.. Creating ...");
         	   $result = $customer->create_customer($email,$password);
-
         	   if($result['status']== 'SUCCESS' ){
 							 $key_content = json_decode($customer->get_customer_key($email,$password), true);
 							 if($key_content['status'] == 'SUCCESS'){
@@ -327,8 +325,7 @@ class BesamlController extends ActionController
 							 }else{
 								 Utilities::showErrorFlashMessage('It seems like you have entered the incorrect password');
 							 }
-						 }
-
+        	   }
         }elseif ($check_content['status'] == 'SUCCESS'){
             $key_content = json_decode($customer->get_customer_key($email,$password), true);
 
@@ -370,12 +367,12 @@ class BesamlController extends ActionController
         $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
     }
 
-	// ---- UPDATE SAML Settings
-	public function update_saml_setting($column, $value)
-	{
-		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-		$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
-	}
+// ---- UPDATE SAML Settings
+public function update_saml_setting($column, $value)
+{
+    $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+    $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+}
 
   public function insertValue()
     {
