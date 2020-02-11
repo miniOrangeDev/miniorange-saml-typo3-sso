@@ -94,10 +94,10 @@ class CustomerSaml{
                 'email' => array(
                     'customerKey' => $customerKey,
                     'fromEmail'   => $email,
-										'fromName'    => 'miniOrange',
-										'toEmail'     => $support_email_id,
-										'toName'      => $support_email_id,
-										'bccEmail'    => "saml2support@xecurify.com",
+                    'fromName'    => 'miniOrange',
+                    'toEmail'     => $support_email_id,
+                    'toName'      => $support_email_id,
+                    'bccEmail'    => "saml2support@xecurify.com",
                     'subject'     => $subject,
                     'content'     => $content
                 ),
