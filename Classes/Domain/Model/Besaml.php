@@ -1,4 +1,5 @@
 <?php
+
 namespace Miniorange\MiniorangeSaml\Domain\Model;
 
 /***

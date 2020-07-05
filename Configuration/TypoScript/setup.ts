@@ -1,56 +1,56 @@
 
-plugin.tx_ekey_fekey; {
-    view; {
-        templateRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Templates/
-        templateRootPaths;.1 = {$plugin.tx_ekey_fekey.view.templateRootPath};
-        partialRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Partials/
-        partialRootPaths;.1 = {$plugin.tx_ekey_fekey.view.partialRootPath};
-        layoutRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Layouts/
-        layoutRootPaths;.1 = {$plugin.tx_ekey_fekey.view.layoutRootPath}
+plugin.tx_miniorangesaml_fesamlkey {
+    view {
+        templateRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Templates/
+        templateRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.templateRootPath};
+        partialRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Partials/
+        partialRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.partialRootPath};
+        layoutRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Layouts/
+        layoutRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.layoutRootPath}
     }
-    persistence; {
-        storagePid = {$plugin.tx_ekey_fekey.persistence.storagePid};
+    persistence {
+        storagePid = {$plugin.tx_miniorangesaml_fesamlkey.persistence.storagePid};
         #recursive = 1
     }
-    features; {
+    features {
         #skipDefaultArguments = 1;
         # if set to; 1, the; enable; fields; are; ignored in BE; context;
         ignoreAllEnableFieldsInBe = 0;
         # Should; be; on; by; default, but; can; be; disabled; if all action in the; plugin; are; uncached;
         requireCHashArgumentForActionArguments = 1
     }
-    mvc; {
+    mvc {
         #callDefaultActionIfActionCantBeResolved = 1
     }
 }
 
-plugin.tx_ekey_responsekey; {
-    view; {
-        templateRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Templates/
-        templateRootPaths;.1 = {$plugin.tx_ekey_responsekey.view.templateRootPath};
-        partialRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Partials/
-        partialRootPaths;.1 = {$plugin.tx_ekey_responsekey.view.partialRootPath};
-        layoutRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Layouts/
-        layoutRootPaths;.1 = {$plugin.tx_ekey_responsekey.view.layoutRootPath}
+plugin.tx_miniorangesaml_responsekey {
+    view {
+        templateRootPaths.0 = EXT::miniorange_saml/Resources/Private/Templates/
+        templateRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.templateRootPath};
+        partialRootPaths.0 = EXT::miniorange_saml/Resources/Private/Partials/
+        partialRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.partialRootPath};
+        layoutRootPaths.0 = EXT::miniorange_saml/Resources/Private/Layouts/
+        layoutRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.layoutRootPath}
     }
-    persistence; {
-        storagePid = {$plugin.tx_ekey_responsekey.persistence.storagePid};
+    persistence {
+        storagePid = {$plugin.tx_miniorangesaml_responsekey.persistence.storagePid};
         #recursive = 1
     }
-    features; {
+    features {
         #skipDefaultArguments = 1;
         # if set to; 1, the; enable; fields; are; ignored in BE; context;
         ignoreAllEnableFieldsInBe = 0;
         # Should; be; on; by; default, but; can; be; disabled; if all action in the; plugin; are; uncached;
         requireCHashArgumentForActionArguments = 1
     }
-    mvc; {
+    mvc {
         #callDefaultActionIfActionCantBeResolved = 1
     }
 }
 
 # these; classes; are; only; used in auto-generated; templates;
-plugin.tx_ekey._CSS_DEFAULT_STYLE (
+plugin.tx_miniorangesaml._CSS_DEFAULT_STYLE (
     textarea.f3-form-error; {
         background-color;:#FF9F9F;
         1;px; #FF0000; solid;
@@ -84,16 +84,16 @@ plugin.tx_ekey._CSS_DEFAULT_STYLE (
 )
 
 # Module; configuration;
-module.tx_ekey_tools_ekeybekey; {
-    persistence; {
-        storagePid = {$module.tx_ekey_bekey.persistence.storagePid}
+module.tx_miniorangesaml_tools_miniorangesamlbesamlkey {
+    persistence {
+        storagePid = {$module.tx_miniorangesaml_besamlkey.persistence.storagePid}
     }
-    view; {
-        templateRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Backend/Templates/
-        templateRootPaths;.1 = {$module.tx_ekey_bekey.view.templateRootPath};
-        partialRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Backend/Partials/
-        partialRootPaths;.1 = {$module.tx_ekey_bekey.view.partialRootPath};
-        layoutRootPaths;.0 = EXT;:miniorange_saml/Resources/Private/Backend/Layouts/
-        layoutRootPaths;.1 = {$module.tx_ekey_bekey.view.layoutRootPath}
+    view {
+        templateRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Templates/
+        templateRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.templateRootPath};
+        partialRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Partials/
+        partialRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.partialRootPath};
+        layoutRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Layouts/
+        layoutRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.layoutRootPath}
     }
 }

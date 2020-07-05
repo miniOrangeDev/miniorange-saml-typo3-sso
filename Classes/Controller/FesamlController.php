@@ -1,38 +1,15 @@
 <?php
 namespace Miniorange\MiniorangeSaml\Controller;
 
-use Miniorange\classes\actions\ProcessResponseAction;
-use Miniorange\classes\actions\ProcessUserAction;
-use Miniorange\classes\actions\ReadResponseAction;
-use Miniorange\classes\actions\TestResultActions;
-use Miniorange\helper\Constants;
-use Miniorange\helper\Messages;
-use Miniorange\helper\PluginSettings;
+
+use Miniorange\Helper\Constants;
+use Miniorange\Helper\SAMLUtilities;
+use Miniorange\Helper\SamlResponse;
 use Miniorange\MiniorangeSaml\Domain\Model\Fesaml;
-use Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository;
-use Miniorange\SSO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Miniorange\helper\SAMLUtilities;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
-use Miniorange\classes\actions;
-use Miniorange\classes;
-use Miniorange\classes\SamlResponse;
-use Miniorange\helper;
-use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
-use Miniorange\helper\Utilities;
-use TYPO3\CMS\Core\Database\Connection;
-/***
- *
- * This file is part of the "etitle" Extension for TYPO3 CMS.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- *  (c) 2019 Miniorange <info@xecurify.com>
- *
- ***/
+use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
 
 /**
  * FesamlController
@@ -77,8 +54,6 @@ class FesamlController extends ActionController
      * action list
      * 
      * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
-     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
-     * @return void
      * @return void
      */
     public function listAction()
@@ -109,20 +84,8 @@ class FesamlController extends ActionController
     public function printAction()
     {
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-        $caches = new TypoScriptTemplateModuleController();
-        $caches->clearCache();
 
         $this->controlAction();
-
-//        error_log("in FesamlController : relayState = ".$_REQUEST['RelayState']);
-//        error_log("FesamlController : idpname : ".$this->idp_name);
-//        error_log("FesamlController : idp entity id : ".$this->idp_entity_id);
-//        error_log("FesamlController : acs url : ".$this->acs_url);
-//        error_log("FesamlController : saml login url : ".$this->saml_login_url);
-//        error_log("FesamlController : signed assertion : ".$this->signedAssertion);
-//        error_log("FesamlController : force-authn : ".$this->force_authn);
-//        error_log("FesamlController : x509-certificate : ".$this->x509_certificate);
-//        error_log("FesamlController : sp-entity-id : ".$this->sp_entity_id);
 
         $this->bindingType = $this->fetchBindingType();
         error_log("FesamlController : binding type : ".$this->bindingType);

@@ -3,26 +3,35 @@
 	<file source-language="en" datatype="plaintext" original="messages" date="2019-05-10T08:29:02Z" product-name="miniorange_saml">
 		<header/>
 		<body>
-			<trans-unit id="tx_ekey_domain_model_fesaml">
+			<trans-unit id="tx_miniorangesaml_domain_model_fesaml">
 				<source>Fesaml</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_domain_model_besaml">
+			<trans-unit id="tx_miniorangesaml_domain_model_besaml">
 				<source>Besaml</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_domain_model_response">
+			<trans-unit id="tx_miniorangesaml_domain_model_logout">
+				<source>Logout</source>
+			</trans-unit>
+			<trans-unit id="tx_miniorangesaml_domain_model_response">
 				<source>Response</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_fekey.name">
-				<source>fename</source>
+			<trans-unit id="tx_miniorangesaml_fesaml.name">
+				<source>Fesaml</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_fekey.description">
-				<source></source>
+			<trans-unit id="tx_miniorangesaml_fesaml.description">
+				<source>For SAML Request</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_responsekey.name">
-				<source>response</source>
+			<trans-unit id="tx_miniorangesaml_response.name">
+				<source>Response</source>
 			</trans-unit>
-			<trans-unit id="tx_ekey_responsekey.description">
-				<source></source>
+			<trans-unit id="tx_miniorangesaml_response.description">
+				<source>For handling SAMl Response</source>
+			</trans-unit>
+			<trans-unit id="tx_miniorangesaml_logout.name">
+				<source>Logout</source>
+			</trans-unit>
+			<trans-unit id="tx_miniorangesaml_logout.description">
+				<source>For Single Logout</source>
 			</trans-unit>
 		</body>
 	</file>

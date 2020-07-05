@@ -17,7 +17,7 @@ miniorangesaml
 		miniorange_saml
 
 	:Version:
-		|release|
+		1.2.3
 
 	:Language:
 		en
@@ -26,7 +26,7 @@ miniorangesaml
 		SAML SP Single Sign-On(SSO)
 
 	:Keywords:
-		comma,separated,list,of,keywords
+		saml sso,sso,single sign on,single sign-on,Azure AD,Okta,Google SSO,
 
 	:Copyright:
 		2019

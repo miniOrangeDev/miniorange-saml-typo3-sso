@@ -2,13 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Essential javascripts for application to work-->
-    <script src="includes/js/jquery-3.2.1.min.js"></script>
-    <script src="includes/js/popper.min.js"></script>
-    <script src="includes/js/bootstrap.min.js"></script>
-    <script src="includes/js/main.js"></script>
-    <!-- The javascript plugin to display page loading on top-->
-    <script src="includes/js/plugins/pace.min.js"></script>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,17 +13,6 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
-    <!--<script>-->
-        <!--$(document).ready(function(){-->
-            <!--if(localStorage.selected) {-->
-                <!--$('#' + localStorage.selected ).attr('checked', true);-->
-            <!--}-->
-            <!--$('.inputabs').click(function(){-->
-                <!--localStorage.setItem("selected", this.id);-->
-            <!--});-->
-        <!--});-->
-    <!--</script>-->
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -196,6 +179,33 @@
             background: #ffe6e6;
         }
 
+        .gm-div{
+            display: flex;
+            flex-flow: row nowrap;
+            width: 100%;
+            /*justify-content: flex-end;*/
+            margin: 15px 0;
+        }
+
+        .gm-input-label{
+            order: 1;
+            /*width: 40%;*/
+            justify-self: left;
+            flex: 0.2 1 40% ;
+            background: lightgrey;
+            margin-right: 2% ;
+        }
+
+        .gm-input{
+            order: 2;
+            /*width: 35%;*/
+            flex: 0.2 1 50% ;
+            margin-left: 2% ;
+            justify-self: right;
+        }
+        .gm-submit{
+            margin-left: 2%;
+        }
 
     </style>
 
@@ -205,19 +215,19 @@
 
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 
-
 <div class="tab">
-    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
-    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
-    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
-    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
-    <button class="tablinks button" onclick="removeFlashMessage(); openTab(event,'Support')">Support</button>
+    <button class="tablinks button" id="Account_Tab" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
+    <button class="tablinks button" id="Idp_Settings_Tab" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
+    <button class="tablinks button" id="SP_Settings_Tab" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
+    <button class="tablinks button" id="Attribute Mapping" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
+    <button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab(event, 'Group_Mapping')">Group Mapping</button>
+    <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab(event,'Support')">Support</button>
 </div>
 
-<input hidden name="taby" id="taby" value="{tab}">
+<input type="hidden" name="taby" id="taby" value="{tab}">
 
 <div id="topContainer">
-<!--Left Container-->
+    <f:comment><!--Left Container--></f:comment>
     <div id="leftContainer">
 
     <!--   IDENTITY PROVIDER TAB-->
@@ -229,26 +239,26 @@
                     <input type="hidden" name="option" value="save_connector_settings">
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b></label>
-                                <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf.idp_name}">
+                                <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
                             </div>
 
                             <div class="form-group">
                                 <label for="idp_entity_id"><b>IDP Entity ID</b></label>
                                 <input class="form-control" {log} name="idp_entity_id" id="idp_entity_id" type="text"
-                                       required value="{conf.idp_entity_id}">
+                                       required value="{conf_idp.idp_entity_id}">
                             </div>
 
                             <div class="form-group">
                                 <label for="saml_login_url"><b>SAML Login URL</b></label>
                                 <input class="form-control" {log} name="saml_login_url" id="saml_login_url" type="text"
-                                       required value="{conf.saml_login_url}">
+                                       required value="{conf_idp.saml_login_url}">
                             </div>
 
                             <div class="premiumBox" disabled >
 
                                 <label><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
                                 <table>
-                                    <f:if condition="{0: conf.login_binding_type} == {0: 'HttpRedirect'} or {0: conf.login_binding_type} == {0: ''} ">
+                                    <f:if condition="{0: conf_idp.login_binding_type} == {0: 'HttpRedirect'} or {0: conf_idp.login_binding_type} == {0: ''} ">
                                         <tr>
                                             <td style="padding:10px;">
                                                 <div class="animated-radio-button">
@@ -267,7 +277,7 @@
                                             </td>
                                         </tr>
                                     </f:if>
-                                    <f:if condition="{0: conf.login_binding_type} == {0: 'HttpPost'}">
+                                    <f:if condition="{0: conf_idp.login_binding_type} == {0: 'HttpPost'}">
                                         <tr>
                                             <td style="padding:10px;">
                                                 <div class="animated-radio-button">
@@ -291,13 +301,13 @@
 
                             <div class="form-group" style= "border: black">
                                 <label for="x509_certificate"><b>SAML x509 Certificate</b></label>
-                                <textarea class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf.x509_certificate}</textarea>
+                                <textarea class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
                                 <small><b>NOTE:</b> Format of the certificate:<br/><b>-----BEGIN CERTIFICATE-----<br/>XXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>-----END CERTIFICATE-----</b></small><br/>
                             </div>
 
                             <div class="form-group">
                                 <label for="saml_logout_url"><b>SAML Logout URL</b></label>
-                                <input class="form-control" {log} name="saml_logout_url" id="saml_logout_url" type="text" value="{conf.saml_logout_url}">
+                                <input class="form-control" {log} name="saml_logout_url" id="saml_logout_url" type="text" value="{conf_idp.saml_logout_url}">
                             </div>
 
                             <label for="signing_info"><b>Signing</b></label>
@@ -320,7 +330,7 @@
                     &nbsp
                     <div class="tile-footer">
                         <button class="btn btn-primary" type="button" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
-                        <a  {log} style="text-decoration:none"><button onClick="window.open('{conf2.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
+                        <a  {log} style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
                     </div>
 
                 </form>
@@ -338,35 +348,35 @@
                 <!--<div style="width: 40%; display: inline-block">-->
                 <div class="form-group">
                     <label for="fesaml"><b> URL with fesaml</b></label>
-                       <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf2.fesaml}"
+                       <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="response"><b>URL with response</b></label>
-                    <input class="form-control" {log} id="response" name="response" type="text" value="{conf2.response}" >
+                    <input class="form-control" {log} id="response" name="response" type="text" value="{conf_sp.response}" >
                 </div>
 
                 <div class="form-group">
                     <label for="site_base_url"><b> Base URL</b></label>
                     <input class="form-control" {log} id="site_base_url"
-                           name="site_base_url" type="text" value="{conf2.site_base_url}" >
+                           name="site_base_url" type="text" value="{conf_sp.site_base_url}" >
                 </div>
 
                 <div class="form-group">
                     <label for="acs_url"><b>ACS URL</b></label>
-                    <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf2.acs_url}" >
+                    <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
                 </div>
 
                 <div class="form-group" >
                     <label for="sp_entity_id"><b>SP Entity ID</b></label>
-                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf2.sp_entity_id}"
+                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}"
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
-                    <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf2.slo_url}"  >
+                    <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf_sp.slo_url}"  >
                 </div>
 
                 <div class="form-group" style="margin:20px 0">
@@ -391,44 +401,113 @@
         <div id="Attribute_Mapping" class="tabcontent"  >
             <form id="attrs_form" method="post" action ="">
                 <input type="hidden" name="option" value="attribute_mapping">
-    <!--            <br>-->
-                <h3><strong>Attribute Mapping</strong> <span class="premiumMessage"> [Premium Feature ] </span></h3>
+                <h3><strong>Attribute Mapping</strong> <span class="premiumMessage" > [Premium Feature]</span> </h3>
                 <hr>
                 <div class="tile">
 
+                    <div class="form-group">
+                        <label for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
+                        <input class="form-control" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
+                        <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em> User accounts will be created using this attribute value.</em>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_email"><b>Email</b></label>
+                        <input class="form-control" id="saml_am_email" name="saml_am_email" type="text" disabled value="NameID">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_groups"><b>Groups/Roles</b></label>
+                        <input class="form-control" disabled id="saml_am_groups" name="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_title"><b>Title</b></label>
+                        <input class="form-control" disabled id="saml_am_title" name="saml_am_title" type="text" value = "{conf_am.saml_am_title}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_fname"><b>First Name</b></label>
+                        <input class="form-control" disabled id="saml_am_fname" name="saml_am_fname" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_lname"><b>Last Name</b></label>
+                        <input class="form-control" disabled id="saml_am_lname" name="saml_am_lname" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_address"><b>Address</b></label>
+                        <input class="form-control" disabled id="saml_am_address" name="saml_am_address" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_city"><b>City</b></label>
+                        <input class="form-control" disabled id="saml_am_city" name="saml_am_city" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_zip"><b>ZIP</b></label>
+                        <input class="form-control" disabled id="saml_am_zip" name="saml_am_zip" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_country"><b>Country</b></label>
+                        <input class="form-control" disabled id="saml_am_country" name="saml_am_country" type="text" value = "">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saml_am_phone"><b>Phone</b></label>
+                        <input class="form-control" disabled id="saml_am_phone" name="saml_am_phone" type="text" value = "">
+                    </div>
+
+                </div>
+
+                <div class="form-group" >
+                    <input type="checkbox" disabled  id="saml_am_update_attr"  name="saml_am_update_attr" >
+                    <label for="saml_am_update_attr">Sync user attributes on login</label><br>
+                    <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em>  Enable to sync ussr attribute values on every signin.</em>
+                </div>
+                &nbsp;
                 <div class="form-group">
-                    <label for="saml_am_username"><strong>Username</strong><span class="premiumMessage"> * </span></label>
-                    <input class="form-control" disabled id="saml_am_username" name="saml_am_username" type="text" value = "NameID">
+                    <f:comment><!--    <br/>--></f:comment>
+                    <button type="submit" disabled class="btn btn-primary" onClick="jQuery('#attrs_form').submit();">Save Attribute Mapping</button>
                 </div>
 
-                <div class="form-group">
-                    <label for="saml_am_email"><strong>Email</strong><span class="premiumMessage"> * </span></label>
-                    <input class="form-control"  disabled id="saml_am_email" name="saml_am_email" type="text" value="NameID">
-                </div>
-
-            <div disabled >
-
-                <div class="form-group">
-                    <label for="saml_am_fname"><b>First Name</b><span class="premiumMessage"> * </span></label>
-                    <input class="form-control" style="color: red" disabled id="saml_am_fname" name="saml_am_fname" type="text" >
-                </div>
-                <div class="form-group">
-                    <label for="saml_am_lname"><b>Last Name</b><span class="premiumMessage"> * </span></label>
-                    <input class="form-control" style="color: red" disabled id="saml_am_lname" name="saml_am_lname" type="text" >
-                </div>
-
-            </div>
-                </div>
-
-                <div class="form-inline">
-                </div>
-                <br/>
-                <button type="submit" disabled class="btn btn-primary" name="custom_attrs" id="custom_attrs" onClick="jQuery('#attrs_form').submit();">Save Attribute Mapping</button>
-                <!--</div>-->
             </form>
         </div>
 
-          <p id="saml_message"></p>
+        <!--   GROUP MAPPING TAB-->
+        <div id="Group_Mapping" class="tabcontent"  >
+            <form {disabled} id="gm_form" method="post" action ="">
+                <input type="hidden" name="option" value="group_mapping">
+                <h3><strong>Group Mapping</strong></h3>  <span class="premiumMessage" > [Premium Feature]</span>
+                <hr>
+
+                <f:comment><!--  Default UserGroup--></f:comment>
+                <div class="form-group gm-div">
+                    <label class="form-control gm-input-label" for="defaultUserGroup">Default UserGroup</label>
+                    <f:comment><!--  Populate DropDown--></f:comment>
+                    <select class="form-control gm-input" disabled name="defaultUserGroup" id="defaultUserGroup" >
+                            <option value="{userGroup.title}">{userGroup.title}</option>
+                    </select>
+                </div>
+
+                <h4><strong>Map Typo3 Groups to IDP Groups</strong></h4>
+                <hr>
+
+                <f:debug title="userGroups: ">{allUserGroups}</f:debug>
+                <f:for each="{allUserGroups}" as="userGroup">
+                    <div class="gm-div">
+                        <label class="form-control gm-input-label">{userGroup.title}</label>
+                        <input class="form-control gm-input" disabled  type="text" value="">
+                    </div>
+                </f:for>
+                <br/>
+                <button type="submit" disabled class="btn btn-primary gm-submit" >Save Group Mapping</button>
+            </form>
+
+        </div>
 
     <!--   ACCOUNT TAB-->
         <div id="Account" style="margin-left: 20px" class="tabcontent" >
@@ -599,60 +678,28 @@
 </div>
 
 <script>
-    function mo_saml_valid_query(f) {
-        !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(
-            /[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
-    }
-</script>
-
-<script>
 
     $(document).ready(function() {
-        var session = document.getElementById('taby').value;
-        console.log("Session in start : in ready(): "+session);
+        let session = document.getElementById('taby').value;
+        console.log("Session : in document ready() = "+session);
 
-        // document.querySelectorAll('.typo3-messages').forEach(function(a){
-        //     a.remove();
-        // });
-
-        if (session == "Service_Provider")
-        {
+        if (session == "Service_Provider") {
             openTab(event, 'Service_Provider');
-        }
-
-        if (session == "Identity_Provider"){
+        }else if (session == "Identity_Provider"){
             openTab(event, 'Identity_Provider');
-        }
-
-        if (session == "Support"){
-
+        }else if(session == "Support"){
             openTab(event, 'Support');
-        }
-
-        if (session == "Attribute_Mapping")
-        {
+        }else if(session == "Attribute_Mapping") {
             openTab(event, 'Attribute_Mapping');
-        }
-
-        if(session == "" || session == "Account" || session===null)
-        {
-            // document.getElementById('Account').style.display = "block";
+        }else if(session == "" || session == "Account" || session===null){
             openTab(event, 'Account');
-            session = "Account";
         }
-
-        if(document.getElementsByClassName("active").length === 0){
-            document.getElementById(session).className  += " active";
-        }
-        // evt.currentTarget.className += " active ";
-        console.log("Session in end : ".session);
-        document.getElementById(session).className  += " active";
-
     });
 
-    function openTab(evt, cityName) {
+    function openTab(evt, activeTab) {
 
-        console.log("inside openTab ".cityname);
+        console.log("inside openTab "+activeTab);
+
         document.getElementById("leftContainer").classList.add("showElement");
         document.getElementById("leftContainer").classList.remove("hideElement");
 
@@ -668,16 +715,19 @@
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
 
-        if(cityName!=="Support"){
-            document.getElementById(cityName).style.display = "block";
+        if(activeTab!=="Support"){
+            document.getElementById(activeTab).style.display = "block";
             document.getElementById("Support").style.display = "block";
+            let temp= activeTab + "_Tab";
+            console.log("tab id: "+temp);
+            document.getElementById(temp).className  += " active";
         }else{
-            document.getElementById(cityName).style.display = "block";
+            document.getElementById(activeTab).style.display = "block";
+            document.getElementById("Support_Tab").className  += " active";
             document.getElementById("leftContainer").classList.replace("showElement","hideElement");
         }
 
-        evt.currentTarget.className += " active";
-
+        // evt.currentTarget.className += " active";
     }
 
     function removeFlashMessage(){
@@ -697,58 +747,13 @@
         }
     }
 
-    // function onIdpSettingsSubmit( Event ){
-    //     console.log("saml form submitted");
-    //     if( (document.getElementById("idp_name").value === "") || (document.getElementById("x509_certificate").value !== "")
-    //         || (document.getElementById("idp_entity_id").value !== "") || (document.getElementById("saml_login_url").value !== "") ){
-    //
-    //         Event.preventDefault();
-    //         window.alert("Please fill all the fields.");
-    //     }
-    // }
-
-    // $("#saml_form").submit(function(e){
-    //     console.log("saml form submitted");
-    //     if( ($("#idp_name").val() === "") || ($("#x509_certificate").val() !== "")
-    //         || ($("#idp_entity_id").val() !== "") || ($("#saml_login_url").val() !== "") ){
-    //         e.preventDefault();
-    //         window.alert("Please fill all the fields.");
-    //     }
-    // })
-
-    // function onSpSettingsSubmit(Event){
-    //     console.log("sp settings form submitted");
-    //     if( (document.getElementById("fesaml").value === "") || (document.getElementById("response").value !== "")
-    //         || (document.getElementById("sp_entity_id").value !== "") || (document.getElementById("acs_url").value !== "")
-    //         || (document.getElementById("site_base_url").value !== "")){
-    //
-    //         Event.preventDefault();
-    //         window.alert("Please fill all the fields.");
-    //     }
-    // }
-
 </script>
 
 <script>
-
-    var getid = document.getElementsByName("attribute_name1");
-
-    function myFunction() {
-        getid.setAttribute("disabled", false);
+    function mo_saml_valid_query(f) {
+        !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(
+            /[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
     }
-
-    $.ajax({
-        url: "BesamlController.php",
-        type : "POST",
-        data : $myjson,
-        crossDomain: true,
-        dataType : "json",
-        contentType : "application/json; charset=utf-8",
-        success: function(results){
-            console.log(results);
-        }
-    });
-
 </script>
 
 </body>
