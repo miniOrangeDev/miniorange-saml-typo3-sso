@@ -3,41 +3,19 @@
 namespace Miniorange\MiniorangeSaml\Controller;
 
 use Exception;
-use Miniorange\MiniorangeSaml\Domain\Model\Besaml;
 use PDO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use Miniorange\classes\CustomerSaml;
+use Miniorange\Helper\CustomerSaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use Miniorange\helper\Utilities;
-use Miniorange\helper\PluginSettings;
+use Miniorange\Helper\Utilities;
 
-/***
- *
- * This file is part of the "etitle" Extension for TYPO3 CMS.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- *  (c) 2019 Miniorange <info@xecurify.com>
- *
- ***/
 
 /**
  * BesamlController
  */
 class BesamlController extends ActionController
 {
-    /**
-     * besamlRepository
-     * 
-     * @var \Miniorange\MiniorangeSaml\Domain\Repository\BesamlRepository
-     * @inject
-     */
-    public $besamlRepository = null;
-
     private $myjson = null;
 
     private $myattrjson = null;
@@ -61,26 +39,9 @@ class BesamlController extends ActionController
     protected $tab = "";
 
     /**
-     * action list
-     * 
-     * @return void
+     * @var TYPO3\CMS\Extbase\Object\ObjectManagerInterface
      */
-    public function listAction()
-    {
-        $besamls = $this->besamlRepository->findAll();
-        $this->view->assign('besamls', $besamls);
-    }
-
-    /**
-     * action show
-     * 
-     * @param Besaml $besaml
-     * @return void
-     */
-    public function showAction(Besaml $besaml)
-    {
-        $this->view->assign('besaml', $besaml);
-    }
+    protected $objectManager;
 
 	/**
 	 * @throws Exception
@@ -186,11 +147,6 @@ class BesamlController extends ActionController
         {
             $this->tab = "Service_Provider";
         }
-        elseif ($_POST['option'] == 'mo_saml_verify_customer')
-        {
-            $this->tab = "Account";
-
-        }
         elseif ($_POST['option'] == 'save_connector_settings')
         {
             $this->tab = "Identity_Provider";
@@ -198,18 +154,28 @@ class BesamlController extends ActionController
         elseif ($_POST['option'] == 'attribute_mapping')
         {
             $this->tab = "Attribute_Mapping";
-
+        }
+        elseif ($_POST['option'] == 'group_mapping')
+        {
+            $this->tab = "Group_Mapping";
         }
         elseif ($_POST['option'] == 'mo_saml_contact_us_query_option')
         {
             $this->tab = "Support";
-
+        }
+        else
+        {
+            $this->tab = "Account";
         }
 
+        $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
+        $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
+        $this->view->assign('allUserGroups', $allUserGroups);
+
 //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
-        $this->view->assign('conf', json_decode($this->fetch('object'), true));
-        $this->view->assign('conf2', json_decode($this->fetch('spobject')), true);
-        $this->view->assign('conf1', json_decode($this->fetch('attrobject'), true));
+        $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
+        $this->view->assign('conf_sp', json_decode($this->fetch('spobject')), true);
 
 //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
         if($this->fetch_cust('cust_reg_status') == 'logged'){
@@ -229,8 +195,6 @@ class BesamlController extends ActionController
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath',Utilities::getExtensionRelativePath());
 
-        $caches = new TypoScriptTemplateModuleController();
-        $caches->clearCache();
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
     }
 

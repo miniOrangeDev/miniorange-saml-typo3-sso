@@ -2,49 +2,37 @@
 namespace Miniorange\MiniorangeSaml\Controller;
 
 use Exception;
-use Miniorange\classes\actions\ProcessResponseAction;
-use Miniorange\classes\actions\ReadResponseAction;
-use Miniorange\classes\actions\TestResultActions;
-use Miniorange\helper\Exception\InvalidAudienceException;
-use Miniorange\helper\Exception\InvalidDestinationException;
-use Miniorange\helper\Exception\InvalidIssuerException;
-use Miniorange\helper\Exception\InvalidSamlStatusCodeException;
-use Miniorange\helper\Exception\InvalidSignatureInResponseException;
+use Miniorange\Helper\Actions\ProcessResponseAction;
+use Miniorange\Helper\Actions\ReadResponseAction;
+use Miniorange\Helper\Actions\TestResultActions;
+use Miniorange\Helper\Exception\InvalidAudienceException;
+use Miniorange\Helper\Exception\InvalidDestinationException;
+use Miniorange\Helper\Exception\InvalidIssuerException;
+use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
+use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
 use ReflectionClass;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use Miniorange\helper\lib\XMLSecLibs\XMLSecurityKey;
-use Miniorange\helper\lib\XMLSecLibs\XMLSecurityDSig;
+use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityDSig;
 use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
-
-/***
- *
- * This file is part of the "miniorange_saml" Extension for TYPO3 CMS.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- *  (c) 2019 Miniorange <info@xecurify.com>
- *
- ***/
 
 /**
  * ResponseController
  */
 class ResponseController extends ActionController
 {
-    /**
-     * responseRepository
-     * 
-     * @var \Miniorange\MiniorangeSaml\Domain\Repository\ResponseRepository
-     * @inject
-     */
-    protected $responseRepository = null;
+//    /**
+//     * responseRepository
+//     *
+//     * @var \Miniorange\MiniorangeSaml\Domain\Repository\ResponseRepository
+//     * @inject
+//     */
+//    protected $responseRepository = null;
 
-    protected $fesamlRepository = null;
+//    protected $fesamlRepository = null;
 
     protected $idp_name = null;
 
@@ -100,26 +88,9 @@ class ResponseController extends ActionController
      * @throws InvalidSignatureInResponseException
      * @throws \ReflectionException
      */
-    public function checkAction()
+    public function responseAction()
     {
-        //        if($this->returnFlagValue() == 1)
-        //        {
-        //            if (!isset($_SESSION)) {
-        //                session_id('email');
-        //                session_start();
-        //                $this->ssoemail = $_SESSION['email'];
-        //                $this->ses_id = $_SESSION['id'];
-        //            }
-        //            $samlResponseObj = ReadResponseAction::execute();
-        //            if($samlResponseObj == null)
-        //            $this->logout($this->ses_id,$this->ssoemail);
-        //            $this->setFlag(0);
-        ////            header('Location:http://localhost/typo3/index.php?id=7&ADMCMD_simUser=1');
-        ////            exit;
-        //        }
-        //        else {
-        $caches = new TypoScriptTemplateModuleController();
-        $caches->clearCache();
+
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
             $samlResponseObj = ReadResponseAction::execute();
@@ -241,10 +212,7 @@ class ResponseController extends ActionController
             $issuer = $this->sp_entity_id;
             $single_logout_url = $logout_url;
             $destination = $single_logout_url;
-            // $sessionIndex = '';
             $sessionIndex = $ses_id;
-            //'_d82a4777-6297-4dfe-811e-2c34dfe43f00';
-            // $sendRelayState = $logout_url;
             $sendRelayState = 'test';
             $samlRequest = $this->createLogoutRequest($nameId, $sessionIndex, $issuer, $destination, 'HttpRedirect');
             $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);

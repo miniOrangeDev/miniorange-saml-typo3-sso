@@ -7,9 +7,9 @@ call_user_func(
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
             'Miniorange.MiniorangeSaml',
-            'Fekey',
+            'Fesaml',
             [
-                'Fesaml' => 'print'
+                'Fesaml' => 'request'
             ],
             // non-cacheable actions
             [
@@ -19,9 +19,9 @@ call_user_func(
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
             'Miniorange.MiniorangeSaml',
-            'Responsekey',
+            'Response',
             [
-                'Response' => 'check'
+                'Response' => 'response'
             ],
             // non-cacheable actions
             [
@@ -31,27 +31,47 @@ call_user_func(
             ]
         );
 
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+            'Miniorange.MiniorangeSaml',
+            'Logout',
+            [
+                'Logout' => 'check'
+            ],
+            [
+                'Response' => ''
+            ]
+        );
+
     // wizards
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
         'mod {
             wizards.newContentElement.wizardItems.plugins {
                 elements {
-                    fekey {
-                        iconIdentifier = miniorange_saml-plugin-fekey
-                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_ekey_fekey.name
-                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_ekey_fekey.description
+                    fesaml {
+                        iconIdentifier = miniorange_saml-plugin-fesaml
+                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_miniorangesaml_fesaml.name
+                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_miniorangesaml_fesaml.description
                         tt_content_defValues {
                             CType = list
-                            list_type = ekey_fekey
+                            list_type = fesaml
                         }
                     }
-                    responsekey {
-                        iconIdentifier = miniorange_saml-plugin-responsekey
-                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_ekey_responsekey.name
-                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_ekey_responsekey.description
+                    response {
+                        iconIdentifier = miniorange_saml-plugin-response
+                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_miniorangesaml_response.name
+                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_miniorangesaml_response.description
                         tt_content_defValues {
                             CType = list
-                            list_type = ekey_responsekey
+                            list_type = response
+                        }
+                    }
+                     Logout {
+                        iconIdentifier = miniorange_saml-plugin-logout
+                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_MiniorangeSaml_logout.name
+                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_MiniorangeSaml_logout.description
+                        tt_content_defValues {
+                            CType = list
+                            list_type = Logout
                         }
                     }
                 }
@@ -62,16 +82,22 @@ call_user_func(
 		$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
 		
 			$iconRegistry->registerIcon(
-				'miniorange_saml-plugin-fekey',
+				'miniorange_saml-plugin-fesaml',
 				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
 		
 			$iconRegistry->registerIcon(
-				'miniorange_saml-plugin-responsekey',
+				'miniorange_saml-plugin-response',
 				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
-		
+
+        $iconRegistry->registerIcon(
+            'miniorange_saml-plugin-logout',
+            \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+            ['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
+        );
+
     }
 );

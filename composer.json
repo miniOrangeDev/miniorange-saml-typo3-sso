@@ -10,17 +10,12 @@
         }
     ],
     "require": {
-        "typo3/cms-core": "^8.7.0 || ^9.5.0"
+        "typo3/cms-core": "^8.7. || ^9."
     },
     "autoload": {
         "psr-4": {
             "Miniorange\\MiniorangeSaml\\": "Classes",
-            "Miniorange\\": "sso"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Miniorange\\MiniorangeSaml\\Tests\\": "Tests"
+            "Miniorange\\Helper\\": "Helper"
         }
     },
     "replace": {

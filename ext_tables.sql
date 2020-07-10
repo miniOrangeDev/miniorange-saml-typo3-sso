@@ -1,7 +1,7 @@
 #
 # Table structure for table 'tx_ekey_domain_model_fesaml'
 #
-CREATE TABLE tx_ekey_domain_model_fesaml (
+CREATE TABLE tx_miniorangesaml_domain_model_fesaml (
 
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE tx_ekey_domain_model_fesaml (
 #
 # Table structure for table 'tx_ekey_domain_model_besaml'
 #
-CREATE TABLE tx_ekey_domain_model_besaml (
+CREATE TABLE tx_miniorangesaml_domain_model_besaml (
 
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE tx_ekey_domain_model_besaml (
 #
 # Table structure for table 'tx_ekey_domain_model_response'
 #
-CREATE TABLE tx_ekey_domain_model_response (
+CREATE TABLE tx_miniorangesaml_domain_model_response (
 
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
