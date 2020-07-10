@@ -16,7 +16,6 @@ class CustomerSaml{
 
             $url = 'https://login.xecurify.com/moas/rest/customer/add';
             $ch = curl_init($url);
-            // $current_user = wp_get_current_user();
             $this->email = $email;
             $password = $password;
             $fields = array (
