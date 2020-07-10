@@ -24,15 +24,15 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  */
 class ResponseController extends ActionController
 {
-    /**
-     * responseRepository
-     * 
-     * @var \Miniorange\MiniorangeSaml\Domain\Repository\ResponseRepository
-     * @inject
-     */
-    protected $responseRepository = null;
+//    /**
+//     * responseRepository
+//     *
+//     * @var \Miniorange\MiniorangeSaml\Domain\Repository\ResponseRepository
+//     * @inject
+//     */
+//    protected $responseRepository = null;
 
-    protected $fesamlRepository = null;
+//    protected $fesamlRepository = null;
 
     protected $idp_name = null;
 
@@ -88,7 +88,7 @@ class ResponseController extends ActionController
      * @throws InvalidSignatureInResponseException
      * @throws \ReflectionException
      */
-    public function checkAction()
+    public function responseAction()
     {
 
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);

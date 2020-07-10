@@ -171,6 +171,7 @@ class BesamlController extends ActionController
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
         $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
+        $this->view->assign('allUserGroups', $allUserGroups);
 
 //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
         $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));

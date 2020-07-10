@@ -5,6 +5,7 @@ namespace Miniorange\MiniorangeSaml\Controller;
 use Miniorange\Helper\Constants;
 use Miniorange\Helper\SAMLUtilities;
 use Miniorange\Helper\SamlResponse;
+use Miniorange\Helper\Utilities;
 use Miniorange\MiniorangeSaml\Domain\Model\Fesaml;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -16,13 +17,13 @@ use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
  */
 class FesamlController extends ActionController
 {
-    /**
-     * fesamlRepository
-     *
-     * @var \Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository
-     * @inject
-     */
-    protected $fesamlRepository = null;
+//    /**
+//     * fesamlRepository
+//     *
+//     * @var \Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository
+//     * @inject
+//     */
+//    protected $fesamlRepository = null;
 
     protected $idp_name = null;
 
@@ -50,29 +51,29 @@ class FesamlController extends ActionController
 
     protected $uid = 1;
 
-    /**
-     * action list
-     * 
-     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
-     * @return void
-     */
-    public function listAction()
-    {
-        $samlmodels = $this->samlmodelRepository->findAll();
-        $this->view->assign('samlmodels', $samlmodels);
-    }
+//    /**
+//     * action list
+//     *
+//     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
+//     * @return void
+//     */
+//    public function listAction()
+//    {
+//        $samlmodels = $this->samlmodelRepository->findAll();
+//        $this->view->assign('samlmodels', $samlmodels);
+//    }
 
-    /**
-     * action show
-     *
-     * @param Fesaml $fesaml
-     * @return void
-     */
-    public function showAction(Fesaml $fesaml)
-    {
-        $samlmodels = $this->samlmodelRepository->findAll();
-        $this->view->assign('samlmodel', $samlmodels);
-    }
+//    /**
+//     * action show
+//     *
+//     * @param Fesaml $fesaml
+//     * @return void
+//     */
+//    public function showAction(Fesaml $fesaml)
+//    {
+//        $samlmodels = $this->samlmodelRepository->findAll();
+//        $this->view->assign('samlmodel', $samlmodels);
+//    }
 
     /**
      * action print
@@ -81,7 +82,7 @@ class FesamlController extends ActionController
      * @return void
      * @throws \Exception
      */
-    public function printAction()
+    public function requestAction()
     {
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
 
@@ -196,7 +197,7 @@ class FesamlController extends ActionController
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-        $certFilePath = file_get_contents(__DIR__ . '/../../sso/resources/sp-key.key');
+        $certFilePath = file_get_contents(Utilities::getBaseUrl().'/'.Utilities::getResourceDir(). 'sp-key.key');
         $key->loadKey($certFilePath);
         $signature = $key->signData($samlRequest);
         $signature = base64_encode($signature);

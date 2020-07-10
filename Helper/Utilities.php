@@ -25,27 +25,22 @@
 			 */
 			public static function getResourceDir()
 			{
-//                $baseUrl = self::getBaseUrl();
-//                error_log("baseUrl : ".$baseUrl);
                 global $sep;
                 $relPath = self::getExtensionRelativePath();
                 $sep = substr($relPath, -1);
-                $resFolder = $relPath.'sso'.$sep.'resources'.$sep;
-                error_log("resFolder : ".$resFolder);
-                return $resFolder;
+                //                error_log("resFolder : ".$resFolder);
+                return $relPath.'Helper'.$sep.'resources'.$sep;
 			}
 
 			public static function getExtensionAbsolutePath(){
                 $extAbsPath = ExtensionManagementUtility::extPath('miniorange_saml');
                 error_log("extensionAbsolutePath : ".$extAbsPath);
-//              print_r("extensionPath : ".$extAbsPath,true);
                 return $extAbsPath;
 			}
 
 			public static function getExtensionRelativePath(){
                 $extRelativePath= PathUtility::getAbsoluteWebPath(self::getExtensionAbsolutePath());
                 error_log("extRelativePath : ".$extRelativePath);
-//              print_r("extRelativePath : ".$extRelativePath,true);
                 return $extRelativePath;
 			}
 
@@ -68,7 +63,7 @@
 			 */
 			public static function getPrivateKey()
 			{
-					return self::getResourceDir().DIRECTORY_SEPARATOR.Constants::SP_KEY;
+				return self::getResourceDir().DIRECTORY_SEPARATOR.Constants::SP_KEY;
 			}
 
 /**
@@ -245,19 +240,12 @@
 			public static function showErrorFlashMessage($message, $header="ERROR"){
 				$message = GeneralUtility::makeInstance(FlashMessage::class,$message,$header,FlashMessage::ERROR);
                 $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-//				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
-//				$messageQueue->addMessage($message);
-//	            $messageQueue->renderFlashMessages();
 				$out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
 				echo $out;
 			}
 
 			public static function showSuccessFlashMessage($message, $header="OK"){
 				$message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::OK);
-//				$flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-//				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
-//				$messageQueue->addMessage($message);
-//				$messageQueue->renderFlashMessages();
                 $out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
                 echo $out;
 			}

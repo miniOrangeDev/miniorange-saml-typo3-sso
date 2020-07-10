@@ -6,208 +6,19 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Main CSS-->
-    <link rel="stylesheet" type="text/css" href="/../../sso/includes/css/main.css">
-    <!-- Font-icon css-->
+
+    <f:comment><!--Main CSS --></f:comment>
+    <link rel="stylesheet" type="text/css" href="{extPath}Helper/resources/css/main.css">
+
+    <f:comment><!-- Font-icon css--></f:comment>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <f:comment><!-- load js file --></f:comment>
+    <script type="text/javascript" src="{extPath}Helper/resources/js/backend.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-
-        html, body {
-            overflow: auto;
-            height: 100%;
-        }
-
-        .button {
-            display: inline-block;
-            border-radius: 2px;
-            background-color: #f2f2f2;
-            border: none;
-            color: white;
-            text-shadow: 2px 2px 4px #0f0e0e;
-            font-weight: bold;
-            text-align: center;
-            font-size: 28px;
-            padding: 5px;
-            width: 200px;
-            transition: all 0.5s;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .button span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
-
-        .button span:after {
-            content: '\00bb';
-            position: absolute;
-            opacity: 0;
-            top: 0;
-            right: -20px;
-            transition: 0.5s;
-        }
-
-        .button:hover span {
-            padding-right: 25px;
-        }
-
-        .button:hover span:after {
-            opacity: 1;
-            right: 0;
-        }
-    </style>
-
-    <style>
-        body {font-family: Arial;}
-
-        /* Style the tab */
-        .tab {
-            overflow: hidden;
-            border: 1px solid #ccc;
-            /*background-color: #f1f1f1;*/
-            background: #002b36;
-            box-shadow: 2px 2px 2px darkgrey;
-        }
-
-        /* Style the buttons inside the tab */
-        .tab button {
-            background-color: inherit;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 10px 14px;
-            transition: 0.3s;
-            font-size: 18px;
-        }
-
-        /* Change background color of buttons on hover */
-        .tab button:hover {
-            /*background-color: #969cdb;*/
-            background: #afcee9;
-        }
-
-        /* Create an active/current tablink class */
-        .tab button.active {
-            background-color: #428bca; ;
-            color: white;
-            font-weight: bolder;
-        }
-
-        /* Style the tab content */
-        .tabcontent {
-            display: none;
-            padding: 3px 6px;
-            /*border: 1px solid #ccc;*/
-            border-top: none;
-        }
-    </style>
-
-    <style>
-
-        .profileTable{
-            width: 95%;
-            background: #f1f1f1;
-            border: solid 2px black;
-        }
-
-        .profileTable tbody td {
-            text-align: center;
-            padding: 15px;
-            border: solid 2px black;
-        }
-
-        #topContainer{
-            display: flex;
-            flex-flow: row wrap;
-            width: 100%;
-            justify-content: space-evenly           /*justify-content: space-between;*/
-        }
-
-        #leftContainer{
-            order: 1;
-            /*width: 52%;*/
-            flex: 0.2 1 45% ;
-        }
-
-        #rightContainer{
-            order: 2;
-            /*width: 35%;*/
-            flex: 0.2 1 30% ;
-        }
-
-        .hideElement{
-            display: none;
-        }
-
-        .showElement{
-            display: block;
-        }
-
-        hr{
-            border-top: 2px solid lightgrey ;
-        }
-
-        .helpButton{
-            background: #428bca;
-            color: white;
-            font-weight: bold;
-            /*width: 100px;*/
-            /*padding: 4px;*/
-            box-shadow: 2px 2px 2px darkgrey;
-            text-shadow: 2px 2px 4px black;
-            border-radius: 5px;
-        }
-
-        .premiumMessage{
-            color: red;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .premiumBox{
-            font-weight: bold;
-            background: #ffe6e6;
-        }
-
-        .gm-div{
-            display: flex;
-            flex-flow: row nowrap;
-            width: 100%;
-            /*justify-content: flex-end;*/
-            margin: 15px 0;
-        }
-
-        .gm-input-label{
-            order: 1;
-            /*width: 40%;*/
-            justify-self: left;
-            flex: 0.2 1 40% ;
-            background: lightgrey;
-            margin-right: 2% ;
-        }
-
-        .gm-input{
-            order: 2;
-            /*width: 35%;*/
-            flex: 0.2 1 50% ;
-            margin-left: 2% ;
-            justify-self: right;
-        }
-        .gm-submit{
-            margin-left: 2%;
-        }
-
-    </style>
 
 </head>
 
@@ -217,9 +28,9 @@
 
 <div class="tab">
     <button class="tablinks button" id="Account_Tab" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
-    <button class="tablinks button" id="Idp_Settings_Tab" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
-    <button class="tablinks button" id="SP_Settings_Tab" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
-    <button class="tablinks button" id="Attribute Mapping" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
+    <button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
+    <button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
+    <button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
     <button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab(event, 'Group_Mapping')">Group Mapping</button>
     <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab(event,'Support')">Support</button>
 </div>
@@ -228,9 +39,9 @@
 
 <div id="topContainer">
     <f:comment><!--Left Container--></f:comment>
-    <div id="leftContainer">
+    <div id="leftContainer" class="container">
 
-    <!--   IDENTITY PROVIDER TAB-->
+        <f:comment><!--   IDENTITY PROVIDER TAB--></f:comment>
      <div id="Identity_Provider" class="tabcontent"  >
         <h3><strong>Identity Provider Settings</strong></h3>  <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>
          <hr>
@@ -337,7 +148,7 @@
         </div>
         </div>
 
-    <!--   SERVICE PROVIDER TAB -->
+        <f:comment><!--   SERVICE PROVIDER TAB --></f:comment>
         <div id="Service_Provider"  class="tabcontent"  >
             <h3><strong>Service Provider Settings</strong></h3> <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>
             <hr>
@@ -381,7 +192,7 @@
 
                 <div class="form-group" style="margin:20px 0">
                     <label><b>  SP Certificate:</b></label>
-                    <a style="padding-left:5px;" target="_blank" href="{extPath}sso/resources/miniorange_sp_cert.cer" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
+                    <a style="padding-left:5px;" target="_blank" href="{extPath}Helper/resources/miniorange_sp_cert.cer" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
                     <br/>
                     <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
                         Provide this certificate to your Identity Provider for encryption or signing.
@@ -397,7 +208,7 @@
             </div>
         </div>
 
-    <!--   ATTRIBUTE MAPPING TAB-->
+        <f:comment><!--   ATTRIBUTE MAPPING TAB--></f:comment>
         <div id="Attribute_Mapping" class="tabcontent"  >
             <form id="attrs_form" method="post" action ="">
                 <input type="hidden" name="option" value="attribute_mapping">
@@ -477,7 +288,7 @@
             </form>
         </div>
 
-        <!--   GROUP MAPPING TAB-->
+        <f:comment><!--   GROUP MAPPING TAB--></f:comment>
         <div id="Group_Mapping" class="tabcontent"  >
             <form {disabled} id="gm_form" method="post" action ="">
                 <input type="hidden" name="option" value="group_mapping">
@@ -496,7 +307,6 @@
                 <h4><strong>Map Typo3 Groups to IDP Groups</strong></h4>
                 <hr>
 
-                <f:debug title="userGroups: ">{allUserGroups}</f:debug>
                 <f:for each="{allUserGroups}" as="userGroup">
                     <div class="gm-div">
                         <label class="form-control gm-input-label">{userGroup.title}</label>
@@ -557,9 +367,7 @@
                                    minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
                                    title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
                             <br>
-
                             <div id="confirmPasswordDiv">
-
                                 <label color="#FF0000">Confirm Password:</label>
                                 <input class="form-control" type="password"
                                            name="confirmPassword" placeholder="Confirm your password"
@@ -567,10 +375,8 @@
                                            title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
                             </div>
                             <br>
-
                             <button type="submit" class="btn btn-primary" value="submit" onClick="jQuery('#account_form').submit();"> Login </button>
                             <br>
-                            &nbsp;
                             &nbsp;
                         </div>
                         <br>
@@ -586,7 +392,7 @@
 
             <br>
 
-    <!--    IF  USER LOGGED-->
+            <f:comment><!--    IF  USER LOGGED--></f:comment>
             <f:if condition="{0: status} == {0: 'logged'}">
                 <div id="toggle3" class="panel_toggle">
                     <h3 ><strong>Profile</strong></h3>
@@ -636,8 +442,8 @@
 
     </div>
 
-<!-- Right Container - SUPPORT TAB-->
-    <div id="rightContainer">
+    <f:comment><!-- Right Container - SUPPORT TAB--></f:comment>
+    <div id="rightContainer" class="container">
         <div id="Support" class="tabcontent" >
             <h3><strong>Support</strong></h3>
             <hr>
@@ -649,7 +455,7 @@
                             <div class="col-lg-10">
                                 <form method="post" action="">
                                     <p><b>Need any help? Just send us a query and we will get back to you soon.</b></p>
-<!--                                    We can help you in configuring the connector with your Identity Provider. -->
+
                                     <input type="hidden" name="option" value="mo_saml_contact_us_query_option"/>
                                     &nbsp;
                                     <div class="form-group">
@@ -657,11 +463,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <input class="form-control" type="tel" name="mo_saml_contact_us_phone" placeholder="Enter your phone number">
+                                        <input class="form-control" type="tel" name="mo_saml_contact_us_phone" placeholder="Enter your phone number to get support on phone [optional]">
                                     </div>
 
                                     <div class="form-group">
-                                        <textarea class="form-control" rows="6" name="mo_saml_contact_us_query" placeholder="Enter your query here"></textarea>
+                                        <textarea class="form-control" rows="8" name="mo_saml_contact_us_query" placeholder="Please write your query here and hit submit to contact us."></textarea>
                                     </div>
                                     <div class="tile-footer">
                                         <button class="btn btn-primary" type="submit" name="submit">Submit</button>
@@ -676,85 +482,6 @@
     </div>
 
 </div>
-
-<script>
-
-    $(document).ready(function() {
-        let session = document.getElementById('taby').value;
-        console.log("Session : in document ready() = "+session);
-
-        if (session == "Service_Provider") {
-            openTab(event, 'Service_Provider');
-        }else if (session == "Identity_Provider"){
-            openTab(event, 'Identity_Provider');
-        }else if(session == "Support"){
-            openTab(event, 'Support');
-        }else if(session == "Attribute_Mapping") {
-            openTab(event, 'Attribute_Mapping');
-        }else if(session == "" || session == "Account" || session===null){
-            openTab(event, 'Account');
-        }
-    });
-
-    function openTab(evt, activeTab) {
-
-        console.log("inside openTab "+activeTab);
-
-        document.getElementById("leftContainer").classList.add("showElement");
-        document.getElementById("leftContainer").classList.remove("hideElement");
-
-        let i, tabcontent, tablinks;
-        // document.getElementsByClassName("leftContainer").style.display="block";
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-
-        if(activeTab!=="Support"){
-            document.getElementById(activeTab).style.display = "block";
-            document.getElementById("Support").style.display = "block";
-            let temp= activeTab + "_Tab";
-            console.log("tab id: "+temp);
-            document.getElementById(temp).className  += " active";
-        }else{
-            document.getElementById(activeTab).style.display = "block";
-            document.getElementById("Support_Tab").className  += " active";
-            document.getElementById("leftContainer").classList.replace("showElement","hideElement");
-        }
-
-        // evt.currentTarget.className += " active";
-    }
-
-    function removeFlashMessage(){
-
-        document.querySelectorAll('.typo3-messages').forEach(function(a){
-            a.remove();
-            console.log("remove typo3 messages.");
-        });
-    }
-
-    function ifUserRegistered(){
-        if (document.getElementById('registered').checked)
-        {
-            document.getElementById('confirmPasswordDiv').style.display = "none";
-        } else {
-            document.getElementById('confirmPasswordDiv').style.display = "block";
-        }
-    }
-
-</script>
-
-<script>
-    function mo_saml_valid_query(f) {
-        !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(
-            /[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
-    }
-</script>
 
 </body>
 </html>

@@ -1,0 +1,189 @@
+
+html, body {
+    overflow: auto;
+    height: 100%;
+}
+
+.button {
+    display: inline-block;
+    border-radius: 2px;
+    background-color: #f2f2f2;
+    border: none;
+    color: white;
+    text-shadow: 2px 2px 4px #0f0e0e;
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    padding: 5px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.button:hover span {
+    padding-right: 25px;
+}
+
+.button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+  body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    /*background-color: #f1f1f1;*/
+    background: #002b36;
+    box-shadow: 2px 2px 2px darkgrey;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 14px;
+    transition: 0.3s;
+    font-size: 18px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    /*background-color: #969cdb;*/
+    background: #afcee9;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #428bca; ;
+    color: white;
+    font-weight: bolder;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 3px 6px;
+    /*border: 1px solid #ccc;*/
+    border-top: none;
+}
+
+  .profileTable{
+      width: 95%;
+      background: #f1f1f1;
+      border: solid 2px black;
+  }
+
+.profileTable tbody td {
+    text-align: center;
+    padding: 15px;
+    border: solid 2px black;
+}
+
+#topContainer{
+    display: flex;
+    flex-flow: row nowrap;
+    width: 98%;
+    justify-content: space-evenly           /*justify-content: space-between;*/
+}
+
+#leftContainer{
+    order: 1;
+    /*width: 52%;*/
+    flex-basis: 45%;
+}
+
+#rightContainer{
+    order: 2;
+    flex-basis: 35%;
+    max-width: 65%;
+}
+
+.container{
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.hideElement{
+    display: none;
+}
+
+.showElement{
+    display: block;
+}
+
+hr{
+    border-top: 2px solid lightgrey ;
+}
+
+.helpButton{
+    background: #428bca;
+    color: white;
+    font-weight: bold;
+    /*width: 100px;*/
+    /*padding: 4px;*/
+    box-shadow: 2px 2px 2px darkgrey;
+    text-shadow: 2px 2px 4px black;
+    border-radius: 5px;
+}
+
+.premiumMessage{
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.premiumBox{
+    font-weight: bold;
+    background: #ffe6e6;
+}
+
+.gm-div{
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    /*justify-content: flex-end;*/
+    margin: 15px 0;
+}
+
+.gm-input-label{
+    order: 1;
+    /*width: 40%;*/
+    justify-self: left;
+    flex: 0.2 1 40% ;
+    background: lightgrey;
+    margin-right: 2% ;
+}
+
+.gm-input{
+    order: 2;
+    /*width: 35%;*/
+    flex: 0.2 1 50% ;
+    margin-left: 2% ;
+    justify-self: right;
+}
+.gm-submit{
+    margin-left: 2%;
+}

@@ -9,7 +9,7 @@ call_user_func(
             'Miniorange.MiniorangeSaml',
             'Fesaml',
             [
-                'Fesaml' => 'print'
+                'Fesaml' => 'request'
             ],
             // non-cacheable actions
             [
@@ -21,7 +21,7 @@ call_user_func(
             'Miniorange.MiniorangeSaml',
             'Response',
             [
-                'Response' => 'check'
+                'Response' => 'response'
             ],
             // non-cacheable actions
             [
