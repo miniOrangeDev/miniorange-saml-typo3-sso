@@ -105,19 +105,19 @@ html, body {
 #topContainer{
     display: flex;
     flex-flow: row nowrap;
-    width: 98%;
+    width: 100%;
     justify-content: space-evenly           /*justify-content: space-between;*/
 }
 
 #leftContainer{
     order: 1;
     /*width: 52%;*/
-    flex-basis: 45%;
+    flex-basis: 42%;
 }
 
 #rightContainer{
     order: 2;
-    flex-basis: 35%;
+    flex-basis: 32%;
     max-width: 65%;
 }
 

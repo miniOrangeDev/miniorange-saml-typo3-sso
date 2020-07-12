@@ -3,6 +3,7 @@
 namespace Miniorange\MiniorangeSaml\Controller;
 
 use Exception;
+use Miniorange\Helper\Constants;
 use PDO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -55,7 +56,7 @@ class BesamlController extends ActionController
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
 
-//            error_log("Check_certificate_format: ".$value3);
+//          error_log("Check_certificate_format: ".$value3);
 
             if($value1 == 1 && $value2 == 1 && $value3 == 1)
             {
@@ -414,7 +415,7 @@ public function update_saml_setting($column, $value)
                     'saml_logout_url' => $creds['saml_logout_url'],
                     'x509_certificate' => $creds['x509_certificate'],
                     'force_authn' => $creds['force_authn'],
-                    'login_binding_type' => $creds['login_binding_type'],
+                    'login_binding_type' => Constants::HTTP_REDIRECT,
                     'object' => $this->myjson,])
                 ->execute();
             error_log("affected rows ".$affectedRows);
@@ -429,6 +430,8 @@ public function update_saml_setting($column, $value)
                 ->set('saml_login_url', $creds['saml_login_url'])->execute();
             $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
                 ->set('saml_logout_url', $creds['saml_logout_url'])->execute();
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+                ->set('login_binding_type', Constants::HTTP_REDIRECT)->execute();
             $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
                 ->set('x509_certificate', $creds['x509_certificate'])->execute();
             $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
