@@ -4,7 +4,6 @@ defined('TYPO3_MODE') || die('Access denied.');
 call_user_func(
     function()
     {
-
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
             'Miniorange.MiniorangeSaml',
             'Fesaml',
@@ -22,24 +21,13 @@ call_user_func(
             'Response',
             [
                 'Response' => 'response'
-            ],
+            ]
             // non-cacheable actions
-            [
-                'Fesaml' => '',
-                'Besaml' => '',
-                'Response' => ''
-            ]
-        );
-
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Miniorange.MiniorangeSaml',
-            'Logout',
-            [
-                'Logout' => 'check'
-            ],
-            [
-                'Response' => ''
-            ]
+//            [
+//                'Fesaml' => '',
+//                'Besaml' => '',
+//                'Response' => ''
+//            ]
         );
 
     // wizards
@@ -65,15 +53,6 @@ call_user_func(
                             list_type = response
                         }
                     }
-                     Logout {
-                        iconIdentifier = miniorange_saml-plugin-logout
-                        title = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_MiniorangeSaml_logout.name
-                        description = LLL:EXT:miniorange_saml/Resources/Private/Language/locallang_db.xlf:tx_MiniorangeSaml_logout.description
-                        tt_content_defValues {
-                            CType = list
-                            list_type = Logout
-                        }
-                    }
                 }
                 show = *
             }
@@ -92,12 +71,6 @@ call_user_func(
 				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
-
-        $iconRegistry->registerIcon(
-            'miniorange_saml-plugin-logout',
-            \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
-            ['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
-        );
 
     }
 );

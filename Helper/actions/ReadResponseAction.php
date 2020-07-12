@@ -32,7 +32,7 @@ class ReadResponseAction
         $document = new \DOMDocument();
         $document->loadXML($samlResponse);
         $samlResponseXML = $document->firstChild;
-        if($samlResponseXML->localName == 'LogoutResponse') return null; //if logout response then return
+
         $samlResponse = new SamlResponse($samlResponseXML);	//convert the xml to SAML2Response object
         return $samlResponse;
     }

@@ -49,76 +49,53 @@
                 <form method="POST" action="" id="saml_form" >
                     <input type="hidden" name="option" value="save_connector_settings">
                             <div class="form-group" >
-                                <label for="idp_name"><b>Identity Provider Name</b></label>
+                                <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
                             </div>
 
                             <div class="form-group">
-                                <label for="idp_entity_id"><b>IDP Entity ID</b></label>
+                                <label for="idp_entity_id"><b>IDP Entity ID</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" {log} name="idp_entity_id" id="idp_entity_id" type="text"
                                        required value="{conf_idp.idp_entity_id}">
                             </div>
 
                             <div class="form-group">
-                                <label for="saml_login_url"><b>SAML Login URL</b></label>
+                                <label for="saml_login_url"><b>SAML Login URL</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" {log} name="saml_login_url" id="saml_login_url" type="text"
                                        required value="{conf_idp.saml_login_url}">
                             </div>
 
-                            <div class="premiumBox" disabled >
-
-                                <label><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
+                            <div >
+                                <label class="premiumBox"><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
                                 <table>
-                                    <f:if condition="{0: conf_idp.login_binding_type} == {0: 'HttpRedirect'} or {0: conf_idp.login_binding_type} == {0: ''} ">
                                         <tr>
                                             <td style="padding:10px;">
                                                 <div class="animated-radio-button">
                                                     <label>
-                                                        <input class="inputabs" disabled checked type="radio" name="login_binding_type" id="http_redirect_binding1" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
+                                                        <input class="inputabs" disabled checked type="radio" name="login_binding_type" id="http_redirect_binding" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
                                                     </label>
                                                 </div>
                                             </td>
                                             <td style="padding:10px;">
-
                                                 <div class="animated-radio-button">
                                                     <label>
-                                                        <input class="inputabs" disabled  type="radio" name="login_binding_type" id="http_post_binding1" value="HttpPost"><span class="label-text">Http-Post</span>
+                                                        <input class="inputabs" disabled  type="radio" name="login_binding_type" id="http_post_binding" value="HttpPost"><span class="label-text">Http-Post</span>
                                                     </label>
                                                 </div>
                                             </td>
                                         </tr>
-                                    </f:if>
-                                    <f:if condition="{0: conf_idp.login_binding_type} == {0: 'HttpPost'}">
-                                        <tr>
-                                            <td style="padding:10px;">
-                                                <div class="animated-radio-button">
-                                                    <label>
-                                                        <input class = inputabs disabled checked type="radio" name="login_binding_type" id="http_redirect_binding" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td style="padding:10px;">
-
-                                            <div class="animated-radio-button">
-                                                <label>
-                                                    <input class = inputabs disabled checked type="radio" name="login_binding_type" id="http_post_binding" value="HttpPost"><span class="label-text">Http-Post</span>
-                                                </label>
-                                            </div>
-                                            </td>
-                                        </tr>
-                                    </f:if>
                                 </table>
                             </div>
 
                             <div class="form-group" style= "border: black">
-                                <label for="x509_certificate"><b>SAML x509 Certificate</b></label>
-                                <textarea class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
+                                <label for="x509_certificate"><b>SAML x509 Certificate</b><span class="premiumMessage">*</span></label>
+                                <textarea required class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
                                 <small><b>NOTE:</b> Format of the certificate:<br/><b>-----BEGIN CERTIFICATE-----<br/>XXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>-----END CERTIFICATE-----</b></small><br/>
                             </div>
 
                             <div class="form-group">
-                                <label for="saml_logout_url"><b>SAML Logout URL</b></label>
-                                <input class="form-control" {log} name="saml_logout_url" id="saml_logout_url" type="text" value="{conf_idp.saml_logout_url}">
+                                <label for="saml_logout_url" class="premiumBox"><b>SAML Logout URL</b> <span class="premiumMessage">  [Premium Feature] </span></label>
+                                <input class="form-control" disabled name="saml_logout_url" id="saml_logout_url" type="text" value="">
                             </div>
 
                             <label for="signing_info"><b>Signing</b></label>
@@ -130,20 +107,20 @@
                                 </div>
                             </div>
 
-                            <div class="premiumBox" disabled >
+                            <div >
                                 <div class="animated-checkbox">
                                     <input type="checkbox" disabled  id="force_authn"  name="force_authn" >
-                                    <label> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
+                                    <label class="premiumBox"> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
                                     &nbsp
                                 </div>
                             </div>
 
                     &nbsp
                     <div class="tile-footer">
-                        <button class="btn btn-primary" type="button" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
+                        <button class="btn btn-primary" type="submit" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
                         <a  {log} style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
-                    </div>
-
+                    </div><br>
+<br>
                 </form>
         </div>
         </div>
@@ -156,7 +133,7 @@
             <form action="" method="post" id="sp_settings"  >
 
                 <input type="hidden" name="option" value="save_sp_settings"/>
-                <!--<div style="width: 40%; display: inline-block">-->
+                <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
                 <div class="form-group">
                     <label for="fesaml"><b> URL with fesaml</b></label>
                        <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
@@ -181,13 +158,12 @@
 
                 <div class="form-group" >
                     <label for="sp_entity_id"><b>SP Entity ID</b></label>
-                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}"
-                    >
+                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
                 </div>
 
-                <div class="form-group">
-                    <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
-                    <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf_sp.slo_url}"  >
+                <div class="form-group" >
+                    <label for="slo_url" class="premiumBox"><b>SINGLE LOGOUT URL</b><span class="premiumMessage">  [Premium Feature] </span></label>
+                    <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value=""  >
                 </div>
 
                 <div class="form-group" style="margin:20px 0">
@@ -203,7 +179,7 @@
                     <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
                     <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
                 </div>
-
+                <br>
             </form>
             </div>
         </div>

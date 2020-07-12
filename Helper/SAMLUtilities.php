@@ -347,8 +347,6 @@ class SAMLUtilities
         );
 
         //echo "Signature validated";
-
-
         return $ret;
     }
 
@@ -378,7 +376,7 @@ class SAMLUtilities
 
         /* Check the signature. */
         if (! $objXMLSecDSig->verify($key)) {
-            throw new Exception('Unable to validate Sgnature');
+            throw new Exception('Unable to validate Signature');
         }
     }
 

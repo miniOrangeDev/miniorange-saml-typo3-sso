@@ -9,9 +9,6 @@
 			<trans-unit id="tx_miniorangesaml_domain_model_besaml">
 				<source>Besaml</source>
 			</trans-unit>
-			<trans-unit id="tx_miniorangesaml_domain_model_logout">
-				<source>Logout</source>
-			</trans-unit>
 			<trans-unit id="tx_miniorangesaml_domain_model_response">
 				<source>Response</source>
 			</trans-unit>
@@ -26,12 +23,6 @@
 			</trans-unit>
 			<trans-unit id="tx_miniorangesaml_response.description">
 				<source>For handling SAMl Response</source>
-			</trans-unit>
-			<trans-unit id="tx_miniorangesaml_logout.name">
-				<source>Logout</source>
-			</trans-unit>
-			<trans-unit id="tx_miniorangesaml_logout.description">
-				<source>For Single Logout</source>
 			</trans-unit>
 		</body>
 	</file>
