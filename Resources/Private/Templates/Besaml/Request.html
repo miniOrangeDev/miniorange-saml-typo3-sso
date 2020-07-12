@@ -65,9 +65,9 @@
                                        required value="{conf_idp.saml_login_url}">
                             </div>
 
-                            <div class="premiumBox" disabled >
+                            <div >
 
-                                <label><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
+                                <label class="premiumBox"><strong>SAML Login Binding type</strong> <span class="premiumMessage">  [Premium Feature] </span></label>
                                 <table>
                                     <f:if condition="{0: conf_idp.login_binding_type} == {0: 'HttpRedirect'} or {0: conf_idp.login_binding_type} == {0: ''} ">
                                         <tr>
@@ -117,8 +117,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="saml_logout_url"><b>SAML Logout URL</b></label>
-                                <input class="form-control" {log} name="saml_logout_url" id="saml_logout_url" type="text" value="{conf_idp.saml_logout_url}">
+                                <label for="saml_logout_url" class="premiumBox"><b>SAML Logout URL</b> <span class="premiumMessage">  [Premium Feature] </span></label>
+                                <input class="form-control" disabled name="saml_logout_url" id="saml_logout_url" type="text" value="">
                             </div>
 
                             <label for="signing_info"><b>Signing</b></label>
@@ -130,10 +130,10 @@
                                 </div>
                             </div>
 
-                            <div class="premiumBox" disabled >
+                            <div >
                                 <div class="animated-checkbox">
                                     <input type="checkbox" disabled  id="force_authn"  name="force_authn" >
-                                    <label> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
+                                    <label class="premiumBox"> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
                                     &nbsp
                                 </div>
                             </div>
@@ -156,7 +156,7 @@
             <form action="" method="post" id="sp_settings"  >
 
                 <input type="hidden" name="option" value="save_sp_settings"/>
-                <!--<div style="width: 40%; display: inline-block">-->
+                <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
                 <div class="form-group">
                     <label for="fesaml"><b> URL with fesaml</b></label>
                        <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
@@ -181,13 +181,12 @@
 
                 <div class="form-group" >
                     <label for="sp_entity_id"><b>SP Entity ID</b></label>
-                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}"
-                    >
+                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
                 </div>
 
-                <div class="form-group">
-                    <label for="slo_url"><b>SINGLE LOGOUT URL</b></label>
-                    <input class="form-control" {log} id="slo_url" name="slo_url" type="text" value="{conf_sp.slo_url}"  >
+                <div class="form-group" >
+                    <label for="slo_url" class="premiumBox"><b>SINGLE LOGOUT URL</b><span class="premiumMessage">  [Premium Feature] </span></label>
+                    <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value=""  >
                 </div>
 
                 <div class="form-group" style="margin:20px 0">

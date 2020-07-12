@@ -11,7 +11,11 @@ class Constants
     const HTTP_REDIRECT 	= 'HttpRedirect';
     const LOGOUT_REQUEST 	= 'LogoutRequest';
 
-    //Names
+    //Tables
+    const TABLE_SAML = 'saml';
+    const TABLE_CUSTOMER = 'customer';
+
+    //file Names
     const SP_CERT           = 'sp-certificate.crt';
     const SP_KEY            = 'sp-key.key';
     const RESOURCE_FOLDER   = 'resources';
@@ -22,7 +26,7 @@ class Constants
     const IMAGE_RIGHT 		= 'right.png';
     const IMAGE_WRONG 		= 'wrong.png';
   	const HOSTNAME        = "https://login.xecurify.com";
-	  const HASH            = 'aec500ad83a2aaaa7d676c56d8015509d439d56e0e1726b847197f7f089dd8ed';
+	const HASH            = 'aec500ad83a2aaaa7d676c56d8015509d439d56e0e1726b847197f7f089dd8ed';
 
 // DATABASE COLUMNS IN CUSTOMER TABLE
 

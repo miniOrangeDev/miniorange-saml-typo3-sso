@@ -12,9 +12,6 @@
 			<trans-unit id="tx_miniorangesaml_domain_model_response">
 				<source>Response</source>
 			</trans-unit>
-			<trans-unit id="tx_miniorangesaml_domain_model_logout">
-				<source>Logout</source>
-			</trans-unit>
 		</body>
 	</file>
 </xliff>

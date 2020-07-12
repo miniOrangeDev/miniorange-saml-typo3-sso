@@ -17,12 +17,6 @@ call_user_func(
             'response'
         );
 
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'Miniorange.MiniorangeSaml',
-            'Logout',
-            'logout'
-        );
-
         if (TYPO3_MODE === 'BE') {
 
             \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
@@ -53,9 +47,5 @@ call_user_func(
 
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_miniorangesaml_domain_model_response', 'EXT:miniorange_saml/Resources/Private/Language/locallang_csh_tx_miniorangesaml_domain_model_response.xlf');
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_miniorangesaml_domain_model_response');
-
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_miniorangesaml_domain_model_logout', 'EXT:miniorange_saml/Resources/Private/Language/locallang_csh_tx_miniorangesaml_domain_model_logout.xlf');
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_miniorangesaml_domain_model_logout');
-
     }
 );

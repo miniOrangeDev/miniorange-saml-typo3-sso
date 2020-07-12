@@ -18,19 +18,11 @@ class BesamlController extends ActionController
 {
     private $myjson = null;
 
-    private $myattrjson = null;
-
-    private $custom_attr = null;
-
     private $spobject = null;
 
     protected $sp_entity_id = null;
 
-    protected $site_base_url = null;
-
     protected $acs_url = null;
-
-    protected $slo_url = null;
 
     protected $fesaml = null;
 
@@ -53,21 +45,19 @@ class BesamlController extends ActionController
         error_log("REQUEST : ".$_POST['option']);
 
 //------------ IDENTITY PROVIDER SETTINGS---------------
-        if( !empty($_POST['idp_name']) and isset($_POST['idp_entity_id']) and isset($_POST['saml_login_url']) and isset($_POST['saml_logout_url'])){
+        if( !empty($_POST['idp_name']) and isset($_POST['idp_entity_id']) and isset($_POST['saml_login_url'])){
 
-
-
-        	error_log("Received IdP Settings - : \n Name :".$_POST['idp_name'].
-                                                        " \n Entity ID :".$_POST['idp_entity_id'].
-                                                        " \n SSO Url :".$_POST['saml_login_url']);
+//        	error_log("Received IdP Settings - : \n Name :".$_POST['idp_name'].
+//                                                        " \n Entity ID :".$_POST['idp_entity_id'].
+//                                                        " \n SSO Url :".$_POST['saml_login_url']);
 
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-            $value4 = $this->validateURL($_POST['saml_logout_url']);
-            error_log("Check_certificate_format: ".$value3);
 
-            if($value1 == 1 && $value2 == 1 && $value3 == 1 && $value4 = 1)
+//            error_log("Check_certificate_format: ".$value3);
+
+            if($value1 == 1 && $value2 == 1 && $value3 == 1)
             {
                 $obj = new BesamlController();
                 $obj->storeToDatabase($_POST);
@@ -97,50 +87,42 @@ class BesamlController extends ActionController
             }else{
 			    if($_POST['password'] == $_POST['confirmPassword']){
                     $this->account($_POST);
-//                    error_log("both passwords are equal.");
 			    }else{
                     Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
-                    error_log("both passwords are not same.");
                 }
             }
 
         }
 
 //------------ HANDLE LOG OUT ACTION---------------
-				if(isset($_POST['option'])){
+            if(isset($_POST['option'])){
 //					error_log("inside option ");
-					if ($_POST['option']== 'logout') {
-						error_log('Received log out request.');
-						$this->remove_cust();
-						Utilities::showSuccessFlashMessage('Logged out successfully.');
-					}
-					$this->view->assign('status','not_logged');
-				}
+                if ($_POST['option']== 'logout') {
+                    error_log('Received log out request.');
+                    $this->remove_cust();
+                    Utilities::showSuccessFlashMessage('Logged out successfully.');
+                }
+                $this->view->assign('status','not_logged');
+            }
 
 //------------ SERVICE PROVIDER SETTINGS---------------
-				if ($_POST['site_base_url'] != null || $_POST['acs_url'] != null
-						                                || $_POST['sp_entity_id'] != null
-						                                || $_POST['slo_url'] != null) {
+            if( $_POST['site_base_url'] != null || $_POST['acs_url'] != null || $_POST['sp_entity_id'] != null) {
+                $value1 = $this->validateURL($_POST['site_base_url']);
+                $value2 = $this->validateURL($_POST['acs_url']);
+                $value3 = $this->validateURL($_POST['sp_entity_id']);
 
-					  $value1 = $this->validateURL($_POST['site_base_url']);
-						$value2 = $this->validateURL($_POST['acs_url']);
-						$value3 = $this->validateURL($_POST['sp_entity_id']);
-  					$value4 = $this->validateURL($_POST['slo_url']);
+                if($value1 == 1 && $value2 == 1 && $value3 == 1)
+                {
+                    if($this->fetch('uid') == null){
+                        $this->save('uid',1,'saml');
+                    }
+                    $this->defaultSettings($_POST);
+                    Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
 
-						//error_log(" Url Validation Values :".$value1.$value2.$value3);
-
-						if($value1 == 1 && $value2 == 1 && $value3 == 1 && $value4 == 1)
-						{
-                            if($this->fetch('uid') == null){
-                                $this->save('uid',1,'saml');
-                            }
-							$this->defaultSettings($_POST);
-							Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
-
-						}else{
-							  Utilities::showErrorFlashMessage('Incorrect Input');
-						}
-				}
+                }else{
+                      Utilities::showErrorFlashMessage('Incorrect Input');
+                }
+            }
 
 //------------ CHANGING TABS---------------
         if($_POST['option'] == 'save_sp_settings' )
@@ -175,7 +157,7 @@ class BesamlController extends ActionController
 
 //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
         $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
-        $this->view->assign('conf_sp', json_decode($this->fetch('spobject')), true);
+        $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
 
 //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
         if($this->fetch_cust('cust_reg_status') == 'logged'){
