@@ -21,10 +21,6 @@ class BesamlController extends ActionController
 
     private $spobject = null;
 
-    protected $sp_entity_id = null;
-
-    protected $acs_url = null;
-
     protected $fesaml = null;
 
     protected $response = null;
@@ -46,23 +42,17 @@ class BesamlController extends ActionController
         error_log("REQUEST : ".$_POST['option']);
 
 //------------ IDENTITY PROVIDER SETTINGS---------------
-        if( !empty($_POST['idp_name']) and isset($_POST['idp_entity_id']) and isset($_POST['saml_login_url'])){
-
-//        	error_log("Received IdP Settings - : \n Name :".$_POST['idp_name'].
-//                                                        " \n Entity ID :".$_POST['idp_entity_id'].
-//                                                        " \n SSO Url :".$_POST['saml_login_url']);
+        if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
 
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-
-//          error_log("Check_certificate_format: ".$value3);
-
+            
             if($value1 == 1 && $value2 == 1 && $value3 == 1)
             {
                 $obj = new BesamlController();
                 $obj->storeToDatabase($_POST);
-				Utilities::showSuccessFlashMessage('IdP Setting saved successfully.');
+				Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
             }else{
                 if ($value3 == 0) {
                 	  Utilities::showErrorFlashMessage('Incorrect Certificate Format');
@@ -73,13 +63,13 @@ class BesamlController extends ActionController
         }
 
 //------------ HANDLING SUPPORT QUERY---------------
-        if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_contact_us_query_option" ) {
+        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_contact_us_query_option" ) {
 			 error_log('Received support query.  ');
             $this->support();
         }
 
 //------------ VERIFY CUSTOMER---------------
-        if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
+        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
 			error_log('Received verify customer request(login). ');
 
 			if($_POST['registered'] =='isChecked'){
@@ -96,18 +86,16 @@ class BesamlController extends ActionController
         }
 
 //------------ HANDLE LOG OUT ACTION---------------
-            if(isset($_POST['option'])){
+            elseif(isset($_POST['option']) and $_POST['option']== 'logout'){
 //					error_log("inside option ");
-                if ($_POST['option']== 'logout') {
                     error_log('Received log out request.');
                     $this->remove_cust();
                     Utilities::showSuccessFlashMessage('Logged out successfully.');
-                }
-                $this->view->assign('status','not_logged');
+                    $this->view->assign('status','not_logged');
             }
 
 //------------ SERVICE PROVIDER SETTINGS---------------
-            if( $_POST['site_base_url'] != null || $_POST['acs_url'] != null || $_POST['sp_entity_id'] != null) {
+            elseif(isset($_POST['option']) and $_POST['option'] == 'save_sp_settings') {
                 $value1 = $this->validateURL($_POST['site_base_url']);
                 $value2 = $this->validateURL($_POST['acs_url']);
                 $value3 = $this->validateURL($_POST['sp_entity_id']);
@@ -125,12 +113,19 @@ class BesamlController extends ActionController
                 }
             }
 
+
+        //GROUP MAPPINGS
+        elseif(isset($_POST['option']) and $_POST['option'] == 'group_mapping'){
+            Utilities::updateTable(Constants::DEFAULT_GROUP_COLUMN, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
+            Utilities::showSuccessFlashMessage('Default Group saved successfully.');
+        }
+
 //------------ CHANGING TABS---------------
         if($_POST['option'] == 'save_sp_settings' )
         {
             $this->tab = "Service_Provider";
         }
-        elseif ($_POST['option'] == 'save_connector_settings')
+        elseif ($_POST['option'] == 'idp_settings')
         {
             $this->tab = "Identity_Provider";
         }
@@ -155,13 +150,14 @@ class BesamlController extends ActionController
         $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
         $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
         $this->view->assign('allUserGroups', $allUserGroups);
+        $this->view->assign('defaultGroup',Utilities::fetchFromTable(Constants::DEFAULT_GROUP_COLUMN,Constants::TABLE_SAML));
 
 //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
         $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
         $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
 
 //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
-        if($this->fetch_cust('cust_reg_status') == 'logged'){
+        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
 					$this->view->assign('status','logged');
 					$this->view->assign('log', '');
                     $this->view->assign('nolog', 'display:none');

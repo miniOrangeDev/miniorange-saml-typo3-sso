@@ -27,15 +27,6 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  */
 class ResponseController extends ActionController
 {
-//    /**
-//     * responseRepository
-//     *
-//     * @var \Miniorange\MiniorangeSaml\Domain\Repository\ResponseRepository
-//     * @inject
-//     */
-//    protected $responseRepository = null;
-
-//    protected $fesamlRepository = null;
 
     protected $idp_name = null;
 
@@ -48,10 +39,6 @@ class ResponseController extends ActionController
     protected $saml_login_url = null;
 
     private $issuer = null;
-
-    private $ssoUrl = null;
-
-    private $bindingType = null;
 
     private $first_name = null;
 
@@ -238,9 +225,13 @@ class ResponseController extends ActionController
         $frontendUser->setEmail($username);
         $frontendUser->setPassword('');
 
-        $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid(1);
+        $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::DEFAULT_GROUP_COLUMN,Constants::TABLE_SAML));
+        $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
+
         if($userGroup!=null){
             $frontendUser->addUsergroup($userGroup);
+        }else{
+            exit("Unable to create User. No UserGroup found.");
         }
 
         $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);

@@ -47,7 +47,7 @@
          <hr>
             <div class="tile" >
                 <form method="POST" action="" id="saml_form" >
-                    <input type="hidden" name="option" value="save_connector_settings">
+                    <input type="hidden" name="option" value="idp_settings">
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
@@ -266,21 +266,33 @@
 
         <f:comment><!--   GROUP MAPPING TAB--></f:comment>
         <div id="Group_Mapping" class="tabcontent"  >
-            <form {disabled} id="gm_form" method="post" action ="">
+            <form {log} id="gm_form" method="post" action ="">
                 <input type="hidden" name="option" value="group_mapping">
-                <h3><strong>Group Mapping</strong></h3>  <span class="premiumMessage" > [Premium Feature]</span>
+                <h3><strong>Group Mapping</strong></h3>
                 <hr>
 
                 <f:comment><!--  Default UserGroup--></f:comment>
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label" for="defaultUserGroup">Default UserGroup</label>
                     <f:comment><!--  Populate DropDown--></f:comment>
-                    <select class="form-control gm-input" disabled name="defaultUserGroup" id="defaultUserGroup" >
-                            <option value="{userGroup.title}">{userGroup.title}</option>
-                    </select>
+                        <select class="form-control gm-input" {log} name="defaultUserGroup" id="defaultUserGroup" >
+                            <f:for each="{allUserGroups}" as="userGroup">
+                                <f:if condition="{userGroup.title}=={defaultGroup}" >
+                                    <f:then>
+                                        <option selected value="{userGroup.title}">{userGroup.title}</option>
+                                    </f:then>
+                                    <f:else>
+                                        <option value="{userGroup.title}">{userGroup.title}</option>
+                                    </f:else>
+                                </f:if>
+                            </f:for>
+                        </select>
                 </div>
-
-                <h4><strong>Map Typo3 Groups to IDP Groups</strong></h4>
+                <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em>  Users will be assigned this group by default. Please create a usergroup if no usergroup is there.</em><br>
+                    &nbsp;
+                    &nbsp;
+                <br>
+                <h4><strong>Map Typo3 Groups to IDP Groups</strong> <span class="premiumMessage" > [Premium Feature]</span></h4>
                 <hr>
 
                 <f:for each="{allUserGroups}" as="userGroup">
@@ -290,7 +302,7 @@
                     </div>
                 </f:for>
                 <br/>
-                <button type="submit" disabled class="btn btn-primary gm-submit" >Save Group Mapping</button>
+                <button type="submit" {log} class="btn btn-primary gm-submit" >Save Group Mapping</button>
             </form>
 
         </div>
@@ -352,15 +364,11 @@
                             </div>
                             <br>
                             <button type="submit" class="btn btn-primary" value="submit" onClick="jQuery('#account_form').submit();"> Login </button>
-                            <br>
-                            &nbsp;
+                            <br>&nbsp;
                         </div>
                         <br>
                     </div>
                     <br>
-                    &nbsp;
-
-                    &nbsp;
                 </form>
                 <br>
                 <br>
