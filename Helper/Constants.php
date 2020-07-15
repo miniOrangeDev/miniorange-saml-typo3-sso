@@ -15,6 +15,10 @@ class Constants
     const TABLE_SAML = 'saml';
     const TABLE_CUSTOMER = 'customer';
 
+    //Column SAML
+    const DEFAULT_GROUP_COLUMN = 'defaultGroup';
+
+
     //file Names
     const SP_CERT           = 'sp-certificate.crt';
     const SP_KEY            = 'sp-key.key';
@@ -34,7 +38,7 @@ class Constants
 	 const CUSTOMER_KEY = "cust_key";
 	 const CUSTOMER_API_KEY = "cust_api_key";
 	 const CUSTOMER_TOKEN = "cust_token";
-	 const REG_STATUS = "cust_reg_status";
+	 const CUSTOMER_REGSTATUS = "cust_reg_status";
 
 	 const AREA_OF_INTEREST = "TYPO3 miniOrange SAML SP";
 

@@ -137,6 +137,7 @@ CREATE TABLE saml (
   object text DEFAULT '',
   spobject text DEFAULT '',
   attrobject text DEFAULT '',
+  defaultGroup text DEFAULT '',
 	PRIMARY KEY (uid)
 );
 
