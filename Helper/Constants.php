@@ -20,10 +20,10 @@ class Constants
 
 
     //file Names
-    const SP_CERT           = 'sp-certificate.crt';
-    const SP_KEY            = 'sp-key.key';
     const RESOURCE_FOLDER   = 'resources';
     const TEST_RELAYSTATE   = 'testconfig';
+    const SP_CERT           = 'sp-certificate.crt';
+    const SP_KEY            = 'sp-key.key';
     const SP_ALTERNATE_CERT = 'miniorange_sp_cert.crt';
     const SP_ALTERNATE_KEY  = 'miniorange_sp_priv_key.key';
     //images
