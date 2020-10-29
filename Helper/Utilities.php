@@ -128,10 +128,10 @@
             $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
         }
 
-        public static function getAlternatePrivateKey()
-        {
-            return self::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_ALTERNATE_KEY;
-        }
+//        public static function getAlternatePrivateKey()
+//        {
+//            return self::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_ALTERNATE_KEY;
+//        }
 
         /**
          * Get the Public Key File Path
