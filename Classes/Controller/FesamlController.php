@@ -166,8 +166,8 @@ class FesamlController extends ActionController
      * @param $sloUrl
      */
     public function sendHTTPPostRequest($samlRequest, $sendRelayState, $sloUrl){
-        $privateKeyPath = file_get_contents(__DIR__ . '/../../sso/resources/sp-key.key');
-        $publicCertPath = file_get_contents(__DIR__ . '/../../sso/resources/sp-certificate.crt');
+        $privateKeyPath = file_get_contents(__DIR__ . '/../../sso/resources/'.Constants::SP_KEY);
+        $publicCertPath = file_get_contents(__DIR__ . '/../../sso/resources/'.Constants::SP_CERT);
         $signedXML = SAMLUtilities::signXML($samlRequest, $publicCertPath, $privateKeyPath, 'NameIDPolicy');
         $base64EncodedXML = base64_encode($signedXML);
         //post request
@@ -197,7 +197,9 @@ class FesamlController extends ActionController
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-        $certFilePath = file_get_contents(Utilities::getBaseUrl().'/'.Utilities::getResourceDir(). 'sp-key.key');
+//        error_log("key-path: ".Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+        $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+//        error_log("certFilePath: ".$certFilePath);
         $key->loadKey($certFilePath);
         $signature = $key->signData($samlRequest);
         $signature = base64_encode($signature);

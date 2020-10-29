@@ -2,6 +2,7 @@
 
 namespace Miniorange\Helper\Actions;
 
+use Miniorange\Helper\Constants;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
 use Miniorange\Helper\SAMLUtilities;
 use Miniorange\Helper\Utilities;
@@ -67,8 +68,8 @@ class HttpAction
      */
     public function sendHTTPPostRequest($samlRequest,$sendRelayState,$sloUrl)
     {
-        $privateKeyPath = Utilities::getResourceDir() . DIRECTORY_SEPARATOR . 'sp-key.key';
-        $publicCertPath =  Utilities::getResourceDir() . DIRECTORY_SEPARATOR . 'sp-certificate.crt';
+        $privateKeyPath = Utilities::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_KEY;
+        $publicCertPath =  Utilities::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_CERT;
         $signedXML = SAMLUtilities::signXML($samlRequest, file_get_contents($publicCertPath),
             file_get_contents($privateKeyPath), 'NameIDPolicy' );
         $base64EncodedXML = base64_encode($signedXML);
