@@ -197,8 +197,9 @@ class FesamlController extends ActionController
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-        error_log("key-path: ".Utilities::getBaseUrl().'/'.Utilities::getResourceDir(). 'sp-key.key');
-        $certFilePath = file_get_contents(Utilities::getBaseUrl().'/'.Utilities::getResourceDir(). 'sp-key.key');
+//        error_log("key-path: ".Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+        $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+//        error_log("certFilePath: ".$certFilePath);
         $key->loadKey($certFilePath);
         $signature = $key->signData($samlRequest);
         $signature = base64_encode($signature);
