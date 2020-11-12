@@ -10,14 +10,14 @@ $EM_CONF[$_EXTKEY] = [
     'category' => 'plugin',
     'author' => 'Miniorange',
     'author_email' => 'info@xecurify.com',
-    'state' => 'stable',
+    'state' => 'alpha',
     'uploadfolder' => 0,
     'createDirs' => '',
     'clearCacheOnLoad' => 0,
-    'version' => '1.3.3',
+    'version' => '1.4.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.0-9.6.0',
+            'typo3' => '8.7.0-10.5.0',
         ],
         'conflicts' => [],
         'suggests' => [],
