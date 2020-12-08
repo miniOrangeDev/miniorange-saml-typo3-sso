@@ -5,29 +5,17 @@ call_user_func(
     function()
     {
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Fesaml',
-            [
-                'Fesaml' => 'request'
-            ],
+            [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ],
             // non-cacheable actions
-            [
-                'Fesaml' => 'control'
-            ]
+            [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'control' ]
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Response',
-            [
-                'Response' => 'response'
-            ]
-            // non-cacheable actions
-//            [
-//                'Fesaml' => '',
-//                'Besaml' => '',
-//                'Response' => ''
-//            ]
+            [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ]
         );
 
     // wizards
