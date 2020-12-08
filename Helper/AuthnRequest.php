@@ -74,7 +74,7 @@ class AuthnRequest
      */
     public function build()
     {   
-        $pluginSettings=PluginSettings::getPluginSettings();
+//        $pluginSettings=PluginSettings::getPluginSettings();
         $requestXmlStr = $this->generateXML();
         if(empty($this->bindingType) 
             || $this->bindingType == Constants::HTTP_REDIRECT)

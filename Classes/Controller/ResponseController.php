@@ -13,6 +13,8 @@ use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
 use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
 use Miniorange\Helper\Utilities;
 use ReflectionClass;
+use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
@@ -105,14 +107,20 @@ class ResponseController extends ActionController
                 $username = $this->ssoemail;
                 $GLOBALS['TSFE']->fe_user->checkPid = 0;
                 $info = $GLOBALS['TSFE']->fe_user->getAuthInfoArray();
-                $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
+                $user = fetchUserRecord($info['db_user'], $username);
                 if ($user == null) {
                     $user = $this->create($username);
-                    $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
+                    $user = fetchUserRecord($info['db_user'], $username);
                 }
 
+//              $mainContext = GeneralUtility::makeInstance(Context::class);
+                $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
+                $isLoggedIn = $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
+//                $this->setAspect('frontend.user', new UserAspect());
+////              $customContext->setAspect(GeneralUtility::makeInstance(UserAspect::class, true, true, false))
+
                 $GLOBALS['TSFE']->fe_user->forceSetCookie = TRUE;
-                $GLOBALS['TSFE']->fe_user->loginUser = 1;
+//              $GLOBALS['TSFE']->fe_user->loginUser = 1;
                 $GLOBALS['TSFE']->fe_user->start();
                 $GLOBALS['TSFE']->fe_user->createUserSession($user);
                 $GLOBALS['TSFE']->initUserGroups();
@@ -128,7 +136,8 @@ class ResponseController extends ActionController
                 $setSessionCookieMethod->invoke($GLOBALS['TSFE']->fe_user);
                 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = true;
                 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysAuthUser'] = true;
-                $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['login_confirmed'] = true;
+//              $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['login_confirmed'] = true;
+                Dispatcher::emit(\TYPO3\CMS\FrontendLogin\Event\LoginConfirmedEvent);
                 $GLOBALS['TSFE']->fe_user->storeSessionData();
 
               if (!isset($_SESSION)) {
