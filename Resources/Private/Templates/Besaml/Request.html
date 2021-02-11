@@ -199,60 +199,40 @@
                 <h3><strong>Attribute Mapping</strong> <span class="premiumMessage" > [Premium Feature]</span> </h3>
                 <hr>
                 <div class="tile">
-                    <div class="form-group">
-                        <label for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
-                        <input class="form-control" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
-                        <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em> User accounts will be created using this attribute value.</em>
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
+                        <input class="form-control gm-input" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
+                    </div>
+                    <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"> <em> User accounts will be created using this attribute value.</em></i>
+
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_email"><b>Email</b></label>
+                        <input class="form-control gm-input" id="saml_am_email" name="saml_am_email" type="text" disabled value="NameID">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_email"><b>Email</b></label>
-                        <input class="form-control" id="saml_am_email" name="saml_am_email" type="text" disabled value="NameID">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_groups"><b>Groups/Roles</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_groups" name="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_groups"><b>Groups/Roles</b></label>
-                        <input class="form-control" disabled id="saml_am_groups" name="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
+<!--                    <div class="form-group">-->
+<!--                        <label for="saml_am_title"><b>Title</b></label>-->
+<!--                        <input class="form-control gm-input" disabled id="saml_am_title" name="saml_am_title" type="text" value = "{conf_am.saml_am_title}">-->
+<!--                    </div>-->
+
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_fname"><b>First Name</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_fname" name="saml_am_fname" type="text" value = "">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_title"><b>Title</b></label>
-                        <input class="form-control" disabled id="saml_am_title" name="saml_am_title" type="text" value = "{conf_am.saml_am_title}">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_lname"><b>Last Name</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_lname" name="saml_am_lname" type="text" value = "">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_fname"><b>First Name</b></label>
-                        <input class="form-control" disabled id="saml_am_fname" name="saml_am_fname" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_lname"><b>Last Name</b></label>
-                        <input class="form-control" disabled id="saml_am_lname" name="saml_am_lname" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_address"><b>Address</b></label>
-                        <input class="form-control" disabled id="saml_am_address" name="saml_am_address" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_city"><b>City</b></label>
-                        <input class="form-control" disabled id="saml_am_city" name="saml_am_city" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_zip"><b>ZIP</b></label>
-                        <input class="form-control" disabled id="saml_am_zip" name="saml_am_zip" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_country"><b>Country</b></label>
-                        <input class="form-control" disabled id="saml_am_country" name="saml_am_country" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_phone"><b>Phone</b></label>
-                        <input class="form-control" disabled id="saml_am_phone" name="saml_am_phone" type="text" value = "">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label" for="saml_am_phone"><b>Phone</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_phone" name="saml_am_phone" type="text" value = "">
                     </div>
 
                 </div>
@@ -260,7 +240,7 @@
                 <div class="form-group" >
                     <input type="checkbox" disabled  id="saml_am_update_attr"  name="saml_am_update_attr" >
                     <label for="saml_am_update_attr">Sync user attributes on login</label><br>
-                    <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em>  Enable to sync ussr attribute values on every signin.</em>
+                    <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"><em>Enable to sync user attribute values on every signin.</em></i>
                 </div>
                 &nbsp;
                 <div class="form-group">
@@ -287,7 +267,7 @@
                     <button class="btn btn-primary" disabled type="button" >Delete (-)</button>
                 </div>
             </div>
-            <p><i class="fa fa-question-circle"  style="color:cadetblue; padding:5px;"> Please enter Column Name of Custom Attributes from FE_USERS table .</i>
+            <p style="color:cadetblue; padding:5px;"><i class="fa fa-question-circle" ><em>Enter column_name of custom attributes from FE_USERS table to ADD or DELETE mapping.</em></i>
 
             <div class="new-row vmargin">
                 <br />
