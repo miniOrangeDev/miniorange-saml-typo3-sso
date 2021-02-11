@@ -6,13 +6,13 @@ call_user_func(
     {
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'MiniorangeSaml',
+            'Miniorange.MiniorangeSaml',
             'Fesaml',
             'fesaml'
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'MiniorangeSaml',
+            'Miniorange.MiniorangeSaml',
             'Response',
             'response'
         );
