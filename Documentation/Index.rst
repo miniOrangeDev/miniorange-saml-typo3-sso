@@ -17,7 +17,7 @@ miniorangesaml
 		miniorange_saml
 
 	:Version:
-		1.2.3
+		1.4.0b
 
 	:Language:
 		en
@@ -29,7 +29,7 @@ miniorangesaml
 		saml sso,sso,single sign on,single sign-on,Azure AD,Okta,Google SSO,
 
 	:Copyright:
-		2019
+		2021
 
 	:Author:
 		miniOrange
