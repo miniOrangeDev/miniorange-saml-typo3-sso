@@ -5,6 +5,7 @@
     use Exception;
     use PDO;
     use TYPO3\CMS\Core\Database\ConnectionPool;
+    use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
     use TYPO3\CMS\Core\Messaging\FlashMessage;
     use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
     use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -219,6 +220,23 @@
             //$certificate = chunk_split($certificate, 64, "\r\n");
             //$certificate = "-----BEGIN CERTIFICATE-----\r\n" . $certificate . "-----END CERTIFICATE-----";
             return $certificate;
+        }
+
+        //---------------------FETCHUID_FROM_USERNAME_check_for_disabled user--------------------------
+        public static function fetchUserFromUsername($username)
+        {
+            $table = Constants::TABLE_FE_USERS;
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+            // Remove all restrictions but add DeletedRestriction again
+            $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            $var_uid = $queryBuilder->select('uid','disable')->from($table)->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
+            )->execute()->fetch();
+            if(null == $var_uid){
+                error_log("uid null: ".print_r($var_uid,true));
+                return false;
+            }
+            return $var_uid;
         }
 
 
