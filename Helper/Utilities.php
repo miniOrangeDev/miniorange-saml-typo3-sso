@@ -229,7 +229,7 @@
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
             // Remove all restrictions but add DeletedRestriction again
             $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-            $var_uid = $queryBuilder->select('uid','disable')->from($table)->where(
+            $var_uid = $queryBuilder->select('*')->from($table)->where(
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
             )->execute()->fetch();
             if(null == $var_uid){
