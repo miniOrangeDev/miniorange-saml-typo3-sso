@@ -5,7 +5,7 @@ call_user_func(
     function()
     {
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'MiniorangeSaml',
+            'Miniorange.MiniorangeSaml',
             'Fesaml',
             [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ],
             // non-cacheable actions
@@ -13,7 +13,7 @@ call_user_func(
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'MiniorangeSaml',
+            'Miniorange.MiniorangeSaml',
             'Response',
             [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ]
         );
@@ -59,22 +59,6 @@ call_user_func(
 				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
-
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
-            'miniorange_saml',
-            'auth',
-            Miniorange\MiniorangeSaml\Service\LoginUser::class,
-            [
-                'title' => 'SAML SSO Login',
-                'description' => 'Allows sso for users',
-                'subtype' => 'getUserFE, authUserFE',
-                'available' => true,
-                'priority' => 70,
-                'quality' => 60,
-                'className' => Miniorange\MiniorangeSaml\Service\LoginUser::class,
-                'public' => true
-            ]
-        );
 
     }
 );
