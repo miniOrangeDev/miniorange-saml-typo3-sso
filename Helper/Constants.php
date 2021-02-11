@@ -14,6 +14,7 @@ class Constants
     //Tables
     const TABLE_SAML = 'saml';
     const TABLE_CUSTOMER = 'customer';
+    const TABLE_FE_USERS = 'fe_users';
 
     //Column SAML
     const DEFAULT_GROUP_COLUMN = 'defaultGroup';
