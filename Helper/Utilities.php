@@ -29,21 +29,20 @@
             global $sep;
             $relPath = self::getExtensionRelativePath();
             $sep = substr($relPath, -1);
-
             return $relPath . 'Helper' . $sep . 'resources' . $sep;
         }
 
         public static function getExtensionAbsolutePath()
         {
             $extAbsPath = ExtensionManagementUtility::extPath('miniorange_saml');
-            error_log("extensionAbsolutePath : " . $extAbsPath);
+//            error_log("extensionAbsolutePath : " . $extAbsPath);
             return $extAbsPath;
         }
 
         public static function getExtensionRelativePath()
         {
             $extRelativePath = PathUtility::getAbsoluteWebPath(self::getExtensionAbsolutePath());
-            error_log("extRelativePath : " . $extRelativePath);
+//            error_log("extRelativePath : " . $extRelativePath);
             return $extRelativePath;
         }
 

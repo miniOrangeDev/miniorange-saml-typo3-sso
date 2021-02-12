@@ -38,7 +38,6 @@ class BesamlController extends ActionController
     public function requestAction()
     {
 
-
 //------------ IDENTITY PROVIDER SETTINGS---------------
         if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
 
