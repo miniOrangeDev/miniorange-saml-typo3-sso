@@ -5,7 +5,7 @@ call_user_func(
     function()
     {
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Fesaml',
             [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ],
             // non-cacheable actions
@@ -13,7 +13,7 @@ call_user_func(
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Response',
             [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ]
         );

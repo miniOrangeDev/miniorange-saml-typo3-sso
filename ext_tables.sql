@@ -116,20 +116,18 @@ CREATE TABLE saml (
   saml_login_url varchar (100) DEFAULT '' NOT NULL,
   saml_logout_url varchar (100) DEFAULT '' NOT NULL,
   x509_certificate varchar (1500) DEFAULT '',
-  login_binding_type varchar (100) DEFAULT '' ,
+  login_binding_type varchar (100) DEFAULT 'HttpRedirect' ,
   site_base_url varchar (100) DEFAULT '' NOT NULL,
   fesaml varchar (100) DEFAULT '' NOT NULL,
   response varchar (100) DEFAULT '' NOT NULL,
-  force_authn varchar (100) DEFAULT '' ,
   sp_entity_id varchar (100) DEFAULT '' NOT NULL,
   acs_url varchar (100) DEFAULT '' NOT NULL,
   slo_url varchar (100) DEFAULT '' ,
-  custom_attr int (11) DEFAULT '0' ,
   object text DEFAULT '',
   spobject text DEFAULT '',
   attrobject text DEFAULT '',
   defaultGroup text DEFAULT '',
-	PRIMARY KEY (uid)
+  PRIMARY KEY (uid)
 );
 
 CREATE TABLE customer (
@@ -142,4 +140,5 @@ CREATE TABLE customer (
 	cust_reg_status varchar (100) DEFAULT '' ,
 	cust_object varchar (100) DEFAULT '' ,
 	PRIMARY KEY (id)
+
 );

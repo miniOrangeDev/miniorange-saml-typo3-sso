@@ -38,8 +38,6 @@ class BesamlController extends ActionController
     public function requestAction()
     {
 
-        error_log("inside showAction : BeSamlController : ");
-        error_log("REQUEST : ".$_POST['option']);
 
 //------------ IDENTITY PROVIDER SETTINGS---------------
         if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
@@ -64,13 +62,11 @@ class BesamlController extends ActionController
 
 //------------ HANDLING SUPPORT QUERY---------------
         elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_contact_us_query_option" ) {
-			 error_log('Received support query.  ');
             $this->support();
         }
 
 //------------ VERIFY CUSTOMER---------------
         elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
-			error_log('Received verify customer request(login). ');
 
 			if($_POST['registered'] =='isChecked'){
                 error_log("registered is checked. Registering User : ");
@@ -87,8 +83,6 @@ class BesamlController extends ActionController
 
 //------------ HANDLE LOG OUT ACTION---------------
             elseif(isset($_POST['option']) and $_POST['option']== 'logout'){
-//					error_log("inside option ");
-                    error_log('Received log out request.');
                     $this->remove_cust();
                     Utilities::showSuccessFlashMessage('Logged out successfully.');
                     $this->view->assign('status','not_logged');
@@ -116,7 +110,7 @@ class BesamlController extends ActionController
 
         //GROUP MAPPINGS
         elseif(isset($_POST['option']) and $_POST['option'] == 'group_mapping'){
-            Utilities::updateTable(Constants::DEFAULT_GROUP_COLUMN, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
+            Utilities::updateTable(Constants::COLUMN_GROUP_DEFAULT, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
             Utilities::showSuccessFlashMessage('Default Group saved successfully.');
         }
 
@@ -150,7 +144,7 @@ class BesamlController extends ActionController
         $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
         $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
         $this->view->assign('allUserGroups', $allUserGroups);
-        $this->view->assign('defaultGroup',Utilities::fetchFromTable(Constants::DEFAULT_GROUP_COLUMN,Constants::TABLE_SAML));
+        $this->view->assign('defaultGroup',Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
 
 //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
         $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
@@ -191,24 +185,20 @@ class BesamlController extends ActionController
         $this->update_cust('cust_reg_status', '');
         $this->update_cust('cust_email','');
 
-        $this->update_saml_setting('idp_name',"");
-        $this->update_saml_setting('idp_entity_id',"");
-        $this->update_saml_setting('saml_login_url',"");
-		$this->update_saml_setting('saml_logout_url',"");
-        $this->update_saml_setting('x509_certificate',"");
-        $this->update_saml_setting('login_binding_type',"");
-        $this->update_saml_setting('object',"");
+//        $this->update_saml_setting('idp_name',"");
+//        $this->update_saml_setting('idp_entity_id',"");
+//        $this->update_saml_setting('saml_login_url',"");
+//		  $this->update_saml_setting('saml_logout_url',"");
+//        $this->update_saml_setting('x509_certificate',"");
+//        $this->update_saml_setting('login_binding_type',"");
+//        $this->update_saml_setting('object',"");
     }
 
 //    VALIDATE CERTIFICATE
     public function validate_cert($saml_x509_certificate)
     {
 
-    	  error_log("saml_certificate : ".print_r($saml_x509_certificate,true));
-
-			  $certificate = openssl_x509_parse ( $saml_x509_certificate);
-
-			  error_log("parsed certificate : ".print_r($certificate,true));
+		$certificate = openssl_x509_parse ( $saml_x509_certificate);
 
         foreach( $certificate as $key => $value ) {
             if ( empty( $value ) ) {
