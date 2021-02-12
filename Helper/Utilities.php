@@ -95,8 +95,7 @@
         public static function fetchFromTable($col,$table)
         {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-            return $variable;
+            return $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
         }
 
 // -------------UPDATE TABLE---------------------------------------
@@ -128,11 +127,6 @@
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
             $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
         }
-
-//        public static function getAlternatePrivateKey()
-//        {
-//            return self::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_ALTERNATE_KEY;
-//        }
 
         /**
          * Get the Public Key File Path
@@ -285,5 +279,9 @@
 				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
 				$messageQueue->clear();
 			}
+
+			public static function log_php_error($msg="",$obj){
+			    error_log($msg.": ".print_r($obj,true));
+            }
 
     }

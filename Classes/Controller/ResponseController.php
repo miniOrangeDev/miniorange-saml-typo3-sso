@@ -86,10 +86,8 @@ class ResponseController extends ActionController
 
                 $this->name_id = current(current($samlResponseObj->getAssertions())->getNameId());
                 $this->ssoemail = current(current($samlResponseObj->getAssertions())->getNameId());
-                error_log("Assertions: ".print_r($this->name_id,true));
-
                 $attrs = current($samlResponseObj->getAssertions())->getAttributes();
-                error_log("Assertions: ".print_r($attrs,true));
+                Utilities::log_php_error("idp attribute",$attrs);
 
                 $attrs['NameID'] = ['0' => $this->name_id];
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
@@ -102,26 +100,13 @@ class ResponseController extends ActionController
                 $responseAction = new ProcessResponseAction($samlResponseObj, $this->acs_url, $this->issuer, $this->sp_entity_id, $this->signedResponse, $this->signedAssertion, $this->x509_certificate);
                 $responseAction->execute();
                 $ses_id = current($samlResponseObj->getAssertions())->getSessionIndex();
-//              $attributes = current($samlResponseObj->getAssertions())->getAttributes();
-
                 $username = $this->ssoemail;
                 $GLOBALS['TSFE']->fe_user->checkPid = 0;
 
-                $loginData = array(
-                    'uname' => $this->ssoemail, //username
-                    'uident' => '', //password
-                    'status' => 'login'
-                );
-
                 $user = $this->createIfNotExist($username);
-//              debug($user);
-//              $info = $GLOBALS['TSFE']->fe_user->getAuthInfoArray();
-//              $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
 
                 $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
-
                 $GLOBALS['TSFE']->fe_user->forceSetCookie = TRUE;
-//              $GLOBALS['TSFE']->fe_user->loginUser = 1; //Deprecated
                 $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
 
                 $GLOBALS['TSFE']->fe_user->start();
@@ -141,12 +126,12 @@ class ResponseController extends ActionController
                 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysAuthUser'] = true;
                 $GLOBALS['TSFE']->fe_user->storeSessionData();
 
-              if (!isset($_SESSION)) {
-                  session_id('email');
-                  session_start();
-                  $_SESSION['email'] = $this->ssoemail;
-                  $_SESSION['id'] = $ses_id;
-              }
+                if (!isset($_SESSION)) {
+                      session_id('email');
+                      session_start();
+                      $_SESSION['email'] = $this->ssoemail;
+                      $_SESSION['id'] = $ses_id;
+                }
 
                $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
                \TYPO3\CMS\Core\Utility\HttpUtility::redirect($actual_link);
@@ -177,7 +162,7 @@ class ResponseController extends ActionController
             $frontendUser->setEmail($this->ssoemail);
             $frontendUser->setPassword('');  //Setting Random Password
 
-            $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::DEFAULT_GROUP_COLUMN,Constants::TABLE_SAML));
+            $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
             $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
 
             if($userGroup!=null){
