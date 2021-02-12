@@ -75,7 +75,7 @@ class ResponseController extends ActionController
     {
 
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-        error_log("in ResponseController: "); //.print_r($_REQUEST,true)
+//      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
 
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 

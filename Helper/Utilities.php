@@ -142,9 +142,9 @@
         public static function getImageUrl($imgFileName)
         {
             $imageDir = self::getResourceDir() . SEP . 'images' . SEP;
-            error_log("resDir : " . $imageDir);
+//            error_log("resDir : " . $imageDir);
             $iconDir = self::getExtensionRelativePath() . SEP . 'Resources' . SEP . 'Public' . SEP . 'Icons' . SEP;
-            error_log("iconDir : " . $iconDir);
+//            error_log("iconDir : " . $iconDir);
             return $iconDir . $imgFileName;
         }
 
@@ -226,7 +226,7 @@
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
             )->execute()->fetch();
             if(null == $var_uid){
-                error_log("uid null: ".print_r($var_uid,true));
+//                error_log("uid null: ".print_r($var_uid,true));
                 return false;
             }
             return $var_uid;
