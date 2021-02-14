@@ -1,25 +1,48 @@
 <?php
+
+use TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+
 defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(
     function()
     {
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'MiniorangeSaml',
-            'Fesaml',
-            [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ],
+
+        if (version_compare(TYPO3_version, '10.0.0', '>=')) {
+            $extensionName = 'MiniorangeSaml';
+            $pluginNameFesaml = 'Fesaml';
+            $pluginNameResponse = 'Response';
+            $cache_actions_fesaml = [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ];
+            $non_cache_actions_fesaml = [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'control' ];
+            $cache_actions_response = [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ];
+        }else{
+            $extensionName = 'Miniorange.MiniorangeSaml';
+            $pluginNameFesaml = 'Fesaml';
+            $pluginNameResponse = 'Response';
+            $cache_actions_fesaml = [ 'Fesaml' => 'request' ];
+            $non_cache_actions_fesaml = [ 'Fesaml' => 'control' ];
+            $cache_actions_response = [ 'Response' => 'response' ];
+        }
+
+        ExtensionUtility::configurePlugin(
+            $extensionName,
+            $pluginNameFesaml,
+            $cache_actions_fesaml,
             // non-cacheable actions
-            [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'control' ]
+            $non_cache_actions_fesaml
         );
 
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'MiniorangeSaml',
-            'Response',
-            [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ]
+        ExtensionUtility::configurePlugin(
+            $extensionName,
+            $pluginNameResponse,
+            $cache_actions_response
         );
 
-    // wizards
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
+        // wizards
+        ExtensionManagementUtility::addPageTSConfig(
         'mod {
             wizards.newContentElement.wizardItems.plugins {
                 elements {
@@ -46,17 +69,18 @@ call_user_func(
             }
        }'
     );
-		$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+
+		$iconRegistry = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
 		
 			$iconRegistry->registerIcon(
 				'miniorange_saml-plugin-fesaml',
-				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+				BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
 
 			$iconRegistry->registerIcon(
 				'miniorange_saml-plugin-response',
-				\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+				BitmapIconProvider::class,
 				['source' => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png']
 			);
 
