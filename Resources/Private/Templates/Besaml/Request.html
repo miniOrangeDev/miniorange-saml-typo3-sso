@@ -1,6 +1,6 @@
-<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<html lang="en" xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
 <!DOCTYPE html>
-<html lang="en">
+
 <head>
 
     <meta charset="utf-8">
@@ -27,21 +27,21 @@
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 
 <div class="tab">
-    <button class="tablinks button" id="Account_Tab" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
-    <button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
-    <button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab(event, 'Service_Provider')">SP Settings</button>
-    <button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab(event, 'Attribute_Mapping')">Attribute Mapping</button>
-    <button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab(event, 'Group_Mapping')">Group Mapping</button>
-    <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab(event,'Support')">Support</button>
+    <button class="tablinks button" id="Account_Tab" onclick="removeFlashMessage(); openTab('Account')">Account</button>
+    <button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab( 'Identity_Provider')">IdP Settings</button>
+    <button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab('Service_Provider')">SP Settings</button>
+    <button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab('Attribute_Mapping')">Attribute Mapping</button>
+    <button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab('Group_Mapping')">Group Mapping</button>
+    <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab('Support')">Support</button>
 </div>
 
 <input type="hidden" name="taby" id="taby" value="{tab}">
 
 <div id="topContainer">
-    <f:comment><!--Left Container--></f:comment>
-    <div id="leftContainer" class="container">
+     <f:comment><!--Left Container--></f:comment>
+     <div id="leftContainer" class="container">
 
-        <f:comment><!--   IDENTITY PROVIDER TAB--></f:comment>
+     <f:comment><!--   IDENTITY PROVIDER TAB--></f:comment>
      <div id="Identity_Provider" class="tabcontent"  >
         <h3><strong>Identity Provider Settings</strong></h3>  <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>
          <hr>
@@ -120,69 +120,77 @@
                         <button class="btn btn-primary" type="submit" {log} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
                         <a  {log} style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
                     </div><br>
-<br>
+                <br>
                 </form>
         </div>
         </div>
 
-        <f:comment><!--   SERVICE PROVIDER TAB --></f:comment>
-        <div id="Service_Provider"  class="tabcontent"  >
-            <h3><strong>Service Provider Settings</strong></h3> <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>
-            <hr>
-            <div class="tile">
-            <form action="" method="post" id="sp_settings"  >
+    <f:comment><!--   SERVICE PROVIDER TAB --></f:comment>
+    <div id="Service_Provider"  class="tabcontent"  >
+        <h3><strong>Service Provider Settings</strong></h3> <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>
+        <hr>
+        <div class="tile">
+        <form action="" method="post" id="sp_settings"  >
 
-                <input type="hidden" name="option" value="save_sp_settings"/>
-                <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
-                <div class="form-group">
-                    <label for="fesaml"><b> URL with fesaml</b></label>
-                       <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="response"><b>URL with response</b></label>
-                    <input class="form-control" {log} id="response" name="response" type="text" value="{conf_sp.response}" >
-                </div>
-
-                <div class="form-group">
-                    <label for="site_base_url"><b> Base URL</b></label>
-                    <input class="form-control" {log} id="site_base_url"
-                           name="site_base_url" type="text" value="{conf_sp.site_base_url}" >
-                </div>
-
-                <div class="form-group">
-                    <label for="acs_url"><b>ACS URL</b></label>
-                    <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
-                </div>
-
-                <div class="form-group" >
-                    <label for="sp_entity_id"><b>SP Entity ID</b></label>
-                    <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
-                </div>
-
-                <div class="form-group" >
-                    <label for="slo_url" class="premiumBox"><b>SINGLE LOGOUT URL</b><span class="premiumMessage">  [Premium Feature] </span></label>
-                    <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value=""  >
-                </div>
-
-                <div class="form-group" style="margin:20px 0">
-                    <label><b>  SP Certificate:</b></label>
-                    <a style="padding-left:5px;" target="_blank" href="{extPath}Helper/resources/sp-certificate.crt" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
-                    <br/>
-                    <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
-                        Provide this certificate to your Identity Provider for encryption or signing.
-                    </div>
-                </div>
-
-                <div class="tile-footer form-group">
-                    <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
-                    <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
-                </div>
-                <br>
-            </form>
+            <input type="hidden" name="option" value="save_sp_settings"/>
+            <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
+            <div class="form-group">
+                <label for="fesaml"><b> Fesaml plugin page URL</b></label>
+                   <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
+                >
             </div>
+
+            <div class="form-group">
+                <label for="response"><b>Response plugin page URL</b></label>
+                <input class="form-control" {log} id="response" name="response" type="text" value="{conf_sp.response}" >
+            </div>
+
+            <div class="form-group" >
+                <label for="slo_url" class="premiumBox"><b>Logout plugin page URL</b><span class="premiumMessage">  [Premium Feature] </span></label>
+                <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value=""  >
+            </div>
+
+            <div class="form-group">
+                <label for="site_base_url"><b> Base URL</b></label>
+                <input class="form-control" {log} id="site_base_url"
+                       name="site_base_url" type="text" value="{conf_sp.site_base_url}" >
+            </div>
+
+            <div class="form-group">
+                <label for="acs_url"><b>ACS URL</b></label>
+                <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
+            </div>
+
+            <div class="form-group" >
+                <label for="sp_entity_id"><b>Issuer/Entity ID</b></label>
+                <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
+            </div>
+
+            <div class="form-group">
+                <label for="login_redirect_url" class="premiumBox"><b>Redirect to this page after login</b><span class="premiumMessage">  [Premium Feature] </span></label>
+                <input class="form-control" disabled id="login_redirect_url" name="login_redirect_url" type="text" value="{conf_sp.login_redirect_url}"  >
+                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
+                    <br>
+            </div>
+
+            <div class="form-group" style="margin:20px 0">
+                <label><b>  SP Certificate:</b></label>
+                <a style="padding-left:5px;" target="_blank" href="{extPath}Helper/resources/sp-certificate.crt" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
+                <br/>
+                <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
+                    Provide this certificate to your Identity Provider for encryption or signing.
+                </div>
+            </div>
+
+            <div class="tile-footer form-group">
+                <button class="btn btn-primary" type="button" name="sp_settings_form" {log} id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
+                <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
+            </div>
+            <br>
+        </form>
+
         </div>
+    </div>
 
         <f:comment><!--   ATTRIBUTE MAPPING TAB--></f:comment>
         <div id="Attribute_Mapping" class="tabcontent"  >
@@ -191,61 +199,40 @@
                 <h3><strong>Attribute Mapping</strong> <span class="premiumMessage" > [Premium Feature]</span> </h3>
                 <hr>
                 <div class="tile">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
+                        <input class="form-control gm-input" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
+                    </div>
+                    <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"> <em> User accounts will be created using this attribute value.</em></i>
 
-                    <div class="form-group">
-                        <label for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
-                        <input class="form-control" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
-                        <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em> User accounts will be created using this attribute value.</em>
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_email"><b>Email</b></label>
+                        <input class="form-control gm-input" id="saml_am_email" name="saml_am_email" type="text" disabled value="NameID">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_email"><b>Email</b></label>
-                        <input class="form-control" id="saml_am_email" name="saml_am_email" type="text" disabled value="NameID">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_groups"><b>Groups/Roles</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_groups" name="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_groups"><b>Groups/Roles</b></label>
-                        <input class="form-control" disabled id="saml_am_groups" name="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
+<!--                    <div class="form-group">-->
+<!--                        <label for="saml_am_title"><b>Title</b></label>-->
+<!--                        <input class="form-control gm-input" disabled id="saml_am_title" name="saml_am_title" type="text" value = "{conf_am.saml_am_title}">-->
+<!--                    </div>-->
+
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_fname"><b>First Name</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_fname" name="saml_am_fname" type="text" value = "">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_title"><b>Title</b></label>
-                        <input class="form-control" disabled id="saml_am_title" name="saml_am_title" type="text" value = "{conf_am.saml_am_title}">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label"  for="saml_am_lname"><b>Last Name</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_lname" name="saml_am_lname" type="text" value = "">
                     </div>
 
-                    <div class="form-group">
-                        <label for="saml_am_fname"><b>First Name</b></label>
-                        <input class="form-control" disabled id="saml_am_fname" name="saml_am_fname" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_lname"><b>Last Name</b></label>
-                        <input class="form-control" disabled id="saml_am_lname" name="saml_am_lname" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_address"><b>Address</b></label>
-                        <input class="form-control" disabled id="saml_am_address" name="saml_am_address" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_city"><b>City</b></label>
-                        <input class="form-control" disabled id="saml_am_city" name="saml_am_city" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_zip"><b>ZIP</b></label>
-                        <input class="form-control" disabled id="saml_am_zip" name="saml_am_zip" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_country"><b>Country</b></label>
-                        <input class="form-control" disabled id="saml_am_country" name="saml_am_country" type="text" value = "">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="saml_am_phone"><b>Phone</b></label>
-                        <input class="form-control" disabled id="saml_am_phone" name="saml_am_phone" type="text" value = "">
+                    <div class="form-group gm-div">
+                        <label class="form-control gm-input-label" for="saml_am_phone"><b>Phone</b></label>
+                        <input class="form-control gm-input" disabled id="saml_am_phone" name="saml_am_phone" type="text" value = "">
                     </div>
 
                 </div>
@@ -253,7 +240,7 @@
                 <div class="form-group" >
                     <input type="checkbox" disabled  id="saml_am_update_attr"  name="saml_am_update_attr" >
                     <label for="saml_am_update_attr">Sync user attributes on login</label><br>
-                    <p><i class="fa fa-question-circle" id="signing_info" style="color:cadetblue; padding-left:5px;"></i> <em>  Enable to sync ussr attribute values on every signin.</em>
+                    <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"><em>Enable to sync user attribute values on every signin.</em></i>
                 </div>
                 &nbsp;
                 <div class="form-group">
@@ -262,6 +249,37 @@
                 </div>
 
             </form>
+
+            <br>
+            <h3><strong>Custom Attributes Mapping</strong><span class="premiumMessage" > [Premium Feature]</span> </h3>
+            <hr>
+            <div>
+                <div class="form-group same-row hmargin">
+                    <label for="this_attribute"><b>Enter Attribute Name: </b></label>
+                </div>
+                <div class="form-group same-row hmargin">
+                    <input class="form-control" disabled id="this_attribute" name="this_attribute" type="text" value = "">
+                </div>
+                <div class="form-group same-row hmargin">
+                    <button class="btn btn-primary" disabled type="button" >Add (+)</button>
+                </div>
+                <div class="form-group same-row hmargin">
+                    <button class="btn btn-primary" disabled type="button" >Delete (-)</button>
+                </div>
+            </div>
+            <p style="color:cadetblue; padding:5px;"><i class="fa fa-question-circle" ><em>Enter column_name of custom attributes from FE_USERS table to ADD or DELETE mapping.</em></i>
+
+            <div class="new-row vmargin">
+                <br />
+                <form disabled id="custom_attrs_form" method="post" action ="">
+                    <input type="hidden" name="option" value="custom_attribute_mapping">
+
+                    <div id="submit_custom_attr" class="form-group">
+                        <button type="submit" disabled class="btn btn-primary" onClick="$('#custom_attrs_form').submit();">Save Custom Attributes Mapping</button>
+                    </div>
+                </form>
+            </div>
+
         </div>
 
         <f:comment><!--   GROUP MAPPING TAB--></f:comment>
@@ -307,7 +325,7 @@
 
         </div>
 
-    <!--   ACCOUNT TAB-->
+         <f:comment>  <!--   ACCOUNT TAB--></f:comment>
         <div id="Account" style="margin-left: 20px" class="tabcontent" >
 
     <!--    IF USER NOT LOGGED IN -->

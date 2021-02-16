@@ -1,7 +1,6 @@
 <?php
 namespace Miniorange\MiniorangeSaml\Controller;
 
-use Exception;
 use Miniorange\Helper\Actions\ProcessResponseAction;
 use Miniorange\Helper\Actions\ReadResponseAction;
 use Miniorange\Helper\Actions\TestResultActions;
@@ -13,14 +12,23 @@ use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
 use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
 use Miniorange\Helper\Utilities;
 use ReflectionClass;
+use ReflectionException;
+use TYPO3\CMS\Core\Crypto\Random;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
+use Miniorange\MiniorangeSaml\Service\LoginUser;
+
+use Exception;
+use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityDSig;
-use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserGroupRepository;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Annotation\Inject;
+use TYPO3\CMS\Core\Utility\HttpUtility;
 
 /**
  * ResponseController
@@ -29,43 +37,28 @@ class ResponseController extends ActionController
 {
 
     protected $idp_name = null;
-
     protected $acs_url = null;
-
     protected $sp_entity_id = null;
-
-    protected $force_authn = null;
-
     protected $saml_login_url = null;
-
     private $issuer = null;
 
-    private $first_name = null;
-
-    private $last_name = null;
-
     private $signedAssertion = null;
-
     private $signedResponse = null;
-
     protected $persistenceManager = null;
-
     protected $frontendUserRepository = null;
 
+    private $name_id = null;
     private $ssoemail = null;
-
-    private $ses_id = null;
-
     private $x509_certificate;
 
-    /**
-     * @inject
-     * @param FrontendUserRepository $frontendUserRepository
-     */
-    public function injectFrontendUserRepository(FrontendUserRepository $frontendUserRepository)
-    {
-        $this->frontendUserRepository = $frontendUserRepository;
-    }
+//    /**
+//     * @inject
+//     * @param FrontendUserRepository $frontendUserRepository
+//     */
+//    public function injectFrontendUserRepository(FrontendUserRepository $frontendUserRepository)
+//    {
+//        $this->frontendUserRepository = $frontendUserRepository;
+//    }
 
     /**
      * action check
@@ -76,87 +69,139 @@ class ResponseController extends ActionController
      * @throws InvalidIssuerException
      * @throws InvalidSamlStatusCodeException
      * @throws InvalidSignatureInResponseException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function responseAction()
     {
 
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
+//      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
+
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
+
             $samlResponseObj = ReadResponseAction::execute();
+
             if ($samlResponseObj != null) {
                 $this->control();
+
+                $this->name_id = current(current($samlResponseObj->getAssertions())->getNameId());
                 $this->ssoemail = current(current($samlResponseObj->getAssertions())->getNameId());
                 $attrs = current($samlResponseObj->getAssertions())->getAttributes();
-                $attrs['NameID'] = ['0' => $this->ssoemail];
+                Utilities::log_php_error("idp attribute",$attrs);
+
+                $attrs['NameID'] = ['0' => $this->name_id];
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
+
                 if ($relayStateUrl == 'testconfig') {
                     (new TestResultActions($attrs))->execute();
                     die;
                 }
+
                 $responseAction = new ProcessResponseAction($samlResponseObj, $this->acs_url, $this->issuer, $this->sp_entity_id, $this->signedResponse, $this->signedAssertion, $this->x509_certificate);
                 $responseAction->execute();
-                $this->ses_id = current($samlResponseObj->getAssertions())->getSessionIndex();
-                $attributes = current($samlResponseObj->getAssertions())->getAttributes();
-                if ($attributes != null) {
-                    $this->first_name = $attributes[$this->fetch_fname()];
-                    $this->last_name = $attributes[$this->fetch_lname()];
-                }
+                $ses_id = current($samlResponseObj->getAssertions())->getSessionIndex();
                 $username = $this->ssoemail;
                 $GLOBALS['TSFE']->fe_user->checkPid = 0;
-                $info = $GLOBALS['TSFE']->fe_user->getAuthInfoArray();
-                $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
-                if ($user == null) {
-                    $user = $this->create($username);
-                    $user = $GLOBALS['TSFE']->fe_user->fetchUserRecord($info['db_user'], $username);
-                }
 
+                $user = $this->createIfNotExist($username);
+
+                $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
                 $GLOBALS['TSFE']->fe_user->forceSetCookie = TRUE;
-                $GLOBALS['TSFE']->fe_user->loginUser = 1;
+                $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
+
                 $GLOBALS['TSFE']->fe_user->start();
                 $GLOBALS['TSFE']->fe_user->createUserSession($user);
                 $GLOBALS['TSFE']->initUserGroups();
                 $GLOBALS['TSFE']->fe_user->loginSessionStarted = TRUE;
                 $GLOBALS['TSFE']->fe_user->user = $user;
                 $GLOBALS['TSFE']->fe_user->setKey('user', 'fe_typo_user', $user);
-                //$GLOBALS['TSFE']->fe_user->user = $GLOBALS['TSFE']->fe_user->fetchUserSession();
+
                 $GLOBALS['TSFE']->fe_user->setAndSaveSessionData('user', TRUE);
-                $this->ses_id = $GLOBALS['TSFE']->fe_user->fetchUserSession();
+                $ses_id = $GLOBALS['TSFE']->fe_user->fetchUserSession();
                 $reflection = new ReflectionClass($GLOBALS['TSFE']->fe_user);
                 $setSessionCookieMethod = $reflection->getMethod('setSessionCookie');
                 $setSessionCookieMethod->setAccessible(TRUE);
                 $setSessionCookieMethod->invoke($GLOBALS['TSFE']->fe_user);
                 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = true;
                 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysAuthUser'] = true;
-                $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['login_confirmed'] = true;
                 $GLOBALS['TSFE']->fe_user->storeSessionData();
 
-              if (!isset($_SESSION)) {
-                  session_id('email');
-                  session_start();
-                  $_SESSION['email'] = $this->ssoemail;
-                  $_SESSION['id'] = $this->ses_id;
-              }
-                $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                if (!isset($_SESSION)) {
+                      session_id('email');
+                      session_start();
+                      $_SESSION['email'] = $this->ssoemail;
+                      $_SESSION['id'] = $ses_id;
+                }
+
+               $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
                \TYPO3\CMS\Core\Utility\HttpUtility::redirect($actual_link);
+
             }
         }
 
     }
 
-    public function fetch_fname()
+    /**
+     *
+     * @param $username
+     * @return bool
+     */
+    public function createIfNotExist($username)
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $fname = $queryBuilder->select('saml_am_fname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        return $fname;
+//     $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+
+        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $user = Utilities::fetchUserFromUsername($username);
+            debug("User Search 1 : ".$user);
+        if ($user == false) {
+            $frontendUser = new FrontendUser();
+            $frontendUser->setUsername($username);
+
+            $frontendUser->setFirstName($this->first_name);
+            $frontendUser->setLastName($this->last_name);
+            $frontendUser->setEmail($this->ssoemail);
+            $frontendUser->setPassword('');  //Setting Random Password
+
+            $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
+            $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
+
+            if($userGroup!=null){
+                $frontendUser->addUsergroup($userGroup);
+            }else{
+                exit("Unable to create User. No UserGroup found.");
+            }
+
+            $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
+            $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
+            $user = Utilities::fetchUserFromUsername($username);
+            debug("User Search 1 : ".$user);
+
+            return $user;
+
+        }else{
+            if($user['disable'] == 1){
+                exit("You are not allowed to login. Please contact your admin.");
+            }
+
+            return $user;
+
+        }
+
     }
 
-    public function fetch_lname()
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $lname = $queryBuilder->select('saml_am_lname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        return $lname;
-    }
+//    public function fetch_fname()
+//    {
+//        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+//        $fname = $queryBuilder->select('saml_am_fname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+//        return $fname;
+//    }
+//
+//    public function fetch_lname()
+//    {
+//        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+//        $lname = $queryBuilder->select('saml_am_lname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+//        return $lname;
+//    }
 
     /**
      * @param $val
@@ -208,36 +253,6 @@ class ResponseController extends ActionController
         return openssl_random_pseudo_bytes($length);
     }
 
-    /**
-     *
-     * @param $username
-     * @return FrontendUser
-     */
-    public function create($username)
-    {
-        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-
-        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $frontendUser = new FrontendUser();
-        $frontendUser->setUsername($username);
-        $frontendUser->setFirstName($this->first_name);
-        $frontendUser->setLastName($this->last_name);
-        $frontendUser->setEmail($username);
-        $frontendUser->setPassword('');
-
-        $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::DEFAULT_GROUP_COLUMN,Constants::TABLE_SAML));
-        $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
-
-        if($userGroup!=null){
-            $frontendUser->addUsergroup($userGroup);
-        }else{
-            exit("Unable to create User. No UserGroup found.");
-        }
-
-        $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
-        $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
-        return $frontendUser;
-    }
 
     public function control()
     {

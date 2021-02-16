@@ -2,6 +2,7 @@
 namespace Miniorange\MiniorangeSaml\Controller;
 
 
+use Exception;
 use Miniorange\Helper\Constants;
 use Miniorange\Helper\SAMLUtilities;
 use Miniorange\Helper\SamlResponse;
@@ -80,7 +81,7 @@ class FesamlController extends ActionController
      *
      * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function requestAction()
     {
@@ -88,23 +89,16 @@ class FesamlController extends ActionController
 
         $this->controlAction();
 
-        $this->bindingType = $this->fetchBindingType();
-        error_log("FesamlController : binding type : ".$this->bindingType);
-
+        $this->bindingType = Constants::HTTP_REDIRECT;
         $samlRequest = $this->build();
-
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
-        error_log("relaystate :  ".$relayState);
 
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
+        error_log("relaystate :  ".$relayState);
 
-        if (empty($this->bindingType) || ($this->bindingType == Constants::HTTP_REDIRECT)) {
-            $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
-        } else {
-            $this->sendHTTPPostRequest($samlRequest, $relayState, $this->saml_login_url);
-        }
+        $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
 
     }
 
@@ -121,12 +115,6 @@ class FesamlController extends ActionController
         }
     }
 
-    public function fetchBindingType(){
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $this->bindingType = $queryBuilder->select('login_binding_type')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        return $this->bindingType;
-    }
-
     /**
      * action control
      * 
@@ -134,14 +122,19 @@ class FesamlController extends ActionController
      */
     public function controlAction()
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $this->idp_name = $queryBuilder->select('idp_name')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->acs_url = $queryBuilder->select('acs_url')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->sp_entity_id = $queryBuilder->select('sp_entity_id')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->saml_login_url = $queryBuilder->select('saml_login_url')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->force_authn = $queryBuilder->select('force_authn')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->x509_certificate = $queryBuilder->select('x509_certificate')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->idp_entity_id = $queryBuilder->select('idp_entity_id')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
+
+        $idp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_IDP, Constants::TABLE_SAML),true);
+        $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
+
+         $this->idp_name = $idp_object[Constants::COLUMN_IDP_NAME];
+         $this->acs_url = $idp_object[Constants::COLUMN_IDP_NAME];
+         $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
+         $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
+         $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
+         $this->force_authn = false;
+         $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
+
         $this->signedAssertion = true;
         $this->signedResponse = true;
         $this->destination = $this->saml_login_url;
@@ -163,43 +156,15 @@ class FesamlController extends ActionController
     /**
      * @param $samlRequest
      * @param $sendRelayState
-     * @param $sloUrl
-     */
-    public function sendHTTPPostRequest($samlRequest, $sendRelayState, $sloUrl){
-        $privateKeyPath = file_get_contents(__DIR__ . '/../../sso/resources/'.Constants::SP_KEY);
-        $publicCertPath = file_get_contents(__DIR__ . '/../../sso/resources/'.Constants::SP_CERT);
-        $signedXML = SAMLUtilities::signXML($samlRequest, $publicCertPath, $privateKeyPath, 'NameIDPolicy');
-        $base64EncodedXML = base64_encode($signedXML);
-        //post request
-        ob_clean();
-        printf('  <html><head><script src=\'https://code.jquery.com/jquery-1.11.3.min.js\'></script><script type="text/javascript">
-                    $(function(){document.forms[\'saml-request-form\'].submit();});</script></head>
-                    <body>
-                        Please wait...
-                        <form action="%s" method="post" id="saml-request-form" style="display:none;">
-                            <input type="hidden" name="SAMLRequest" value="%s" />
-                            <input type="hidden" name="RelayState" value="%s" />
-                        </form>
-                    </body>
-                </html>',
-            $sloUrl, $base64EncodedXML, htmlentities($sendRelayState)
-        );
-    }
-
-    /**
-     * @param $samlRequest
-     * @param $sendRelayState
      * @param $idpUrl
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendHTTPRedirectRequest($samlRequest, $sendRelayState, $idpUrl)
     {
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-//        error_log("key-path: ".Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
         $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
-//        error_log("certFilePath: ".$certFilePath);
         $key->loadKey($certFilePath);
         $signature = $key->signData($samlRequest);
         $signature = base64_encode($signature);
@@ -270,4 +235,5 @@ class FesamlController extends ActionController
     {
         return openssl_random_pseudo_bytes($length);
     }
+
 }

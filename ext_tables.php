@@ -6,13 +6,13 @@ call_user_func(
     {
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Fesaml',
             'fesaml'
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'Miniorange.MiniorangeSaml',
+            'MiniorangeSaml',
             'Response',
             'response'
         );
@@ -20,14 +20,11 @@ call_user_func(
         if (TYPO3_MODE === 'BE') {
 
             \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-                'Miniorange.MiniorangeSaml',
+                'MiniorangeSaml',
                 'tools', // Make module a submodule of 'tools'
                 'besaml', // Submodule key
                 '', // Position
-                [
-                    'Besaml' => 'request',
-                    
-                ],
+                [ Miniorange\MiniorangeSaml\Controller\BesamlController::class => 'request' ],
                 [
                     'access' => 'user,group',
                     'icon'   => 'EXT:miniorange_saml/Resources/Public/Icons/miniorange.png',

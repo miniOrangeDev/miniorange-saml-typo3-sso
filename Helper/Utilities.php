@@ -5,6 +5,7 @@
     use Exception;
     use PDO;
     use TYPO3\CMS\Core\Database\ConnectionPool;
+    use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
     use TYPO3\CMS\Core\Messaging\FlashMessage;
     use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
     use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -28,21 +29,20 @@
             global $sep;
             $relPath = self::getExtensionRelativePath();
             $sep = substr($relPath, -1);
-
             return $relPath . 'Helper' . $sep . 'resources' . $sep;
         }
 
         public static function getExtensionAbsolutePath()
         {
             $extAbsPath = ExtensionManagementUtility::extPath('miniorange_saml');
-            error_log("extensionAbsolutePath : " . $extAbsPath);
+//            error_log("extensionAbsolutePath : " . $extAbsPath);
             return $extAbsPath;
         }
 
         public static function getExtensionRelativePath()
         {
             $extRelativePath = PathUtility::getAbsoluteWebPath(self::getExtensionAbsolutePath());
-            error_log("extRelativePath : " . $extRelativePath);
+//            error_log("extRelativePath : " . $extRelativePath);
             return $extRelativePath;
         }
 
@@ -94,8 +94,7 @@
         public static function fetchFromTable($col,$table)
         {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-            return $variable;
+            return $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
         }
 
 // -------------UPDATE TABLE---------------------------------------
@@ -128,11 +127,6 @@
             $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
         }
 
-//        public static function getAlternatePrivateKey()
-//        {
-//            return self::getResourceDir() . DIRECTORY_SEPARATOR . Constants::SP_ALTERNATE_KEY;
-//        }
-
         /**
          * Get the Public Key File Path
          * @return string
@@ -148,9 +142,9 @@
         public static function getImageUrl($imgFileName)
         {
             $imageDir = self::getResourceDir() . SEP . 'images' . SEP;
-            error_log("resDir : " . $imageDir);
+//            error_log("resDir : " . $imageDir);
             $iconDir = self::getExtensionRelativePath() . SEP . 'Resources' . SEP . 'Public' . SEP . 'Icons' . SEP;
-            error_log("iconDir : " . $iconDir);
+//            error_log("iconDir : " . $iconDir);
             return $iconDir . $imgFileName;
         }
 
@@ -221,6 +215,23 @@
             return $certificate;
         }
 
+        //---------------------FETCHUID_FROM_USERNAME_check_for_disabled user--------------------------
+        public static function fetchUserFromUsername($username)
+        {
+            $table = Constants::TABLE_FE_USERS;
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+            // Remove all restrictions but add DeletedRestriction again
+            $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            $var_uid = $queryBuilder->select('*')->from($table)->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
+            )->execute()->fetch();
+            if(null == $var_uid){
+//                error_log("uid null: ".print_r($var_uid,true));
+                return false;
+            }
+            return $var_uid;
+        }
+
 
 			/**
 			 * Exception Page HTML Content
@@ -267,5 +278,9 @@
 				$messageQueue  = $flashMessageService->getMessageQueueByIdentifier();
 				$messageQueue->clear();
 			}
+
+			public static function log_php_error($msg="",$obj){
+			    error_log($msg.": ".print_r($obj,true));
+            }
 
     }

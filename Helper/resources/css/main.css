@@ -46,7 +46,35 @@ html, body {
     right: 0;
 }
 
-  body {font-family: Arial;}
+.same-row{
+    float: left;
+}
+
+.new-row{
+    clear: both;
+}
+
+.hmargin{
+    margin: 0 10px;
+}
+
+.vmargin{
+    margin: 10px 0;
+}
+
+.margin10{
+    margin: 10px;
+}
+
+.margin5{
+    margin: 5px;
+}
+
+<!-- Style the tab -->
+
+ body {
+     font-family: Arial;
+ }
 
 /* Style the tab */
 .tab {
@@ -90,6 +118,7 @@ html, body {
     border-top: none;
 }
 
+
   .profileTable{
       width: 95%;
       background: #f1f1f1;
@@ -104,7 +133,7 @@ html, body {
 
 #topContainer{
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     width: 100%;
     justify-content: space-evenly           /*justify-content: space-between;*/
 }
@@ -112,18 +141,13 @@ html, body {
 #leftContainer{
     order: 1;
     /*width: 52%;*/
-    flex-basis: 42%;
+    flex: 0.2 1 45% ;
 }
 
 #rightContainer{
     order: 2;
-    flex-basis: 32%;
-    max-width: 65%;
-}
-
-.container{
-    flex-grow: 1;
-    flex-shrink: 1;
+    /*width: 35%;*/
+    flex: 0.2 1 30% ;
 }
 
 .hideElement{
@@ -184,6 +208,7 @@ hr{
     margin-left: 2% ;
     justify-self: right;
 }
+
 .gm-submit{
     margin-left: 2%;
 }

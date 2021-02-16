@@ -1,5 +1,5 @@
 
-plugin.tx_miniorangesaml_fesamlkey {
+plugin.tx_miniorangesaml_fesamlkey{
     view {
         templateRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Templates/
         templateRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.templateRootPath};

@@ -11,6 +11,7 @@
 ChangeLog
 =========
 
-Providing a change log chapter is optional. You can also refer
-users to the ChangeLog file inside the extension or to some repository's
-commit listing.
+v1.4.0b
+ - Added Typo3 v10 Support
+ - Added UI changes from Premium Plugin
+ - Other minor fixes
