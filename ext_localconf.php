@@ -11,17 +11,16 @@ call_user_func(
     function()
     {
 
+         $pluginNameFesaml = 'Fesaml';
+         $pluginNameResponse = 'Response';
+
         if (version_compare(TYPO3_version, '10.0.0', '>=')) {
             $extensionName = 'MiniorangeSaml';
-            $pluginNameFesaml = 'Fesaml';
-            $pluginNameResponse = 'Response';
-            $cache_actions_fesaml = [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request' ];
-            $non_cache_actions_fesaml = [ Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'control' ];
-            $cache_actions_response = [ Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response' ];
+            $cache_actions_fesaml = [Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'request'];
+            $non_cache_actions_fesaml = [Miniorange\MiniorangeSaml\Controller\FesamlController::class => 'control'];
+            $cache_actions_response = [Miniorange\MiniorangeSaml\Controller\ResponseController::class => 'response'];
         }else{
             $extensionName = 'Miniorange.MiniorangeSaml';
-            $pluginNameFesaml = 'Fesaml';
-            $pluginNameResponse = 'Response';
             $cache_actions_fesaml = [ 'Fesaml' => 'request' ];
             $non_cache_actions_fesaml = [ 'Fesaml' => 'control' ];
             $cache_actions_response = [ 'Response' => 'response' ];
@@ -66,9 +65,9 @@ call_user_func(
                     }
                 }
                 show = *
-            }
-       }'
-    );
+             }
+            }'
+        );
 
 		$iconRegistry = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
 		
