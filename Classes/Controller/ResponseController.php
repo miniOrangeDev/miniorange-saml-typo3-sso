@@ -10,6 +10,7 @@ use Miniorange\Helper\Exception\InvalidDestinationException;
 use Miniorange\Helper\Exception\InvalidIssuerException;
 use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
 use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
+use Miniorange\Helper\SAMLUtilities;
 use Miniorange\Helper\Utilities;
 use ReflectionClass;
 use ReflectionException;
@@ -160,7 +161,7 @@ class ResponseController extends ActionController
             $frontendUser->setFirstName($this->first_name);
             $frontendUser->setLastName($this->last_name);
             $frontendUser->setEmail($this->ssoemail);
-            $frontendUser->setPassword('');  //Setting Random Password
+            $frontendUser->setPassword(SAMLUtilities::generateRandomAlphanumericValue(10));  //Setting Random Password
 
             $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
             $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
