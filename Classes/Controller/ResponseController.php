@@ -153,8 +153,8 @@ class ResponseController extends ActionController
 
         $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $user = Utilities::fetchUserFromUsername($username);
-            debug("User Search 1 : ".$user);
-        if ($user == false) {
+        debug("User Search 1 : ".$user);
+        if($user == false){
             $frontendUser = new FrontendUser();
             $frontendUser->setUsername($username);
 
@@ -183,26 +183,10 @@ class ResponseController extends ActionController
             if($user['disable'] == 1){
                 exit("You are not allowed to login. Please contact your admin.");
             }
-
             return $user;
-
         }
 
     }
-
-//    public function fetch_fname()
-//    {
-//        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-//        $fname = $queryBuilder->select('saml_am_fname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-//        return $fname;
-//    }
-//
-//    public function fetch_lname()
-//    {
-//        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-//        $lname = $queryBuilder->select('saml_am_lname')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-//        return $lname;
-//    }
 
     /**
      * @param $val

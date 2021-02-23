@@ -159,16 +159,27 @@
             <div class="form-group">
                 <label for="acs_url"><b>ACS URL</b></label>
                 <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
+                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Response plugin URL here.</i>
+                <br>
             </div>
 
             <div class="form-group" >
                 <label for="sp_entity_id"><b>Issuer/Entity ID</b></label>
                 <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
+                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Base URL here.</i>
+                    <br>
             </div>
 
             <div class="form-group">
                 <label for="login_redirect_url" class="premiumBox"><b>Redirect to this page after login</b><span class="premiumMessage">  [Premium Feature] </span></label>
                 <input class="form-control" disabled id="login_redirect_url" name="login_redirect_url" type="text" value="{conf_sp.login_redirect_url}"  >
+                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
+                    <br>
+            </div>
+
+            <div class="form-group">
+                <label for="logout_redirect_url" class="premiumBox"><b>Redirect to this page after logout</b><span class="premiumMessage">  [Premium Feature] </span></label>
+                <input class="form-control" disabled id="logout_redirect_url" name="logout_redirect_url" type="text"  >
                 <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
                     <br>
             </div>
