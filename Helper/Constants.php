@@ -41,8 +41,6 @@ class Constants
     //file Names
     const RESOURCE_FOLDER   = 'resources';
     const TEST_RELAYSTATE   = 'testconfig';
-    const SP_CERT           = 'sp-certificate.crt';
-    const SP_KEY            = 'sp-key.key';
 
     //images
     const IMAGE_RIGHT 		= 'right.png';
