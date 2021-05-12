@@ -118,10 +118,6 @@ class BesamlController extends ActionController
         {
             $this->tab = "Service_Provider";
         }
-//        elseif ($_POST['option'] == 'idp_settings')
-//        {
-//            $this->tab = "Identity_Provider";
-//        }
         elseif ($_POST['option'] == 'attribute_mapping')
         {
             $this->tab = "Attribute_Mapping";
@@ -166,7 +162,6 @@ class BesamlController extends ActionController
 
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath', Utilities::getExtensionRelativePath());
-
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
     }
 

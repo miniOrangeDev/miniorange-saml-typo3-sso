@@ -163,14 +163,15 @@ class FesamlController extends ActionController
     {
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
-        $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-        $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
-        $key->loadKey($certFilePath);
-        $signature = $key->signData($samlRequest);
-        $signature = base64_encode($signature);
+//      $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
+//      $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+//      $key->loadKey($certFilePath);
+//      $signature = $key->signData($samlRequest);
+//      $signature = base64_encode($signature);
         $redirect = $idpUrl;
         $redirect .= strpos($idpUrl, '?') !== false ? '&' : '?';
-        $redirect .= $samlRequest . '&Signature=' . urlencode($signature);
+        $redirect .= $samlRequest ;
+//      .'&Signature=' . urlencode($signature);
         //var_dump
         //($redirect);exit;
         if (isset($_REQUEST)) {

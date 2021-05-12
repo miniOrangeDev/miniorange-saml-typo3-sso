@@ -2,20 +2,21 @@
 //when clicking extension name on left panel
 $(document).ready(function() {
     let session = document.getElementById('taby').value;
+
     console.log("Session : in document ready() = "+session);
 
-    if (session == "Service_Provider") {
+    if (session == "Service_Provider"){
         openTab('Service_Provider');
-    }else if (session == "Identity_Provider"){
-        openTab( 'Identity_Provider');
     }else if(session == "Support"){
         openTab( 'Support');
     }else if(session == "Attribute_Mapping") {
         openTab( 'Attribute_Mapping');
     }else if(session == "Group_Mapping") {
         openTab( 'Group_Mapping');
-    }else if(session == "" || session == "Account" || session===null){
-        openTab( 'Account');
+    }else if(session == "Premium") {
+        openTab( 'Premium');
+    }else{
+        openTab( 'Identity_Provider');
     }
 });
 
@@ -25,7 +26,6 @@ function openTab(activeTab) {
     document.getElementById("leftContainer").classList.replace("hideElement","showElement");
 
     let tabcontent = document.getElementsByClassName("tabcontent");
-
     for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
@@ -37,14 +37,14 @@ function openTab(activeTab) {
 
     document.getElementById(activeTab).style.display = "block";
 
-    if(activeTab==="Support"){
-        document.getElementById("Support_Tab").className  += " active";
-        document.getElementById("leftContainer").hidden = true;
-    }else{
-        document.getElementById("Support").style.display = "block";
-        document.getElementById(activeTab + "_Tab").className  += " active";
-        document.getElementById("leftContainer").hidden = false;
-    }
+    // if(activeTab==="Support"){
+    //     document.getElementById("Support_Tab").className  += " active";
+    //     document.getElementById("leftContainer").hidden = true;
+    // }else{
+    //     document.getElementById(activeTab).style.display = "block";
+     document.getElementById(activeTab + "_Tab").className  += " active";
+        // document.getElementById("leftContainer").hidden = false;
+    // }
 }
 
 //remove flash messages
@@ -55,13 +55,13 @@ function removeFlashMessage(){
 }
 
 //is user registered
-function ifUserRegistered(){
-    if (document.getElementById('registered').checked){
-        document.getElementById('confirmPasswordDiv').style.display = "none";
-    } else {
-        document.getElementById('confirmPasswordDiv').style.display = "block";
-    }
-}
+// function ifUserRegistered(){
+//     if (document.getElementById('registered').checked){
+//         document.getElementById('confirmPasswordDiv').style.display = "none";
+//     } else {
+//         document.getElementById('confirmPasswordDiv').style.display = "block";
+//     }
+// }
 
 
 function addCustomAttribute(){
