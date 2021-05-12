@@ -128,7 +128,7 @@ class FesamlController extends ActionController
         $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
 
          $this->idp_name = $idp_object[Constants::COLUMN_IDP_NAME];
-         $this->acs_url = $idp_object[Constants::COLUMN_SP_ACS_URL];
+         $this->acs_url = $idp_object[Constants::COLUMN_IDP_NAME];
          $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
          $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
          $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
@@ -163,14 +163,15 @@ class FesamlController extends ActionController
     {
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
-        $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-        $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
-        $key->loadKey($certFilePath);
-        $signature = $key->signData($samlRequest);
-        $signature = base64_encode($signature);
+//      $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
+//      $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
+//      $key->loadKey($certFilePath);
+//      $signature = $key->signData($samlRequest);
+//      $signature = base64_encode($signature);
         $redirect = $idpUrl;
         $redirect .= strpos($idpUrl, '?') !== false ? '&' : '?';
-        $redirect .= $samlRequest . '&Signature=' . urlencode($signature);
+        $redirect .= $samlRequest ;
+//      .'&Signature=' . urlencode($signature);
         //var_dump
         //($redirect);exit;
         if (isset($_REQUEST)) {

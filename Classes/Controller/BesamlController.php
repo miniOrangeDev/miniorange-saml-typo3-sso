@@ -118,10 +118,6 @@ class BesamlController extends ActionController
         {
             $this->tab = "Service_Provider";
         }
-        elseif ($_POST['option'] == 'idp_settings')
-        {
-            $this->tab = "Identity_Provider";
-        }
         elseif ($_POST['option'] == 'attribute_mapping')
         {
             $this->tab = "Attribute_Mapping";
@@ -130,13 +126,13 @@ class BesamlController extends ActionController
         {
             $this->tab = "Group_Mapping";
         }
-        elseif ($_POST['option'] == 'mo_saml_contact_us_query_option')
+        elseif ($_POST['option'] == 'get_premium')
         {
-            $this->tab = "Support";
+            $this->tab = "Premium";
         }
         else
         {
-            $this->tab = "Account";
+            $this->tab = "Identity_Provider";
         }
 
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
@@ -150,23 +146,22 @@ class BesamlController extends ActionController
         $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
 
 //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
-        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
-					$this->view->assign('status','logged');
-					$this->view->assign('log', '');
-                    $this->view->assign('nolog', 'display:none');
-					$this->view->assign('email',$this->fetch_cust('cust_email'));
-					$this->view->assign('key',$this->fetch_cust('cust_key'));
-					$this->view->assign('token',$this->fetch_cust('cust_token'));
-					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
-        }else{
-					$this->view->assign('log', 'disabled');
-                    $this->view->assign('nolog', 'display:block');
-					$this->view->assign('status','not_logged');
-        }
+//        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
+//					$this->view->assign('status','logged');
+//					$this->view->assign('log', '');
+//                    $this->view->assign('nolog', 'display:none');
+//					$this->view->assign('email',$this->fetch_cust('cust_email'));
+//					$this->view->assign('key',$this->fetch_cust('cust_key'));
+//					$this->view->assign('token',$this->fetch_cust('cust_token'));
+//					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
+//        }else{
+//					$this->view->assign('log', 'disabled');
+//                    $this->view->assign('nolog', 'display:block');
+//					$this->view->assign('status','not_logged');
+//        }
 
         $this->view->assign('tab', $this->tab);
-        $this->view->assign('extPath',Utilities::getExtensionRelativePath());
-
+        $this->view->assign('extPath', Utilities::getExtensionRelativePath());
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
     }
 
