@@ -128,15 +128,17 @@ class FesamlController extends ActionController
         $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
 
          $this->idp_name = $idp_object[Constants::COLUMN_IDP_NAME];
-         $this->acs_url = $idp_object[Constants::COLUMN_IDP_NAME];
+         $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
          $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
          $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
-         $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
          $this->force_authn = false;
-         $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
+
+        $this->acs_url = $sp_object[Constants::COLUMN_SP_ACS_URL];
+        $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
 
         $this->signedAssertion = true;
         $this->signedResponse = true;
+
         $this->destination = $this->saml_login_url;
     }
 

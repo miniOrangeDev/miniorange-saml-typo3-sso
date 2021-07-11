@@ -1,6 +1,6 @@
 <?php
 
-namespace RobRichards\XMLSecLibs\Utils;
+namespace Miniorange\Helper\lib\XMLSecLibs\Utils;
 
 class XPath
 {

@@ -1,5 +1,5 @@
 <?php
-namespace RobRichards\XMLSecLibs;
+namespace Miniorange\Helper\lib\XMLSecLibs;
 
 use DOMElement;
 use Exception;

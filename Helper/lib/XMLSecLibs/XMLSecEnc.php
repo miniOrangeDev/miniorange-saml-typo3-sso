@@ -1,11 +1,11 @@
 <?php
-namespace RobRichards\XMLSecLibs;
+namespace Miniorange\Helper\lib\XMLSecLibs;
 
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
 use Exception;
-use RobRichards\XMLSecLibs\Utils\XPath as XPath;
+use Miniorange\Helper\lib\XMLSecLibs\Utils\XPath as XPath;
 
 /**
  * xmlseclibs.php

@@ -289,11 +289,11 @@ class Assertion
         }
 
         // Constraint from XSD: MUST have one of the three
-        if (empty($this->authnContextClassRef) && empty($this->authnContextDecl) && empty($this->authnContextDeclRef)) {
-            throw new Exception(
-                'Missing either <saml:AuthnContextClassRef> or <saml:AuthnContextDeclRef> or <saml:AuthnContextDecl>'
-            );
-        }
+//        if (empty($this->authnContextClassRef) && empty($this->authnContextDecl) && empty($this->authnContextDeclRef)) {
+//            throw new Exception(
+//                'Missing either <saml:AuthnContextClassRef> or <saml:AuthnContextDeclRef> or <saml:AuthnContextDecl>'
+//            );
+//        }
 
         $this->AuthenticatingAuthority = SAMLUtilities::extractStrings(
             $authnContextEl,
