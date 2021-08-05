@@ -150,7 +150,7 @@ class TestResultActions
      */
     private function processTemplateContent()
     {
-        $this->commonBody = str_replace("{{email}}",implode("/",$this->nameId),$this->commonBody);
+        $this->commonBody = str_replace("{{email}}",strip_tags(implode("/",$this->nameId)),$this->commonBody);
         $tableContent = !array_filter($this->attrs) ? "No Attributes Received." : $this->getTableContent();
         $this->commonBody = str_replace("{{tablecontent}}",$tableContent,$this->commonBody);
         $this->template = str_replace("{{commonbody}}",$this->commonBody,$this->template);
@@ -168,7 +168,7 @@ class TestResultActions
         {
             if(!in_array(null, $value))
                 $tableContent .= str_replace("{{key}}",$key,str_replace("{{value}}",
-                    implode("<br/>",$value),$this->tableContent));
+                    strip_tags(implode("<br/>",$value)),$this->tableContent));
         }
         return $tableContent;
     }

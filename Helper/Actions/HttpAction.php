@@ -75,8 +75,14 @@ class HttpAction
         $base64EncodedXML = base64_encode($signedXML);
         //post request
         ob_clean();
-        printf("  <html><head><script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script type=\"text/javascript\">
-                    $(function(){document.forms['saml-request-form'].submit();});</script></head>
+        printf("  <html>
+                    <head>
+                    <script type=\"text/javascript\">
+                            $(function(){
+                                document.getElementById('saml-request-form').submit(); 
+                            });
+                    </script>
+                    </head>
                     <body>
                         Please wait...
                         <form action=\"%s\" method=\"post\" id=\"saml-request-form\" style=\"display:none;\">
@@ -110,7 +116,7 @@ class HttpAction
         $base64EncodedXML = base64_encode($signedXML);
         //post request
         ob_clean();
-        printf("  <html><head><script src='https://code.jquery.com/jquery-1.11.3.min.js'></script><script type=\"text/javascript\">
+        printf("  <html><head><script src='https://code.jquery.com/jquery-1.12.4.min.js'></script><script type=\"text/javascript\">
                     $(function(){document.forms['saml-request-form'].submit();});</script></head>
                     <body>
                         Please wait...
