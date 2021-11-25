@@ -39,7 +39,10 @@ class BesamlController extends ActionController
 	 */
     public function requestAction()
     {
+<<<<<<< HEAD
         error_log("in besamlController");
+=======
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
         session_start();
         $util=new Utilities();
         $baseurl= $util->currentPageUrl();
@@ -60,7 +63,11 @@ class BesamlController extends ActionController
 
         //------------ VERIFY CUSTOMER---------------
 
+<<<<<<< HEAD
         if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_verify_customer" ) {
+=======
+        if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
 
 			$this->account($_POST);
         }
@@ -154,7 +161,11 @@ class BesamlController extends ActionController
         {
             $this->tab = "Identity_Provider";
         }
+<<<<<<< HEAD
         elseif($_POST['option']=='mo_contact_us_query_option')
+=======
+        elseif($_POST['option']=='mo_saml_contact_us_query_option')
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
         {
             $this->tab = "Support";
         }
@@ -339,7 +350,11 @@ public function update_saml_setting($column, $value)
 
 // --------------------SUPPORT QUERY---------------------
 	public function support(){
+<<<<<<< HEAD
         if(!$this->mo_is_curl_installed() ) {
+=======
+        if(!$this->mo_saml_is_curl_installed() ) {
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
             error_log("error");
               Utilities::showErrorFlashMessage('ERROR: <a href="http://php.net/manual/en/curl.installation.php" 
                        target="_blank">PHP cURL extension</a> is not installed or disabled. Query submit failed.');
@@ -348,11 +363,19 @@ public function update_saml_setting($column, $value)
         // Contact Us query
         $_POST['email']=$_SESSION['email'];
         $email    = $_POST['email'];
+<<<<<<< HEAD
         $phone    = $_POST['mo_contact_us_phone'];
         $query    = $_POST['mo_contact_us_query'];
     
         
         if($this->mo_check_empty_or_null( $email ) || $this->mo_check_empty_or_null( $query ) ) {
+=======
+        $phone    = $_POST['mo_saml_contact_us_phone'];
+        $query    = $_POST['mo_saml_contact_us_query'];
+    
+        
+        if($this->mo_saml_check_empty_or_null( $email ) || $this->mo_saml_check_empty_or_null( $query ) ) {
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
             error_log("enter valid email");
             $_SESSION['support_response']='invalid id';
           Utilities::showErrorFlashMessage('Please enter a valid Email address. ');

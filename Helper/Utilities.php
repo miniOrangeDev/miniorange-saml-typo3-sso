@@ -48,7 +48,11 @@
 
 			$content = '<div >Hello, <br><br><b>Company :</b><a href="' . $_SERVER['SERVER_NAME'] . '" target="_blank" >' . $_SERVER['SERVER_NAME'] . '</a><br><br><b>Phone Number :</b>' . $phone . '<br><br><b>Email :<a href="mailto:' . $email . '" target="_blank">' . $email . '</a></b><br><br><b>Query: ' . $query . '</b></div>';
 
+<<<<<<< HEAD
             $support_email_id = 'info@xecurify.com';
+=======
+            $support_email_id = 'rutuja.sonawane@xecurify.com';
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
 
             $fields = array(
                 'customerKey' => $customerKey,

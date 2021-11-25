@@ -108,7 +108,11 @@
             <f:if condition="{0: status} == {0: 'not_logged'}">
                 
                 <form name="account" method="post" id="account_form " action="http://localhost/Typo3server/NewVerify.php">
+<<<<<<< HEAD
                     <input type="hidden" name="option" value="mo_verify_customer"/>
+=======
+                    <input type="hidden" name="option" value="mo_saml_verify_customer"/>
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
                     <input type="hidden" name="base_url" />
                     <div id="toggle1" class="panel_toggle">
                         <h3><strong>Register/Login with Miniorange</strong></h3>
@@ -249,16 +253,28 @@
                             <div class="col-lg-10">
                                 <form method="post" action="">
                                     <p><b>Need any help? We can help you in configuring the connector with your Identity Provider. Just send us a query and we will get back to you soon.</b></p>
+<<<<<<< HEAD
                                     <input type="hidden" name="option" {log} value="mo_contact_us_query_option"/>
+=======
+                                    <input type="hidden" name="option" {log} value="mo_saml_contact_us_query_option"/>
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
                                     &nbsp;
                                  
 
                                     <div class="form-group">
+<<<<<<< HEAD
                                         <input class="form-control" {log} type="tel" name="mo_contact_us_phone" placeholder="Enter your phone number">
                                     </div>
 
                                     <div class="form-group">
                                         <textarea class="form-control" {log} rows="6" name="mo_contact_us_query" placeholder="Enter your query here"></textarea>
+=======
+                                        <input class="form-control" {log} type="tel" name="mo_saml_contact_us_phone" placeholder="Enter your phone number">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <textarea class="form-control" {log} rows="6" name="mo_saml_contact_us_query" placeholder="Enter your query here"></textarea>
+>>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
                                     </div>
                                     <div class="tile-footer">
                                         <button class="btn btn-primary" {log} type="submit" name="submit">Submit</button>
