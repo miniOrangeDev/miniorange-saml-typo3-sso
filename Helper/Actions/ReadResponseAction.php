@@ -25,6 +25,7 @@ class ReadResponseAction
         $relayState  = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
         //decode the saml response
         $samlResponse = base64_decode($samlResponse);
+        error_log("decoded saml response: ".print_r($samlResponse,true));
         if(!array_key_exists('SAMLResponse', $_POST)) {
             $samlResponse = gzinflate($samlResponse);
         }
@@ -34,6 +35,7 @@ class ReadResponseAction
         $samlResponseXML = $document->firstChild;
 
         $samlResponse = new SamlResponse($samlResponseXML);	//convert the xml to SAML2Response object
+
         return $samlResponse;
     }
 }

@@ -28,6 +28,7 @@ class AuthnRequest
 
     public function __construct($acsUrl, $issuer, $ssoUrl, $forceAuthn, $bindingType, $signedAssertion, $signedResponse)
     {
+        error_log("sso url: ".$ssoUrl);
         // all values required in the authn request are set here 
         $this->acsUrl = $acsUrl;
         $this->issuer = $issuer;

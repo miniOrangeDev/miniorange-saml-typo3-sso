@@ -17,6 +17,8 @@
 
     <f:comment><!-- load js file --></f:comment>
     <script type="text/javascript" src="{extPath}Helper/resources/js/backend.js"></script>
+    <script type="text/php" src="{extPath}Controller/BesamlController.php"></script>
+
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -53,46 +55,248 @@
 </head>
 
 <body class="app sidebar-mini rtl">
+    <script>
+         $(document).ready(function() {
+    let session = document.getElementById('taby').value;
+
+    console.log("Session : in document ready() = "+session);
+
+    if (session == "Service_Provider"){
+        openTab('Service_Provider');
+    }else if(session == "Support"){
+        openTab( 'Support');
+    }else if(session == "Identity_provider"){
+        openTab('Identity_Provider');
+    }else if(session == "Attribute_Mapping") {
+        openTab( 'Attribute_Mapping');
+    }else if(session == "Group_Mapping") {
+        openTab( 'Group_Mapping');
+    }else if(session == "Premium") {
+        openTab( 'Premium');
+    }else{
+        openTab( 'Account');
+    }
+});
+    </script>
 
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 
 <div class="tab">
+    <button class="tablinks button" id="Account_Tab" onclick="removeFlashMessage(); openTab('Account')">Account</button>
     <div class="tab_items"><button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab( 'Identity_Provider')">IdP Settings</button></div>
     <div class="tab_items"><button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab('Service_Provider')">SP Settings</button></div>
     <div class="tab_items"><button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab('Attribute_Mapping')">Attribute Mapping</button></div>
     <div class="tab_items"><button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab('Group_Mapping')">Group Mapping</button></div>
-<!--   <div> <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab('Support')">Support</button></div>-->
+   <div> <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab('Support')">Support</button></div>
     <div class="tab_items"><button class="tablinks button" id="Premium_Tab" onclick="removeFlashMessage(); openTab('Premium')">Get Premium</button></div>
 </div>
 
+
 <input type="hidden" name="taby" id="taby" value="{tab}">
 
-<div id="topContainer">
+<div id="leftContainer" class="container">
      <f:comment><!--Left Container--></f:comment>
+     <script>
+        document.getElementById("defaultOpen").click();
+        </script>
+
+     <f:comment>  <!--   ACCOUNT TAB--></f:comment>
+        <div id="Account" style="margin-left: 20px" class="tabcontent" id="defaultOpen">
+
+                <!--    IF USER NOT LOGGED IN -->
+             
+            <f:if condition="{0: status} == {0: 'not_logged'}">
+                
+                <form name="account" method="post" id="account_form " action="http://localhost/Typo3server/NewVerify.php">
+                    <input type="hidden" name="option" value="mo_verify_customer"/>
+                    <input type="hidden" name="base_url" />
+                    <div id="toggle1" class="panel_toggle">
+                        <h3><strong>Register/Login with Miniorange</strong></h3>
+                    </div>
+                    &nbsp;
+                    <h4 style=" color: #545454;"><strong>Why should I register?</strong></h4>
+
+                    <div style="background: aliceblue; padding: 10px 10px 10px 10px; border-radius: 10px; color: #545454;">
+                        You should register so that in case you need help, we can help you with step by step
+                        instructions. We support all known IdPs - ADFS, Okta, Salesforce, Shibboleth,
+                        SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2 etc.
+                        <b>You will also need a miniOrange account to upgrade to the premium version of this extension.</b>
+                        We do not store any information except the email that you will use to register with us.
+                    </div>
+
+                    <p id="att-map-tab-partial">If you already have a miniOrange account, submit your existing credentials.
+                        We will retrieve your existing account for you.</p>
+
+                    <hr>
+                    <div id="panel1" class="" style="height: 70%">
+                        <p><b>Please enter your miniOrange email and password.<br/> <a target="_blank" href="https://login.xecurify.com/moas/idp/resetpassword">Click
+                                here if you forgot your password?</a></b></p>
+                        <div>
+                        <input type="checkbox" id="registered" name="registered" value="isChecked" onclick="ifUserRegistered()"/> Already Registered<br>
+                        <br>
+                        </div>
+                        
+                        <div class="col-lg-8 tile" style=" height: fit-content">
+
+                            <label color="#FF0000">Email:</label>
+                            <input class="form-control" type="email" name="email"
+                                   required placeholder="person@example.com"
+                                   value=""/>
+                            <br>
+                            <label color="#FF0000">Password:</label>
+                            <input class="form-control" required type="password"
+                                   name="password" placeholder="Enter your password"
+                                   minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                   title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                            <br>
+                                    <div id="confirmPasswordDiv">
+                                        <label color="#FF0000">Confirm Password:</label>
+                                        <input class="form-control" type="password"
+                                                   name="confirmPassword" placeholder="Confirm your password"
+                                                   minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                                   title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                                    </div>
+                                
+                            
+                            <br>
+                            <button type="submit" class="btn btn-primary" value="submit" onClick="jQuery('#account_form').submit();"> Login </button>
+                            <br>&nbsp;
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                </form>
+                <br>
+            <script>
+                 function ifUserRegistered(){
+                     
+                    var checkBox=document.getElementById('registered');
+                    var login=document.getElementById('confirmPasswordDiv');
+                    if (checkBox.checked == true){
+                    login.style.display = "none";
+        
+                    } else {
+                    login.style.display = "block";
+                    }
+                   
+                    }                  
+            </script>
+                <br>
+                </f:if>
+
+            <br>
+
+            <f:comment><!--    IF  USER LOGGED--></f:comment>
+            
+            <f:if condition="{0: status} == {0: 'logged'}">
+              
+                <div id="toggle3" class="panel_toggle">
+                    <h3 ><strong>Profile</strong></h3>
+                </div>
+                <hr>
+                <div class="tile">
+
+                    <table class="profileTable" >
+                    <tr>
+                        <td><strong>Email : </strong></td>
+                        <td>{email}</td>
+                    </tr>
+                         &nbsp
+                    <tr>
+                        <td><strong>ID : </strong></td>
+                        <td>{key}</td>
+                    </tr>
+                        &nbsp
+                    <tr>
+                        <td><strong>Token : </strong></td>
+                        <td>{token}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Api Key : </strong></td>
+                        <td>{api_key}</td>
+                    </tr>
+                    </table>
+
+                    &nbsp
+
+                    <!--     CHANGE ACCOUNT -->
+                    <form name="log_out_form" id="log_out_form" method="post" action="">
+                        <input type="hidden" name="option" value="logout">
+
+                        <input type="submit"
+                               name="submit"
+                               value="Log out"
+                               class="btn btn-primary" onclick="jQuery('#log_out_form').submit();" />
+                    </form>
+                    
+                </div>
+
+            </f:if>
+
+        </div>
+
+    </div>
+    <!-- Support tab -->
+    <div id="rightContainer">
+        <div id="Support" class="tabcontent" >
+            <h3><strong>Support</strong></h3>
+            <hr>
+            &nbsp;
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tile">
+                        <div class="row ">
+                            <div class="col-lg-10">
+                                <form method="post" action="">
+                                    <p><b>Need any help? We can help you in configuring the connector with your Identity Provider. Just send us a query and we will get back to you soon.</b></p>
+                                    <input type="hidden" name="option" {log} value="mo_contact_us_query_option"/>
+                                    &nbsp;
+                                 
+
+                                    <div class="form-group">
+                                        <input class="form-control" {log} type="tel" name="mo_contact_us_phone" placeholder="Enter your phone number">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <textarea class="form-control" {log} rows="6" name="mo_contact_us_query" placeholder="Enter your query here"></textarea>
+                                    </div>
+                                    <div class="tile-footer">
+                                        <button class="btn btn-primary" {log} type="submit" name="submit">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
      <div id="leftContainer" class="container">
+
 
      <f:comment><!--   IDENTITY PROVIDER TAB--></f:comment>
      <div id="Identity_Provider" class="tabcontent"  >
         <h3><strong>Identity Provider Settings</strong></h3>
-<!--         <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>-->
+         <p class="premiumMessage" style= {nolog} >  [Please login or register to configure settings.]</p>
          <hr>
             <div class="tile" >
                 <form method="POST" action="" id="saml_form" >
                     <input type="hidden" name="option" value="idp_settings">
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control" name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
+                                <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
                             </div>
 
                             <div class="form-group">
                                 <label for="idp_entity_id"><b>IDP Entity ID</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control"  name="idp_entity_id" id="idp_entity_id" type="text"
+                                <input class="form-control" {log} name="idp_entity_id" id="idp_entity_id" type="text"
                                        required value="{conf_idp.idp_entity_id}">
                             </div>
 
                             <div class="form-group">
                                 <label for="saml_login_url"><b>SAML Login URL</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control"  name="saml_login_url" id="saml_login_url" type="text"
+                                <input class="form-control" {log}  name="saml_login_url" id="saml_login_url" type="text"
                                        required value="{conf_idp.saml_login_url}">
                             </div>
 
@@ -120,13 +324,13 @@
 
                             <div class="form-group" style= "border: black">
                                 <label for="x509_certificate"><b>SAML x509 Certificate</b><span class="premiumMessage">*</span></label>
-                                <textarea required class="form-control"  id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
+                                <textarea required class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
                                 <small><b>NOTE:</b> Format of the certificate:<br/><b>-----BEGIN CERTIFICATE-----<br/>XXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>-----END CERTIFICATE-----</b></small><br/>
                             </div>
 
                             <div class="form-group">
                                 <label for="saml_logout_url" class="premiumBox"><b>SAML Logout URL</b> <span class="premiumMessage">  [Premium Feature] </span></label>
-                                <input class="form-control" disabled name="saml_logout_url" id="saml_logout_url" type="text" value="">
+                                <input class="form-control" {log} disabled name="saml_logout_url" id="saml_logout_url" type="text" value="">
                             </div>
 
                             <label for="signing_info"><b>Signing</b></label>
@@ -148,8 +352,8 @@
 
                     &nbsp
                     <div class="tile-footer">
-                        <button class="btn btn-primary" type="submit"  name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
-                        <a   style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');"  class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
+                        <button class="btn btn-primary" {log} type="submit"  name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
+                        <a   style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');" {log} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
                     </div><br>
                 <br>
                 </form>
@@ -159,7 +363,7 @@
     <f:comment><!--   SERVICE PROVIDER TAB --></f:comment>
     <div id="Service_Provider"  class="tabcontent"  >
         <h3><strong>Service Provider Settings</strong></h3>
-<!--        <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>-->
+        <div class="premiumMessage" style={nolog}> [Please register or login to configure settings.]</div>
         <hr>
         <div class="tile">
         <form action="" method="post" id="sp_settings"  >
@@ -168,50 +372,50 @@
             <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
             <div class="form-group">
                 <label for="fesaml"><b> Fesaml plugin page URL</b></label>
-                   <input class="form-control"  id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
+                   <input class="form-control" {log} id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
                 >
             </div>
 
             <div class="form-group">
                 <label for="response"><b>Response plugin page URL</b></label>
-                <input class="form-control"  id="response" name="response" type="text" value="{conf_sp.response}" >
+                <input class="form-control" {log} id="response" name="response" type="text" value="{conf_sp.response}" >
             </div>
 
             <div class="form-group" >
                 <label for="slo_url" class="premiumBox"><b>Logout plugin page URL</b><span class="premiumMessage">  [Premium Feature] </span></label>
-                <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value=""  >
+                <input class="form-control" {log} disabled id="slo_url" name="slo_url" type="text" value=""  >
             </div>
 
             <div class="form-group">
                 <label for="site_base_url"><b> Base URL</b></label>
-                <input class="form-control"  id="site_base_url"
+                <input class="form-control" {log} id="site_base_url"
                        name="site_base_url" type="text" value="{conf_sp.site_base_url}" >
             </div>
 
             <div class="form-group">
                 <label for="acs_url"><b>ACS URL</b></label>
-                <input class="form-control"  id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
+                <input class="form-control" {log} id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
                 <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Response plugin URL here.</i>
                 <br>
             </div>
 
             <div class="form-group" >
                 <label for="sp_entity_id"><b>Issuer/Entity ID</b></label>
-                <input class="form-control"  id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
+                <input class="form-control" {log} id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
                 <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Base URL here.</i>
                     <br>
             </div>
 
             <div class="form-group">
                 <label for="login_redirect_url" class="premiumBox"><b>Redirect to this page after login</b><span class="premiumMessage">  [Premium Feature] </span></label>
-                <input class="form-control" disabled id="login_redirect_url" name="login_redirect_url" type="text" value="{conf_sp.login_redirect_url}"  >
+                <input class="form-control" {log} disabled id="login_redirect_url" name="login_redirect_url" type="text" value="{conf_sp.login_redirect_url}"  >
                 <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
                     <br>
             </div>
 
             <div class="form-group">
                 <label for="logout_redirect_url" class="premiumBox"><b>Redirect to this page after logout</b><span class="premiumMessage">  [Premium Feature] </span></label>
-                <input class="form-control" disabled id="logout_redirect_url" name="logout_redirect_url" type="text"  >
+                <input class="form-control" {log} disabled id="logout_redirect_url" name="logout_redirect_url" type="text"  >
                 <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
                     <br>
             </div>
@@ -226,7 +430,7 @@
             </div>
 
             <div class="tile-footer form-group">
-                <button class="btn btn-primary" type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
+                <button class="btn btn-primary" {log} type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
                 <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
             </div>
             <br>
@@ -237,57 +441,56 @@
 
     <f:comment><!--   ATTRIBUTE MAPPING TAB--></f:comment>
     <div id="Attribute_Mapping" class="tabcontent"  >
-        <form id="" method="" action ="">
+        <form id="attribute" method="" action ="">
             <input type="hidden" name="option" value="attribute_mapping">
             <h3><strong>Attribute Mapping</strong> <span class="premiumMessage" > [Premium Feature]</span> </h3>
             <hr>
             <div class="tile">
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label"  for="saml_am_username"><b>Username</b> <span class="premiumMessage" > * </span> </label>
-                    <input class="form-control gm-input" disabled id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
+                    <input class="form-control gm-input" disabled
+                     id="saml_am_username"  required name="saml_am_username" type="text" value = "NameID">
                 </div>
                 <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"> <em> User accounts will be created using this attribute value.</em></i>
 
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label"  for="saml_am_email"><b>Email</b></label>
-                    <input class="form-control gm-input" id="saml_am_email" type="text" disabled value="NameID">
+                    <input class="form-control gm-input" {log} id="saml_am_email" type="text" disabled value="NameID">
                 </div>
 
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label"  for="saml_am_groups"><b>Groups/Roles</b></label>
-                    <input class="form-control gm-input" disabled id="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
+                    <input class="form-control gm-input" {log} disabled id="saml_am_groups" type="text" value = "{conf_am.saml_am_groups}">
                 </div>
 
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label"  for="saml_am_fname"><b>First Name</b></label>
-                    <input class="form-control gm-input" disabled id="saml_am_fname"  type="text" value = "">
+                    <input class="form-control gm-input" {log} disabled id="saml_am_fname"  type="text" value = "">
                 </div>
 
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label"  for="saml_am_lname"><b>Last Name</b></label>
-                    <input class="form-control gm-input" disabled id="saml_am_lname" type="text" value = "">
+                    <input class="form-control gm-input" {log} disabled id="saml_am_lname" type="text" value = "">
                 </div>
 
                 <div class="form-group gm-div">
                     <label class="form-control gm-input-label" for="saml_am_phone"><b>Phone</b></label>
-                    <input class="form-control gm-input" disabled id="saml_am_phone"  type="text" value = "">
+                    <input class="form-control gm-input" {log} disabled id="saml_am_phone"  type="text" value = "">
                 </div>
 
             </div>
 
             <div class="form-group" >
-                <input type="checkbox" disabled  id="saml_am_update_attr"  name="saml_am_update_attr" >
+                <input type="checkbox" {log} disabled  id="saml_am_update_attr"  name="saml_am_update_attr" >
                 <label for="saml_am_update_attr">Sync user attributes on login</label><br>
                 <p style="color:cadetblue; padding-left:5px;"><i class="fa fa-question-circle" id="signing_info"><em>Enable to sync user attribute values on every signin.</em></i>
             </div>
             &nbsp;
             <div class="form-group">
                 <f:comment><!--    <br/>--></f:comment>
-                <button type="submit" disabled class="btn btn-primary">Save Attribute Mapping</button>
+                <button type="submit" disabled class="btn btn-primary" onClick="jQuery('#attribute').submit();">Save Attribute Mapping</button>
             </div>
-
         </form>
-
         <br>
         <h3><strong>Custom Attributes Mapping</strong><span class="premiumMessage" > [Premium Feature]</span> </h3>
         <hr>
@@ -320,10 +523,12 @@
 
     </div>
 
-    <f:comment><!--   GROUP MAPPING TAB--></f:comment>
+</div>
+
+    <f:comment> <!--  GROUP MAPPING TAB --></f:comment>
     <div id="Group_Mapping" class="tabcontent"  >
         <form  id="gm_form" method="post" action ="">
-            <input type="hidden" name="option" value="group_mapping">
+            <input type="hidden" {log} name="option" value="group_mapping">
             <h3><strong>Group Mapping</strong></h3>
             <hr>
 
@@ -331,14 +536,14 @@
             <div class="form-group gm-div">
                 <label class="form-control gm-input-label" for="defaultUserGroup">Default UserGroup</label>
                 <f:comment><!--  Populate DropDown--></f:comment>
-                    <select class="form-control gm-input"  name="defaultUserGroup" id="defaultUserGroup" >
+                    <select class="form-control gm-input"  name="defaultUserGroup" id="defaultUserGroup" {log}>
                         <f:for each="{allUserGroups}" as="userGroup">
                             <f:if condition="{userGroup.title}=={defaultGroup}" >
                                 <f:then>
-                                    <option selected value="{userGroup.title}">{userGroup.title}</option>
+                                    <option {log} selected value="{userGroup.title}">{userGroup.title}</option>
                                 </f:then>
                                 <f:else>
-                                    <option value="{userGroup.title}">{userGroup.title}</option>
+                                    <option {log} value="{userGroup.title}">{userGroup.title}</option>
                                 </f:else>
                             </f:if>
                         </f:for>
@@ -358,7 +563,7 @@
                 </div>
             </f:for>
             <br/>
-            <button type="submit"  class="btn btn-primary gm-submit" >Save Group Mapping</button>
+            <button type="submit" {log} class="btn btn-primary gm-submit" >Save Group Mapping</button>
         </form>
 
     </div>
@@ -367,7 +572,6 @@
      <div id="Premium" class="tabcontent" >
 
          <div class="tableDiv">
-
              <table class="premium-table">
                 <tr><th ><h3 class="premium-table-row-header">Premium Features</h3></th></tr>
                  <tr class="premium-table-row"><td class="premium-table-row-data">SAML Login Binding type</td></tr>
@@ -383,15 +587,11 @@
 
              <hr>
              <div class="form-group">
-                 <a target="_blank" href="https://www.miniorange.com/contact"><button class="btn btn-primary" >Contact Us</button></a>
+                 <a target="_blank" href="https://www.miniorange.com/contact"><button class="btn btn-primary" {log}>Contact Us</button></a>
              </div>
 
 
              </div>
-
-    </div>
-
-<!--</div>-->
 
 </body>
 </html>

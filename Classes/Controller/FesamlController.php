@@ -96,7 +96,7 @@ class FesamlController extends ActionController
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
-        error_log("relaystate :  ".$relayState);
+        error_log("relaystate in fesaml :  ".$relayState);
 
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
 
@@ -163,6 +163,7 @@ class FesamlController extends ActionController
      */
     public function sendHTTPRedirectRequest($samlRequest, $sendRelayState, $idpUrl)
     {
+        error_log("in fesamlController");
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
 //      $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);

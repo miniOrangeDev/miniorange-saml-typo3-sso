@@ -74,6 +74,7 @@ class ResponseController extends ActionController
      */
     public function responseAction()
     {
+        error_log("in responseController");
 
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
 //      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
@@ -89,10 +90,10 @@ class ResponseController extends ActionController
                 $this->ssoemail = current(current($samlResponseObj->getAssertions())->getNameId());
                 $attrs = current($samlResponseObj->getAssertions())->getAttributes();
                 Utilities::log_php_error("idp attribute",$attrs);
-
+                error_log("name Id passed: ".print_r($this->name_id,true));
                 $attrs['NameID'] = ['0' => $this->name_id];
+                error_log("request in responserController: ".print_r($_REQUEST,true));
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
-
                 if ($relayStateUrl == 'testconfig') {
                     (new TestResultActions($attrs))->execute();
                     die;
