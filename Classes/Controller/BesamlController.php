@@ -1,6 +1,7 @@
 <?php
 
 namespace Miniorange\MiniorangeSaml\Controller;
+
 use Exception;
 use Miniorange\Helper\Constants;
 use PDO;
@@ -8,7 +9,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use Miniorange\Helper\CustomerSaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-//use TYPO3\CMS\Extbase\ActionController;
 use Miniorange\Helper\Utilities;
 
 
@@ -27,8 +27,6 @@ class BesamlController extends ActionController
 
     protected $tab = "";
 
-
-
     /**
      * @var TYPO3\CMS\Extbase\Object\ObjectManagerInterface
      */
@@ -39,10 +37,7 @@ class BesamlController extends ActionController
 	 */
     public function requestAction()
     {
-<<<<<<< HEAD
         error_log("in besamlController");
-=======
->>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
         session_start();
         $util=new Utilities();
         $baseurl= $util->currentPageUrl();
@@ -63,11 +58,7 @@ class BesamlController extends ActionController
 
         //------------ VERIFY CUSTOMER---------------
 
-<<<<<<< HEAD
         if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_verify_customer" ) {
-=======
-        if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
->>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
 
 			$this->account($_POST);
         }
@@ -84,8 +75,6 @@ class BesamlController extends ActionController
             }
 //------------ IDENTITY PROVIDER SETTINGS---------------
         if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
-            
-            
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
@@ -111,7 +100,6 @@ class BesamlController extends ActionController
 
 //------------ SERVICE PROVIDER SETTINGS---------------
             elseif(isset($_POST['option']) and $_POST['option'] == 'save_sp_settings') {
-                
                 $value1 = $this->validateURL($_POST['site_base_url']);
                 $value2 = $this->validateURL($_POST['acs_url']);
                 $value3 = $this->validateURL($_POST['sp_entity_id']);
@@ -134,13 +122,9 @@ class BesamlController extends ActionController
         elseif(isset($_POST['option']) and $_POST['option'] == 'group_mapping'){
             Utilities::updateTable(Constants::COLUMN_GROUP_DEFAULT, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
             Utilities::showSuccessFlashMessage('Default Group saved successfully.');
-        }
-        
-       
-        
+        }    
 
 //------------ CHANGING TABS---------------
-       // var_dump($_POST['option']);exit();
         if($_POST['option'] == 'save_sp_settings' )
         {
             $this->tab = "Service_Provider";
@@ -161,11 +145,7 @@ class BesamlController extends ActionController
         {
             $this->tab = "Identity_Provider";
         }
-<<<<<<< HEAD
         elseif($_POST['option']=='mo_contact_us_query_option')
-=======
-        elseif($_POST['option']=='mo_saml_contact_us_query_option')
->>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
         {
             $this->tab = "Support";
         }
@@ -203,8 +183,6 @@ class BesamlController extends ActionController
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath', Utilities::getExtensionRelativePath());
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-        
-    
     }
 
     public function save($column,$value,$table)
@@ -215,15 +193,11 @@ class BesamlController extends ActionController
 
 //  LOGOUT CUSTOMER
     public function remove_cust(){
-        
         $this->update_cust('cust_key','');
         $this->update_cust('cust_api_key','');
         $this->update_cust('cust_token','');
         $this->update_cust('cust_reg_status', '');
         $this->update_cust('cust_email','');
-
-        
-        
 
 //        $this->update_saml_setting('idp_name',"");
 //        $this->update_saml_setting('idp_entity_id',"");
@@ -278,7 +252,6 @@ class BesamlController extends ActionController
     }
 
 //   HANDLE LOGIN FORM
-
     public function account($post){
         error_log(print_r($_SESSION['flag'],true));
         if(isset($_SESSION['flag']) && $_SESSION['flag']=='set')
@@ -304,7 +277,6 @@ class BesamlController extends ActionController
              $_SESSION['flag']='unset';
 
         }
-       
     }
 
 //  SAVE CUSTOMER
@@ -350,11 +322,7 @@ public function update_saml_setting($column, $value)
 
 // --------------------SUPPORT QUERY---------------------
 	public function support(){
-<<<<<<< HEAD
         if(!$this->mo_is_curl_installed() ) {
-=======
-        if(!$this->mo_saml_is_curl_installed() ) {
->>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
             error_log("error");
               Utilities::showErrorFlashMessage('ERROR: <a href="http://php.net/manual/en/curl.installation.php" 
                        target="_blank">PHP cURL extension</a> is not installed or disabled. Query submit failed.');
@@ -363,19 +331,9 @@ public function update_saml_setting($column, $value)
         // Contact Us query
         $_POST['email']=$_SESSION['email'];
         $email    = $_POST['email'];
-<<<<<<< HEAD
         $phone    = $_POST['mo_contact_us_phone'];
         $query    = $_POST['mo_contact_us_query'];
-    
-        
         if($this->mo_check_empty_or_null( $email ) || $this->mo_check_empty_or_null( $query ) ) {
-=======
-        $phone    = $_POST['mo_saml_contact_us_phone'];
-        $query    = $_POST['mo_saml_contact_us_query'];
-    
-        
-        if($this->mo_saml_check_empty_or_null( $email ) || $this->mo_saml_check_empty_or_null( $query ) ) {
->>>>>>> 77be2e9052ba1cf66d952ad570818f15291b0287
             error_log("enter valid email");
             $_SESSION['support_response']='invalid id';
           Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
@@ -395,7 +353,6 @@ public function update_saml_setting($column, $value)
                     }
         }
     }
-    
 
 	/**
 	 * @param $var

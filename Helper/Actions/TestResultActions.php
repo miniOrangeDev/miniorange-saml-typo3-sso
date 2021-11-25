@@ -76,7 +76,6 @@ class TestResultActions
     public function __construct($attrs, SAMLResponseException $samlResponseException = null)
     {
         $this->attrs = $attrs;
-        error_log("attributes: ".print_r($this->attrs,true));
         $this->nameId = $attrs["NameID"];
         $this->hasExceptionOccurred = Utilities::isBlank($samlResponseException) ? FALSE : TRUE;
         $this->samlException = $samlResponseException;
@@ -151,7 +150,6 @@ class TestResultActions
      */
     private function processTemplateContent()
     {
-        error_log("commonbody: ".print_r($this->nameId,true));
         $this->commonBody = str_replace("{{email}}",strip_tags(implode("/",$this->nameId)),$this->commonBody);
         $tableContent = !array_filter($this->attrs) ? "No Attributes Received." : $this->getTableContent();
         $this->commonBody = str_replace("{{tablecontent}}",$tableContent,$this->commonBody);
@@ -166,10 +164,8 @@ class TestResultActions
     private function getTableContent()
     {
         $tableContent = '';
-        error_log("attributes 169: ".print_r($this->attrs,true));
         foreach ($this->attrs as $key => $value)
         {
-            error_log("table values: ".print_r($key,true));
             if(!in_array(null, $value))
                 $tableContent .= str_replace("{{key}}",$key,str_replace("{{value}}",
                     strip_tags(implode("<br/>",$value)),$this->tableContent));
