@@ -1,15 +1,21 @@
 <?php
 
 namespace Miniorange\MiniorangeSaml\Controller;
-
 use Exception;
 use Miniorange\Helper\Constants;
 use PDO;
+use DOMDocument;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use Miniorange\Helper\CustomerSaml;
+use Miniorange\Helper\SAMLUtilities;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+//use TYPO3\CMS\Extbase\ActionController;
 use Miniorange\Helper\Utilities;
+use Miniorange\Helper\IDPMetadataReader;
+use Miniorange\Helper\IdentityProviders;
+use Miniorange\Helper\SetRedirect;
+
 
 
 /**
@@ -27,6 +33,8 @@ class BesamlController extends ActionController
 
     protected $tab = "";
 
+
+
     /**
      * @var TYPO3\CMS\Extbase\Object\ObjectManagerInterface
      */
@@ -37,14 +45,79 @@ class BesamlController extends ActionController
 	 */
     public function requestAction()
     {
+        session_start();
+        $util=new Utilities();
+        $baseurl= $util->currentPageUrl();
+        $_SESSION['base_url']=$baseurl;
+        if(isset($_SESSION['flag']) && $_SESSION['flag']=='set')
+        {
+            $_POST= $_SESSION;
+            $check_content=$_SESSION['check_content'];
 
+            if(isset($_SESSION['error']) && $_SESSION['error']=='different password')
+            { 
+                Utilities::showSuccessFlashMessage('Please enter same password in both password fields');
+                unset($_SESSION['error']);
+                unset($_SESSION['flag']);
+            }
+        }
+
+        //-------------Upload Metadata-----------------------
+
+        if(isset($_POST['option']) and $_POST['option']=='upload_metadata_file')
+        {
+            Self::_handle_upload_metadata();
+        }
+        //----------- Download metadata---------------
+        if(isset($_POST['option']) and $_POST['option']=='mosaml_metadata_download')
+        {
+            $value1 = $this->validateURL($_POST['site_base_url']);
+            $value2 = $this->validateURL($_POST['acs_url']);
+            $value3 = $this->validateURL($_POST['sp_entity_id']);
+
+                if($value1 == 1 && $value2 == 1 && $value3 == 1)
+                {
+                    SAMLUtilities::mo_saml_miniorange_generate_metadata(true);
+                }
+                else{
+                    Utilities::showErrorFlashMessage('Fill all the fields to download the metadata file');
+                }
+
+        }
+
+
+        //---------------show Metadata-------------------------
+
+        if(isset($_POST['option']) and $_POST['option']=='mosaml_metadata')
+        {
+            SAMLUtilities::mo_saml_miniorange_generate_metadata();
+        }
+
+        //------------ VERIFY CUSTOMER---------------
+
+        if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_verify_customer" ) {
+
+			$this->account($_POST);
+        }
+
+//------------ HANDLE LOG OUT ACTION---------------
+            elseif(isset($_POST['option']) and $_POST['option']== 'logout'){
+                
+                    $this->remove_cust();
+                    
+                    Utilities::showSuccessFlashMessage('Logged out successfully.');
+                    $this->view->assign('status','not_logged');
+                   
+                    
+            }
 //------------ IDENTITY PROVIDER SETTINGS---------------
         if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
-
+            
+            
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-            
+           // $this->view->assign('idp_name','miniorange');
             if($value1 == 1 && $value2 == 1 && $value3 == 1)
             {
                 $obj = new BesamlController();
@@ -60,32 +133,9 @@ class BesamlController extends ActionController
         }
 
 //------------ HANDLING SUPPORT QUERY---------------
-        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_contact_us_query_option" ) {
+        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_contact_us_query_option" ) {
             $this->support();
         }
-
-//------------ VERIFY CUSTOMER---------------
-        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
-
-			if($_POST['registered'] =='isChecked'){
-                error_log("registered is checked. Registering User : ");
-			    $this->account($_POST);
-            }else{
-			    if($_POST['password'] == $_POST['confirmPassword']){
-                    $this->account($_POST);
-			    }else{
-                    Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
-                }
-            }
-
-        }
-
-//------------ HANDLE LOG OUT ACTION---------------
-            elseif(isset($_POST['option']) and $_POST['option']== 'logout'){
-                    $this->remove_cust();
-                    Utilities::showSuccessFlashMessage('Logged out successfully.');
-                    $this->view->assign('status','not_logged');
-            }
 
 //------------ SERVICE PROVIDER SETTINGS---------------
             elseif(isset($_POST['option']) and $_POST['option'] == 'save_sp_settings') {
@@ -100,7 +150,6 @@ class BesamlController extends ActionController
                     }
                     $this->defaultSettings($_POST);
                     Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
-
                 }else{
                       Utilities::showErrorFlashMessage('Incorrect Input');
                 }
@@ -112,7 +161,9 @@ class BesamlController extends ActionController
             Utilities::updateTable(Constants::COLUMN_GROUP_DEFAULT, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
             Utilities::showSuccessFlashMessage('Default Group saved successfully.');
         }
-
+        
+       
+        
 //------------ CHANGING TABS---------------
         if($_POST['option'] == 'save_sp_settings' )
         {
@@ -130,9 +181,21 @@ class BesamlController extends ActionController
         {
             $this->tab = "Premium";
         }
-        else
+        elseif($_POST['option']=='idp_settings')
         {
             $this->tab = "Identity_Provider";
+        }
+        elseif($_POST['option']=='mo_contact_us_query_option')
+        {
+            $this->tab = "Support";
+        }
+        elseif ($_POST['option'] == 'upload_metadata_file')
+        {
+            $this->tab = "Identity_Provider";
+        }
+        else
+        {
+            $this->tab = "Account";
         }
 
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
@@ -146,23 +209,26 @@ class BesamlController extends ActionController
         $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
 
 //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
-//        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
-//					$this->view->assign('status','logged');
-//					$this->view->assign('log', '');
-//                    $this->view->assign('nolog', 'display:none');
-//					$this->view->assign('email',$this->fetch_cust('cust_email'));
-//					$this->view->assign('key',$this->fetch_cust('cust_key'));
-//					$this->view->assign('token',$this->fetch_cust('cust_token'));
-//					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
-//        }else{
-//					$this->view->assign('log', 'disabled');
-//                    $this->view->assign('nolog', 'display:block');
-//					$this->view->assign('status','not_logged');
-//        }
-
+        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
+					$this->view->assign('status','logged');
+					$this->view->assign('log', '');
+                    $this->view->assign('nolog', 'display:none');
+					$this->view->assign('email',$this->fetch_cust('cust_email'));
+					$this->view->assign('key',$this->fetch_cust('cust_key'));
+					$this->view->assign('token',$this->fetch_cust('cust_token'));
+					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
+                   
+        }else{
+					$this->view->assign('log', 'disabled');
+                    $this->view->assign('nolog', 'display:block');
+					$this->view->assign('status','not_logged');
+        }
+        
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath', Utilities::getExtensionRelativePath());
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
+        
+    
     }
 
     public function save($column,$value,$table)
@@ -173,11 +239,15 @@ class BesamlController extends ActionController
 
 //  LOGOUT CUSTOMER
     public function remove_cust(){
+        
         $this->update_cust('cust_key','');
         $this->update_cust('cust_api_key','');
         $this->update_cust('cust_token','');
         $this->update_cust('cust_reg_status', '');
         $this->update_cust('cust_email','');
+
+        
+        
 
 //        $this->update_saml_setting('idp_name',"");
 //        $this->update_saml_setting('idp_entity_id',"");
@@ -232,38 +302,33 @@ class BesamlController extends ActionController
     }
 
 //   HANDLE LOGIN FORM
+
     public function account($post){
-        $email = $post['email'];
-        $password = $post['password'];
-        $customer = new CustomerSaml();
-        $customer->email = $email;
-        $this->update_cust('cust_email', $email);
-        $check_content = json_decode($customer->check_customer($email,$password), true);
+        error_log("In BesamlController: account()");
+        if(isset($_SESSION['flag']) && $_SESSION['flag']=='set')
+        {
 
-        if($check_content['status'] == 'CUSTOMER_NOT_FOUND'){
-        	   $customer = new CustomerSaml();
-               error_log("CUSTOMER_NOT_FOUND.. Creating ...");
-        	   $result = $customer->create_customer($email,$password);
-        	   if($result['status']== 'SUCCESS' ){
-							 $key_content = json_decode($customer->get_customer_key($email,$password), true);
-							 if($key_content['status'] == 'SUCCESS'){
-								 $this->save_customer($key_content,$email);
-								 Utilities::showSuccessFlashMessage('User retrieved successfully.');
-							 }else{
-								 Utilities::showErrorFlashMessage('It seems like you have entered the incorrect password');
-							 }
-        	   }
-        }elseif ($check_content['status'] == 'SUCCESS'){
-            $key_content = json_decode($customer->get_customer_key($email,$password), true);
-
-            if($key_content['status'] == 'SUCCESS'){
+            $email = $post['email'];
+            $password = $post['password'];
+            $check_content=$_POST['check_content'];
+            $key_content=$_POST['key_content'];
+            $result=$_POST['result'];
+            
+                                 
+            if($key_content['status'] == 'SUCCESS' && $check_content['status']=='SUCCESS')
+            {
                 $this->save_customer($key_content,$email);
                 Utilities::showSuccessFlashMessage('User retrieved successfully.');
+            }elseif($key_content['status'] == 'SUCCESS'){
+                $this->save_customer($key_content,$email);
+                Utilities::showSuccessFlashMessage('Customer created successfully.');
+            }else{
+                Utilities::showErrorFlashMessage('This is not a valid email. Please enter a valid email.');
             }
-            else{
-            	  Utilities::showErrorFlashMessage('It seems like you have entered the incorrect password');
-            }
+             $_SESSION['flag']='unset';
+
         }
+       
     }
 
 //  SAVE CUSTOMER
@@ -286,6 +351,7 @@ class BesamlController extends ActionController
 // ---- UPDATE CUSTOMER Details
 	  public function update_cust($column,$value)
     {
+        error_log("In BesamlController: update_cust()");
         if($this->fetch_cust('id') == null)
         {
             $this->insertValue();
@@ -297,6 +363,7 @@ class BesamlController extends ActionController
 // ---- UPDATE SAML Settings
 public function update_saml_setting($column, $value)
 {
+    error_log("In BesamlController: update_saml_setting()");
     $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
     $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
 }
@@ -309,31 +376,38 @@ public function update_saml_setting($column, $value)
 
 // --------------------SUPPORT QUERY---------------------
 	public function support(){
+        error_log("In BesamlController: support()");
         if(!$this->mo_saml_is_curl_installed() ) {
-        	  Utilities::showErrorFlashMessage('ERROR: <a href="http://php.net/manual/en/curl.installation.php" 
+              Utilities::showErrorFlashMessage('ERROR: <a href="http://php.net/manual/en/curl.installation.php" 
                        target="_blank">PHP cURL extension</a> is not installed or disabled. Query submit failed.');
             return;
         }
         // Contact Us query
-        $email    = $_POST['mo_saml_contact_us_email'];
-        $phone    = $_POST['mo_saml_contact_us_phone'];
-        $query    = $_POST['mo_saml_contact_us_query'];
-
-        $customer = new CustomerSaml();
-
+        $_POST['email']=$_SESSION['email'];
+        $email    = $_POST['email'];
+        $phone    = $_POST['mo_contact_us_phone'];
+        $query    = $_POST['mo_contact_us_query'];
+    
+        
         if($this->mo_saml_check_empty_or_null( $email ) || $this->mo_saml_check_empty_or_null( $query ) ) {
+            error_log("enter valid email");
+            $_SESSION['support_response']='invalid id';
           Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
         }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        	  Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
+            error_log("enter valid email");
+              Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
         }else {
-            $submitted = json_decode($customer->submit_contact( $email, $phone, $query ), true);
-					if ( $submitted['status'] == 'SUCCESS' ) {
-						Utilities::showSuccessFlashMessage('Support query sent ! We will get in touch with you shortly.');
-					}else{
-            	      Utilities::showErrorFlashMessage('could not send query. Please try again later or mail us at info@miniorange.com');
-					}
+            $submitted = json_decode(Utilities::submit_contact( $email, $phone, $query ), true);
+                    if ( $submitted['status'] == 'SUCCESS' ) {
+                        error_log("support query sent");
+                        Utilities::showSuccessFlashMessage('Support query sent ! We will get in touch with you shortly.');
+                    }else{
+                        error_log("could not send query. Try again later");
+                      Utilities::showErrorFlashMessage('could not send query. Please try again later or mail us at info@miniorange.com');
+                    }
         }
     }
+    
 
 	/**
 	 * @param $var
@@ -357,6 +431,7 @@ public function update_saml_setting($column, $value)
      */
     public function defaultSettings($postArray)
     {
+        error_log("In BesamlController: defaultSettings()");
 		$this->spobject = json_encode($postArray);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('sp_entity_id', $postArray['sp_entity_id'])->execute();
@@ -373,7 +448,7 @@ public function update_saml_setting($column, $value)
      */
     public function storeToDatabase($creds)
     {
-
+        error_log("In BesamlController: storeToDatabase()");
         $this->myjson = json_encode($creds);
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
@@ -418,4 +493,84 @@ public function update_saml_setting($column, $value)
                 ->set('object', $this->myjson)->execute();
         }
     }
+
+    public function generic_update_query($database_name, $updatefieldsarray){
+        error_log("In BesamlController: generic_update_query()");
+        $idp_obj = json_encode($updatefieldsarray);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+        foreach ($updatefieldsarray as $key => $value)
+        {
+            //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($key, $value)->execute();
+            if($key == 'idp_entity_id')
+            {
+                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('idp_entity_id', $value)->execute();
+
+            }
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->execute();
+
+        }
+        Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
+    }
+
+    public static function _handle_upload_metadata() {
+        error_log("In BesamlController: handle_upload_metadata()");
+        if (isset($_FILES['metadata_file']) || isset($_POST['upload_url'])) {
+            if (!empty($_FILES['metadata_file']['tmp_name'])) {
+                $file = @file_get_contents($_FILES['metadata_file']['tmp_name']);
+            } else {
+                $url = filter_var($_POST['upload_url'], FILTER_SANITIZE_URL);
+                $arrContextOptions = array(
+                    "ssl" => array(
+                        "verify_peer" => false,
+                        "verify_peer_name" => false,
+                    ),
+                );
+                if (empty($url)) {
+                    Utilities::showErrorFlashMessage('No Metadata File/URL Provided.');
+                    return;
+                } else {
+                    $file = file_get_contents($url, false, stream_context_create($arrContextOptions));
+                }
+            }
+            self::upload_metadata($file);
+        } 
+	}
+
+    public static function upload_metadata($file) {
+        error_log("In BesamlController: upload_metadata()");
+		$document = new DOMDocument();
+        $document->loadXML($file);
+        restore_error_handler();
+        $first_child = $document->firstChild;
+        if (!empty($first_child)) {
+            $metadata = new IDPMetadataReader($document);
+            $identity_providers = $metadata->getIdentityProviders();
+            if (empty($identity_providers)) {
+                Utilities::showErrorFlashMessage('Please provide valid metadata.');
+                return;
+            }
+            foreach ($identity_providers as $key => $idp) {
+                $saml_login_url = $idp->getLoginURL('HTTP-Redirect');
+                $saml_issuer = $idp->getEntityID();
+                $saml_x509_certificate = $idp->getSigningCertificate();
+                $database_name = 'saml';
+                $updatefieldsarray = array(
+                    'idp_name' => $_POST['upload_idp'],
+                    'idp_entity_id' => isset($saml_issuer) ? $saml_issuer : 0,
+                    'saml_login_url' => isset($saml_login_url) ? $saml_login_url : 0,
+                    'login_binding_type' => 'HttpRedirect',
+                    'x509_certificate' => isset($saml_x509_certificate) ? $saml_x509_certificate[0] : 0,
+                );
+
+                self::generic_update_query($database_name, $updatefieldsarray);
+                break;
+            }
+            return;
+        } else {
+            
+            return;
+        }
+	}
 }
+
+

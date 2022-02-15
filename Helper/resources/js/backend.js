@@ -9,6 +9,8 @@ $(document).ready(function() {
         openTab('Service_Provider');
     }else if(session == "Support"){
         openTab( 'Support');
+    }else if(session == "Identity_provider"){
+        openTab( 'Identity_Provider');
     }else if(session == "Attribute_Mapping") {
         openTab( 'Attribute_Mapping');
     }else if(session == "Group_Mapping") {
@@ -16,8 +18,9 @@ $(document).ready(function() {
     }else if(session == "Premium") {
         openTab( 'Premium');
     }else{
-        openTab( 'Identity_Provider');
+        openTab( 'Account');
     }
+
 });
 
 //when tabs are clicked
@@ -55,13 +58,18 @@ function removeFlashMessage(){
 }
 
 //is user registered
-// function ifUserRegistered(){
-//     if (document.getElementById('registered').checked){
-//         document.getElementById('confirmPasswordDiv').style.display = "none";
-//     } else {
-//         document.getElementById('confirmPasswordDiv').style.display = "block";
-//     }
-// }
+ function ifUserRegistered(){
+    
+    var checkBox=document.getElementById('registered');
+    var login=document.getElementById('confirmPasswordDiv');
+    if (checkBox.checked == true){
+        login.style.display = "none";
+        
+      } else {
+         login.style.display = "block";
+         
+      }
+ }
 
 
 function addCustomAttribute(){
@@ -110,3 +118,31 @@ function deleteCustomAttribute(){
         $('#'+val+'Div').remove();
         $("#this_attribute").val("");}
 }
+
+function setMetadata()
+        {
+            jQuery('#metadata_download').attr('value','mosaml_metadata');
+            jQuery('#sp_settings').submit();
+        }
+
+        function set_value()
+        {
+            jQuery('#metadata_download').attr('value','mosaml_metadata_download');
+            jQuery('#sp_settings').submit();
+        }
+
+        function save_sp_data()
+        {
+            jQuery('#metadata_download').attr('value','save_sp_settings');
+            jQuery('#sp_settings').submit();
+        }
+
+        function set_acs()
+        {
+            document.getElementById("acs_url").value = document.getElementById("response").value;
+        }
+
+        function set_entityid()
+        {
+            document.getElementById("sp_entity_id").value = document.getElementById("site_base_url").value;
+        }

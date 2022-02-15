@@ -85,18 +85,21 @@ class FesamlController extends ActionController
      */
     public function requestAction()
     {
+        if(isset($_REQUEST['option']) and $_REQUEST['option']=='mosaml_metadata')
+        {
+            SAMLUtilities::mo_saml_miniorange_generate_metadata();
+        }
+        error_log("relaystate :  ".print_r($_REQUEST,true));
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-
         $this->controlAction();
-
         $this->bindingType = Constants::HTTP_REDIRECT;
         $samlRequest = $this->build();
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
-
+        
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
-        error_log("relaystate :  ".$relayState);
+        error_log("metadata: ".$_REQUEST['metadata']);
 
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
 
@@ -132,7 +135,6 @@ class FesamlController extends ActionController
          $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
          $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
          $this->force_authn = false;
-
         $this->acs_url = $sp_object[Constants::COLUMN_SP_ACS_URL];
         $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
 

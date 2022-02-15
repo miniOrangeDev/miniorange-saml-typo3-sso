@@ -76,8 +76,8 @@ class ResponseController extends ActionController
     {
 
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-//      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
 
+        error_log('request in saml response: '.print_r($_REQUEST,true));
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 
             $samlResponseObj = ReadResponseAction::execute();
@@ -92,7 +92,6 @@ class ResponseController extends ActionController
 
                 $attrs['NameID'] = ['0' => $this->name_id];
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
-
                 if ($relayStateUrl == 'testconfig') {
                     (new TestResultActions($attrs))->execute();
                     die;
