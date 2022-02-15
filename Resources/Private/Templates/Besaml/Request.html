@@ -271,7 +271,7 @@
                 </div>
                     <form method="POST" action="" id="saml_form" class="saml_form" enctype="multipart/form-data">
                     <input  type="hidden" name="option" value="idp_settings">
-                    <a class="btn btn-primary" id="upload_metadata" style="float :right; margin-bottom:1%;" type="button" onclick="uploadMetadata()">Upload IDP Metadata </a>
+                    <a class="btn btn-primary" {log} id="upload_metadata" style="float :right; margin-bottom:1%;" type="button" onclick="uploadMetadata()">Upload IDP Metadata </a>
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" {log} name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
@@ -424,7 +424,7 @@
             <label><b>  Metadata URL : </b></label>
             <a target="_blank" href="{conf_sp.fesaml}/?option=mosaml_metadata" id="metadata_url"> Show Metadata &nbsp</a>
             <div class="tooltip_meta">
-               <a target="_blank" class="btn btn-primary" style="text-decoration:none" style="margin-right:40px; padding: 7px 25px " id="copy" onClick="copyURL()" onmouseout="outFunc()"><span class="tooltiptext" id="myTooltip">Copy to clipboard</span>Copy URL</a>
+               <a target="_blank" {log} class="btn btn-primary" style="text-decoration:none" style="margin-right:40px; padding: 7px 25px " id="copy" onClick="copyURL()" onmouseout="outFunc()"><span class="tooltiptext" id="myTooltip">Copy to clipboard</span>Copy URL</a>
             </div>
             <br><br>
 
