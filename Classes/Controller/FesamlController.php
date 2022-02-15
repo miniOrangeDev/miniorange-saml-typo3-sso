@@ -91,11 +91,13 @@ class FesamlController extends ActionController
         }
         error_log("relaystate :  ".print_r($_REQUEST,true));
         $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
+
         $this->controlAction();
+
         $this->bindingType = Constants::HTTP_REDIRECT;
         $samlRequest = $this->build();
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
-        
+
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
@@ -135,6 +137,7 @@ class FesamlController extends ActionController
          $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
          $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
          $this->force_authn = false;
+         
         $this->acs_url = $sp_object[Constants::COLUMN_SP_ACS_URL];
         $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
 

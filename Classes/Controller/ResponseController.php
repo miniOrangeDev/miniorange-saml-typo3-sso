@@ -92,6 +92,7 @@ class ResponseController extends ActionController
 
                 $attrs['NameID'] = ['0' => $this->name_id];
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
+                
                 if ($relayStateUrl == 'testconfig') {
                     (new TestResultActions($attrs))->execute();
                     die;

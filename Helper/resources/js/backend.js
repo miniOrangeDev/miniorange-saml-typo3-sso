@@ -20,7 +20,6 @@ $(document).ready(function() {
     }else{
         openTab( 'Account');
     }
-
 });
 
 //when tabs are clicked

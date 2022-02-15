@@ -728,93 +728,73 @@
                 }
 
                 $(document).ready(function() {
-    let session = document.getElementById('taby').value;
-    console.log("Session : in document ready() = "+session);
-    if (session == "Service_Provider"){
-        openTab('Service_Provider');
-    }else if(session == "Support"){
-        openTab( 'Support');
-    }else if(session == "Identity_Provider"){
-        openTab( 'Identity_Provider');
-    }else if(session == "Attribute_Mapping") {
-        openTab( 'Attribute_Mapping');
-    }else if(session == "Group_Mapping") {
-        openTab( 'Group_Mapping');
-    }else if(session == "Premium") {
-        openTab( 'Premium');
-    }else{
-        openTab( 'Account');
-    }
+                    let session = document.getElementById('taby').value;
+                    console.log("Session : in document ready() = "+session);
+                    if (session == "Service_Provider"){
+                        openTab('Service_Provider');
+                    }else if(session == "Support"){
+                        openTab( 'Support');
+                    }else if(session == "Identity_Provider"){
+                        openTab( 'Identity_Provider');
+                    }else if(session == "Attribute_Mapping") {
+                        openTab( 'Attribute_Mapping');
+                    }else if(session == "Group_Mapping") {
+                        openTab( 'Group_Mapping');
+                    }else if(session == "Premium") {
+                        openTab( 'Premium');
+                    }else{
+                        openTab( 'Account');
+                    }
 
-});
+                });
 
 //when tabs are clicked
-function openTab(activeTab) {
+                function openTab(activeTab) {
 
-    document.getElementById("leftContainer").classList.replace("hideElement","showElement");
+                    document.getElementById("leftContainer").classList.replace("hideElement","showElement");
 
-    let tabcontent = document.getElementsByClassName("tabcontent");
-    for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
+                    let tabcontent = document.getElementsByClassName("tabcontent");
+                    for (let i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].style.display = "none";
+                    }
 
-    let tablinks = document.getElementsByClassName("tablinks");
-    for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
+                    let tablinks = document.getElementsByClassName("tablinks");
+                    for (let i = 0; i < tablinks.length; i++) {
+                        tablinks[i].className = tablinks[i].className.replace(" active", "");
+                    }
 
-    document.getElementById(activeTab).style.display = "block";
+                    document.getElementById(activeTab).style.display = "block";
 
-    // if(activeTab==="Support"){
-    //     document.getElementById("Support_Tab").className  += " active";
-    //     document.getElementById("leftContainer").hidden = true;
-    // }else{
-    //     document.getElementById(activeTab).style.display = "block";
-     document.getElementById(activeTab + "_Tab").className  += " active";
-        // document.getElementById("leftContainer").hidden = false;
-    // }
-}
-
-//remove flash messages
-function removeFlashMessage(){
-    document.querySelectorAll('.typo3-messages').forEach(function(a){
-        a.remove();
-    });
-}
-
-//is user registered
- function ifUserRegistered(){
     
-    var checkBox=document.getElementById('registered');
-    var login=document.getElementById('confirmPasswordDiv');
-    if (checkBox.checked == true){
-        login.style.display = "none";
-        
-      } else {
-         login.style.display = "block";
-         
-      }
- }
+                    document.getElementById(activeTab + "_Tab").className  += " active";
+                }
+
+                //remove flash messages
+                function removeFlashMessage(){
+                    document.querySelectorAll('.typo3-messages').forEach(function(a){
+                    a.remove();
+                });
+                }
 
 
-function addCustomAttribute(){
-    // console.log("Appending a Custom Attribute.");
+                function addCustomAttribute(){
+                    // console.log("Appending a Custom Attribute.");
 
-    var val = $("#this_attribute").val();
+                    var val = $("#this_attribute").val();
 
-    if(val.length>0){
-        if($("#custom_attrs_form").has($("#"+val)).length){
-            console.log("Element exists with this id");
-        }else{
-            var div = generateAttributeDiv($("#this_attribute").val())
-            $("#submit_custom_attr").before(div);
-            $("#this_attribute").val("");
-        }
-    }else{
-        console.log("Enter a valid name.");
-    }
+                    if(val.length>0){
+                        if($("#custom_attrs_form").has($("#"+val)).length){
+                            console.log("Element exists with this id");
+                        }else{
+                            var div = generateAttributeDiv($("#this_attribute").val())
+                            $("#submit_custom_attr").before(div);
+                            $("#this_attribute").val("");
+                        }
+                    }else{
+                    console.log("Enter a valid name.");
+                    }   
 
-}
+                }
 
 function generateAttributeDiv(name){
     // var txt1 = "<p>Text.</p>";               // Create element with HTML
