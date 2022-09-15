@@ -21,13 +21,6 @@ use TYPO3\CMS\Core\Database\Connection;
  */
 class FesamlController extends ActionController
 {
-//    /**
-//     * fesamlRepository
-//     *
-//     * @var \Miniorange\MiniorangeSaml\Domain\Repository\FesamlRepository
-//     * @inject
-//     */
-//    protected $fesamlRepository = null;
 
     protected $idp_name = null;
 
@@ -94,7 +87,6 @@ class FesamlController extends ActionController
             SAMLUtilities::mo_saml_miniorange_generate_metadata();
         }
         error_log("relaystate :  ".print_r($_REQUEST,true));
-        //$this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
         $this->controlAction();
         $this->bindingType = Constants::HTTP_REDIRECT;
         $samlRequest = $this->build();
@@ -103,7 +95,6 @@ class FesamlController extends ActionController
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
-        //error_log("metadata: ".$_REQUEST['metadata']);
 
 
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
@@ -158,7 +149,6 @@ class FesamlController extends ActionController
 
     public function build()
     {
-        //$pluginSettings=PluginSettings::getPluginSettings();
         $requestXmlStr = $this->generateXML();
         if (empty($this->bindingType) || $this->bindingType == Constants::HTTP_REDIRECT) {
             $deflatedStr = gzdeflate($requestXmlStr);
@@ -179,17 +169,9 @@ class FesamlController extends ActionController
     {
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
-//      $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);
-//      $certFilePath = file_get_contents(Utilities::getBaseUrl().Utilities::getResourceDir(). 'sp-key.key');
-//      $key->loadKey($certFilePath);
-//      $signature = $key->signData($samlRequest);
-//      $signature = base64_encode($signature);
         $redirect = $idpUrl;
         $redirect .= strpos($idpUrl, '?') !== false ? '&' : '?';
         $redirect .= $samlRequest ;
-//      .'&Signature=' . urlencode($signature);
-        //var_dump
-        //($redirect);exit;
         if (isset($_REQUEST)) {
             header('Location:' . $redirect);
             die;

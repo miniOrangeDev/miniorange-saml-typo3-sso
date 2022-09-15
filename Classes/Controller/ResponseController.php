@@ -81,8 +81,6 @@ class ResponseController extends ActionController
     public function responseAction()
     {
 
-        //$this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-//      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 
@@ -155,7 +153,6 @@ class ResponseController extends ActionController
      */
     public function createIfNotExist($username)
     {
-//     $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $user = Utilities::fetchUserFromUsername($username);
         if($user == false){
