@@ -187,21 +187,6 @@ if(!empty($_POST['option'])){
         $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
         $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
 
-//------------ LOADING VARIABLES TO BE USED IN VIEW---------------
-//        if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
-//					$this->view->assign('status','logged');
-//					$this->view->assign('log', '');
-//                    $this->view->assign('nolog', 'display:none');
-//					$this->view->assign('email',$this->fetch_cust('cust_email'));
-//					$this->view->assign('key',$this->fetch_cust('cust_key'));
-//					$this->view->assign('token',$this->fetch_cust('cust_token'));
-//					$this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
-//        }else{
-//					$this->view->assign('log', 'disabled');
-//                    $this->view->assign('nolog', 'display:block');
-//					$this->view->assign('status','not_logged');
-//        }
-
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath', Utilities::getExtensionRelativePath());
      //   $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
@@ -227,13 +212,6 @@ if(!empty($_POST['option'])){
         $this->update_cust('cust_reg_status', '');
         $this->update_cust('cust_email','');
 
-//        $this->update_saml_setting('idp_name',"");
-//        $this->update_saml_setting('idp_entity_id',"");
-//        $this->update_saml_setting('saml_login_url',"");
-//		  $this->update_saml_setting('saml_logout_url',"");
-//        $this->update_saml_setting('x509_certificate',"");
-//        $this->update_saml_setting('login_binding_type',"");
-//        $this->update_saml_setting('object',"");
     }
 
     public static function generic_update_query($database_name, $updatefieldsarray){
@@ -249,12 +227,8 @@ if(!empty($_POST['option'])){
             }
             $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->execute();
 
-            // echo ($key." : ");
-            // echo Utilities::fetchFromTable($key,'saml');
         }
-        //exit;
-        // foreach ($updatefieldsarray as $key => $value)
-        // echo $queryBuilder->select($key)->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+
         Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
     }
 
