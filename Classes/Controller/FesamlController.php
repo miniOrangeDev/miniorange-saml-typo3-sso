@@ -13,6 +13,9 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
 
+use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
+use TYPO3\CMS\Core\Database\Connection;
+
 /**
  * FesamlController
  */
@@ -85,18 +88,29 @@ class FesamlController extends ActionController
      */
     public function requestAction()
     {
-        $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
 
+        if(isset($_REQUEST['option']) and $_REQUEST['option']=='mosaml_metadata')
+        {
+            SAMLUtilities::mo_saml_miniorange_generate_metadata();
+        }
+        error_log("relaystate :  ".print_r($_REQUEST,true));
+        //$this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
         $this->controlAction();
-
         $this->bindingType = Constants::HTTP_REDIRECT;
         $samlRequest = $this->build();
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
-
+        
         if ($this->findSubstring($_REQUEST) == 1) {
             $relayState = 'testconfig';
         }
-        error_log("relaystate in fesaml :  ".$relayState);
+        //error_log("metadata: ".$_REQUEST['metadata']);
+
+
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+
+        $this->controlAction();
+
+        error_log("relaystate :  ".$relayState);
 
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
 
@@ -108,7 +122,7 @@ class FesamlController extends ActionController
      */
     public function findSubstring($request)
     {
-        if (strpos($request["id"], 'RelayState') !== false) {
+        if (!empty($request["id"]) && strpos($request["id"], 'RelayState') !== false) {
             return 1;
         }else{
             return 0;
@@ -163,7 +177,6 @@ class FesamlController extends ActionController
      */
     public function sendHTTPRedirectRequest($samlRequest, $sendRelayState, $idpUrl)
     {
-        error_log("in fesamlController");
         $samlRequest = 'SAMLRequest=' . $samlRequest . '&RelayState=' . urlencode($sendRelayState) . '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA256);
         $param = ['type' => 'private'];
 //      $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, $param);

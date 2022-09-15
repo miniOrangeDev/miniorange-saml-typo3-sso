@@ -127,6 +127,7 @@ CREATE TABLE saml (
   spobject text DEFAULT '',
   attrobject text DEFAULT '',
   defaultGroup text DEFAULT '',
+  countuser int(11) DEFAULT '10' NOT NULL,
   PRIMARY KEY (uid)
 );
 

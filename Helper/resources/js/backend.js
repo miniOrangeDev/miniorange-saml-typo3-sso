@@ -7,10 +7,6 @@ $(document).ready(function() {
 
     if (session == "Service_Provider"){
         openTab('Service_Provider');
-    }else if(session == "Support"){
-        openTab( 'Support');
-    }else if(session == "Identity_provider"){
-        openTab( 'Identity_Provider');
     }else if(session == "Attribute_Mapping") {
         openTab( 'Attribute_Mapping');
     }else if(session == "Group_Mapping") {
@@ -18,7 +14,7 @@ $(document).ready(function() {
     }else if(session == "Premium") {
         openTab( 'Premium');
     }else{
-        openTab( 'Account');
+        openTab( 'Identity_Provider');
     }
 });
 
@@ -39,14 +35,7 @@ function openTab(activeTab) {
 
     document.getElementById(activeTab).style.display = "block";
 
-    // if(activeTab==="Support"){
-    //     document.getElementById("Support_Tab").className  += " active";
-    //     document.getElementById("leftContainer").hidden = true;
-    // }else{
-    //     document.getElementById(activeTab).style.display = "block";
      document.getElementById(activeTab + "_Tab").className  += " active";
-        // document.getElementById("leftContainer").hidden = false;
-    // }
 }
 
 //remove flash messages
@@ -57,18 +46,13 @@ function removeFlashMessage(){
 }
 
 //is user registered
- function ifUserRegistered(){
-    
-    var checkBox=document.getElementById('registered');
-    var login=document.getElementById('confirmPasswordDiv');
-    if (checkBox.checked == true){
-        login.style.display = "none";
-        
-      } else {
-         login.style.display = "block";
-         
-      }
- }
+// function ifUserRegistered(){
+//     if (document.getElementById('registered').checked){
+//         document.getElementById('confirmPasswordDiv').style.display = "none";
+//     } else {
+//         document.getElementById('confirmPasswordDiv').style.display = "block";
+//     }
+// }
 
 
 function addCustomAttribute(){
