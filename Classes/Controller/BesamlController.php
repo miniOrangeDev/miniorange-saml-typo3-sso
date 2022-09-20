@@ -51,7 +51,165 @@ class BesamlController extends ActionController
 	 */
     public function requestAction()
     {
+    
+        $version = new Typo3Version();
+        if( $version->getVersion() >=11.5)
+        {
 
+            $res=$this->higherV();
+            return $res;
+        }
+        else{
+            $this->lowerV();
+        }
+
+    }
+    
+    public function lowerV()
+    {
+        //-------------Upload Metadata-----------------------
+
+        if(isset($_POST['option']) and $_POST['option']=='upload_metadata_file')
+        {
+            Self::_handle_upload_metadata();
+        }
+        //----------- Download metadata---------------
+        if(isset($_POST['option']) and $_POST['option']=='mosaml_metadata_download')
+        {
+            $value1 = $this->validateURL($_POST['site_base_url']);
+            $value2 = $this->validateURL($_POST['acs_url']);
+            $value3 = $this->validateURL($_POST['sp_entity_id']);
+
+                if($value1 == 1 && $value2 == 1 && $value3 == 1)
+                {
+                    SAMLUtilities::mo_saml_miniorange_generate_metadata(true);
+                }
+                else{
+                    Utilities::showErrorFlashMessage('Fill all the fields to download the metadata file');
+                }
+
+        }
+
+
+        //---------------show Metadata-------------------------
+        
+        if(isset($_POST['option']) and $_POST['option']=='mosaml_metadata')
+        {
+            SAMLUtilities::mo_saml_miniorange_generate_metadata();
+        }
+
+//------------ IDENTITY PROVIDER SETTINGS---------------
+        if(isset($_POST['option']) and $_POST['option'] == 'idp_settings'){
+
+        	$value1 = $this->validateURL($_POST['saml_login_url']);
+            $value2 = $this->validateURL($_POST['idp_entity_id']);
+            $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
+            
+            if($value1 == 1 && $value2 == 1 && $value3 == 1)
+            {
+                $obj = new BesamlController();
+                $obj->storeToDatabase($_POST);
+				Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
+            }else{
+                if ($value3 == 0) {
+                	  Utilities::showErrorFlashMessage('Incorrect Certificate Format');
+                }else {
+                	 Utilities::showErrorFlashMessage('Blank Field or Invalid input');
+                }
+            }
+        }
+
+//------------ VERIFY CUSTOMER---------------
+        elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
+
+			if($_POST['registered'] =='isChecked'){
+                error_log("registered is checked. Registering User : ");
+			    $this->account($_POST);
+            }else{
+			    if($_POST['password'] == $_POST['confirmPassword']){
+                    $this->account($_POST);
+			    }else{
+                    Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
+                }
+            }
+
+        }
+
+//------------ HANDLE LOG OUT ACTION---------------
+            elseif(isset($_POST['option']) and $_POST['option']== 'logout'){
+                    $this->remove_cust();
+                    Utilities::showSuccessFlashMessage('Logged out successfully.');
+                    $this->view->assign('status','not_logged');
+            }
+
+//------------ SERVICE PROVIDER SETTINGS---------------
+            elseif(isset($_POST['option']) and $_POST['option'] == 'save_sp_settings') {
+                $value1 = $this->validateURL($_POST['site_base_url']);
+                $value2 = $this->validateURL($_POST['acs_url']);
+                $value3 = $this->validateURL($_POST['sp_entity_id']);
+
+                if($value1 == 1 && $value2 == 1 && $value3 == 1)
+                {
+                    if($this->fetch('uid') == null){
+                        $this->save('uid',1,'saml');
+                    }
+                    $this->defaultSettings($_POST);
+                    Utilities::showSuccessFlashMessage('SP Setting saved successfully.');
+
+                }else{
+                      Utilities::showErrorFlashMessage('Incorrect Input');
+                }
+            }
+
+
+        //GROUP MAPPINGS
+        elseif(isset($_POST['option']) and $_POST['option'] == 'group_mapping'){
+            Utilities::updateTable(Constants::COLUMN_GROUP_DEFAULT, $_POST['defaultUserGroup'],Constants::TABLE_SAML);
+            Utilities::showSuccessFlashMessage('Default Group saved successfully.');
+        }
+
+//------------ CHANGING TABS---------------
+if(!empty($_POST['option'])){   
+        if($_POST['option'] == 'save_sp_settings' )
+        {
+            $this->tab = "Service_Provider";
+        }
+        elseif ($_POST['option'] == 'attribute_mapping')
+        {
+            $this->tab = "Attribute_Mapping";
+        }
+        elseif ($_POST['option'] == 'group_mapping')
+        {
+            $this->tab = "Group_Mapping";
+        }
+        elseif ($_POST['option'] == 'get_premium')
+        {
+            $this->tab = "Premium";
+        }
+        else
+        {
+            $this->tab = "Identity_Provider";
+        }
+    }
+
+        $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
+        $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
+        $this->view->assign('allUserGroups', $allUserGroups);
+        $this->view->assign('defaultGroup',Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
+
+//------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
+        $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
+        $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
+
+        $this->view->assign('tab', $this->tab);
+        $this->view->assign('extPath', Utilities::getExtensionRelativePath());
+     //   $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
+     GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+    }
+    
+    public function higherV(): ResponseInterface
+    {
         //-------------Upload Metadata-----------------------
 
         if(isset($_POST['option']) and $_POST['option']=='upload_metadata_file')
@@ -195,7 +353,6 @@ if(!empty($_POST['option'])){
      return $this->responseFactory->createResponse()
      ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
      ->withBody($this->streamFactory->createStream($this->view->render()));
-
     }
 
     public function save($column,$value,$table)
