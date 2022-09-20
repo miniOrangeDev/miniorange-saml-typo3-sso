@@ -19,7 +19,7 @@ class ReadResponseAction
      */
     public static function execute()
     {
-
+        
         // read the response
         $samlResponse = $_REQUEST['SAMLResponse'];
         $relayState  = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';

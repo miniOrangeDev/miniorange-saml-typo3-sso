@@ -7,8 +7,6 @@ $(document).ready(function() {
 
     if (session == "Service_Provider"){
         openTab('Service_Provider');
-    }else if(session == "Support"){
-        openTab( 'Support');
     }else if(session == "Attribute_Mapping") {
         openTab( 'Attribute_Mapping');
     }else if(session == "Group_Mapping") {
@@ -37,14 +35,7 @@ function openTab(activeTab) {
 
     document.getElementById(activeTab).style.display = "block";
 
-    // if(activeTab==="Support"){
-    //     document.getElementById("Support_Tab").className  += " active";
-    //     document.getElementById("leftContainer").hidden = true;
-    // }else{
-    //     document.getElementById(activeTab).style.display = "block";
      document.getElementById(activeTab + "_Tab").className  += " active";
-        // document.getElementById("leftContainer").hidden = false;
-    // }
 }
 
 //remove flash messages

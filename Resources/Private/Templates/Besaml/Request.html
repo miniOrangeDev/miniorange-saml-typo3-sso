@@ -61,7 +61,6 @@
     <div class="tab_items"><button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab('Service_Provider')">SP Settings</button></div>
     <div class="tab_items"><button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab('Attribute_Mapping')">Attribute Mapping</button></div>
     <div class="tab_items"><button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab('Group_Mapping')">Group Mapping</button></div>
-<!--   <div> <button class="tablinks button" id="Support_Tab" onclick="removeFlashMessage(); openTab('Support')">Support</button></div>-->
     <div class="tab_items"><button class="tablinks button" id="Premium_Tab" onclick="removeFlashMessage(); openTab('Premium')">Get Premium</button></div>
 </div>
 
@@ -77,8 +76,34 @@
 <!--         <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>-->
          <hr>
             <div class="tile" >
+                <div type="hidden" style="text-align:center;">
+                    <form method="POST" action="" style="display:none; border:solid; padding: 2%" id="upload_metadata_form" class="upload_metadata_form" enctype="multipart/form-data">
+                        <input type="hidden" name="option" value="upload_metadata_file">
+                        <div style="display:inline">
+                            <h4><strong>Upload IDP XML Metadata</strong></h4>
+                            
+                        </div>
+                            <hr style="border: 1px solid rgb(131, 128, 128)">
+                        <br>
+                        <div>
+                            <label for="metadata"><b>Upload File: </b></label>
+                            <input class="form-control" {log} type="file" name="metadata_file">
+                        </div>
+                        <h4 style="text-align:center;">OR</h4>
+                        <div>
+                            <label for="upload_url"><b>Upload URL: </b></label>
+                            <input class="form-control" {log} type="url" name="upload_url">
+                        </div>
+                        <br>
+                        <br>
+                        <div style="text-align:center;">
+                            <a class="btn btn-primary"  {log} type="submit"  name="submit_upload_metadata" id="submit_upload_metadata" style="margin-right:10px;" onClick="uploadFile()">Upload</a>                </form>
+                            <a class="btn btn-primary" {log} style="background-color:#b82727;"  {log} type="submit"  name="cancel" id="cancel" onClick="cancel()">Cancel</a> 
+                        </div>
+                    </div>
                 <form method="POST" action="" id="saml_form" >
                     <input type="hidden" name="option" value="idp_settings">
+                    <a class="btn btn-primary" id="upload_metadata" style="float :right; margin-bottom:1%;" type="button" onclick="uploadMetadata()">Upload IDP Metadata </a>
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
                                 <input class="form-control" name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
@@ -228,6 +253,19 @@
             <div class="tile-footer form-group">
                 <button class="btn btn-primary" type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
                 <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
+            </div>
+            <hr>
+            <label><b>  Metadata URL : </b></label>
+            <a target="_blank" href="{conf_sp.fesaml}/?option=mosaml_metadata" id="metadata_url"> Show Metadata &nbsp</a>
+            <div class="tooltip_meta">
+               <a target="_blank" class="btn btn-primary" style="text-decoration:none" style="margin-right:40px; padding: 7px 25px " id="copy" onClick="copyURL()" onmouseout="outFunc()"><span class="tooltiptext" id="myTooltip">Copy to clipboard</span>Copy URL</a>
+            </div>
+            <br><br>
+
+            <div>
+                <input type="hidden" name="option" id="metadata_download" value="">
+                <label>You can download the metadata XML from here : </label>
+                <a target="_blank" style="text-decoration:none"><button class="btn btn-primary" {log} type="button" style="margin-right:40px; padding: 7px 25px " name="option" onClick=set_value() id="download_metadata">Download</button></a>
             </div>
             <br>
         </form>
@@ -389,8 +427,141 @@
 
              </div>
 
-    </div>
+</div>
+    <style>
+        .upload_metadata_form {
+            display: none;
+            position: fixed;
+            top: 200px;
+            right: 400px;
+            border: 3px solid #f1f1f1;
+            width: 50%;
+            height:50%;
+            z-index: 9;
+            opacity: 100;
+            background-color: #eeeeee;
+        }
+        .tooltip_meta {
+          position: relative;
+          display: inline-block;
+        }
+        
+        .tooltip_meta .tooltiptext {
+          visibility: hidden;
+          width: 140px;
+          background-color: #555;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px;
+          position: absolute;
+          z-index: 1;
+          bottom: 150%;
+          left: 50%;
+          margin-left: -75px;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+        
+        .tooltip_meta .tooltiptext::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: #555 transparent transparent transparent;
+        }
+        
+        .tooltip_meta:hover .tooltiptext {
+          visibility: visible;
+          opacity: 1;
+        }
+        </style>
 
+    <script>
+
+        function ifUserRegistered()
+        {
+             
+            var checkBox=document.getElementById('registered');
+            var login=document.getElementById('confirmPasswordDiv');
+            if (checkBox.checked == true)
+            {
+            login.style.display = "none";
+            }
+            else 
+            {
+            login.style.display = "block";
+            }
+            
+        }     
+
+        function setMetadata()
+        {
+            jQuery('#metadata_download').attr('value','mosaml_metadata');
+            jQuery('#sp_settings').submit();
+        }
+
+        function set_value()
+        {
+            jQuery('#metadata_download').attr('value','mosaml_metadata_download');
+            jQuery('#sp_settings').submit();
+        }
+
+        function save_sp_data()
+        {
+            jQuery('#metadata_download').attr('value','save_sp_settings');
+            jQuery('#sp_settings').submit();
+        }
+
+        function set_acs()
+        {
+            document.getElementById("acs_url").value = document.getElementById("response").value;
+        }
+
+        function set_entityid()
+        {
+            document.getElementById("sp_entity_id").value = document.getElementById("site_base_url").value;
+        }
+
+        function copyURL() 
+        {
+            var copyText = document.getElementById("metadata_url");
+
+            navigator.clipboard.writeText(copyText);
+
+            var tooltip = document.getElementById("myTooltip");
+            tooltip.innerHTML = "URL Copied: ";
+        }
+
+        function outFunc() 
+        {
+            var tooltip = document.getElementById("myTooltip");
+            tooltip.innerHTML = "Copy to clipboard";
+        }
+
+        function uploadMetadata()
+        {
+            document.getElementById("upload_metadata_form").style.display = "block";
+            jQuery('#saml_form').css('opacity', '0.6');
+        }
+
+        function uploadFile()
+        {
+            jQuery('#upload_metadata_form').submit();
+            document.getElementById("upload_metadata_form").style.display = "none";
+            document.getElementById("saml_form").style.display = "block";
+            jQuery('#saml_form').css('opacity', '100');
+        }
+        function cancel()
+        {
+            document.getElementById("saml_form").style.display = "block";
+            document.getElementById("upload_metadata_form").style.display = "none";
+            jQuery('#saml_form').css('opacity', '100');
+        }
+    </script>
 <!--</div>-->
 
 </body>

@@ -12,6 +12,7 @@ use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
 use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
 use Miniorange\Helper\SAMLUtilities;
 use Miniorange\Helper\Utilities;
+use PDO;
 use ReflectionClass;
 use ReflectionException;
 use TYPO3\CMS\Core\Crypto\Random;
@@ -30,6 +31,11 @@ use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserGroupRepository;
 use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
 use TYPO3\CMS\Extbase\Annotation\Inject;
 use TYPO3\CMS\Core\Utility\HttpUtility;
+
+use Psr\Http\Message\ResponseFactoryInterface;
+use TYPO3\CMS\Core\Session\UserSessionManager;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 /**
  * ResponseController
@@ -75,9 +81,7 @@ class ResponseController extends ActionController
     public function responseAction()
     {
 
-        $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-//      error_log("in ResponseController: "); //.print_r($_REQUEST,true)
-
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 
             $samlResponseObj = ReadResponseAction::execute();
@@ -149,37 +153,42 @@ class ResponseController extends ActionController
      */
     public function createIfNotExist($username)
     {
-//     $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-
         $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $user = Utilities::fetchUserFromUsername($username);
-        debug("User Search 1 : ".$user);
         if($user == false){
-            $frontendUser = new FrontendUser();
-            $frontendUser->setUsername($username);
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
+            $count = $queryBuilder->select('countuser')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+            if($count>0)
+            {
+                $frontendUser = new FrontendUser();
+                $frontendUser->setUsername($username);
+                $fnamelname = explode("@", $username);
+                $this->first_name = $fnamelname[0];
+                $this->last_name = $fnamelname[1];
+                $frontendUser->setFirstName($this->first_name);
+                $frontendUser->setLastName($this->last_name);
+                $frontendUser->setEmail($this->ssoemail);
+                $frontendUser->setPassword(SAMLUtilities::generateRandomAlphanumericValue(10));  //Setting Random Password
 
-            $frontendUser->setFirstName($this->first_name);
-            $frontendUser->setLastName($this->last_name);
-            $frontendUser->setEmail($this->ssoemail);
-            $frontendUser->setPassword(SAMLUtilities::generateRandomAlphanumericValue(10));  //Setting Random Password
-
-            $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
-            $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
-
-            if($userGroup!=null){
-                $frontendUser->addUsergroup($userGroup);
-            }else{
-                exit("Unable to create User. No UserGroup found.");
+                $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
+                $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
+                if($userGroup!=null){
+                    $frontendUser->addUsergroup($userGroup);
+                }else{
+                    exit("Unable to create User. No UserGroup found.");
+                }
+                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count-1)->execute();
+                $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
+                $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
+                $user = Utilities::fetchUserFromUsername($username);
+                return $user;
             }
-
-            $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
-            $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
-            $user = Utilities::fetchUserFromUsername($username);
-            debug("User Search 1 : ".$user);
-
-            return $user;
-
-        }else{
+            else
+            {
+                echo "User limit exceeded!!!";exit;
+            }
+        }
+        else{
             if($user['disable'] == 1){
                 exit("You are not allowed to login. Please contact your admin.");
             }

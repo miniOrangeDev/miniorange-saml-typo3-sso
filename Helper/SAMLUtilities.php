@@ -6,13 +6,15 @@ use DOMElement;
 use DOMNode;
 use DOMDocument;
 use Exception;
+use PDO;
 
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecEnc;
 use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityDSig;
+use Miniorange\Helper\lib\XMLSecLibs\Utils\XPath;
 
 /** @todo - optimize this class  */
-class SAMLUtilities
+class SAMLUtilities extends Utilities
 {
 
     public static function generateID()
@@ -649,5 +651,44 @@ class SAMLUtilities
         for ($i = 0; $i < $length; $i++)
             $uniqueID .= substr($chars,rand(0,15),1);
         return 'a'.$uniqueID;
+    }
+
+    //---------------------Generate Metadata-------------------
+
+    public static function mo_saml_miniorange_generate_metadata($download=false) {
+        $sp_base_url = self::fetchFromTable('site_base_url',Constants::TABLE_SAML);
+        $sp_response_url= self::fetchFromTable('response',Constants::TABLE_SAML);
+        $sp_entity_id = self::fetchFromTable('sp_entity_id',Constants::TABLE_SAML);
+        
+        $entity_id   = $sp_entity_id;
+        $acs_url     = $sp_response_url;
+        if(ob_get_contents())
+            ob_clean();
+
+            header('Content-Type: text/rss+xml; charset=utf-8');
+            if($download)
+            header('Content-Disposition: attachment; filename="Metadata.xml"');
+
+        echo '<?xml version="1.0"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" validUntil="2022-10-28T23:59:59Z" cacheDuration="PT1446808792S" entityID="' . $entity_id . '">
+                <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+                <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="' . $acs_url . '" index="1"/>
+                </md:SPSSODescriptor>
+                <md:Organization>
+                <md:OrganizationName xml:lang="en-US">miniOrange</md:OrganizationName>
+                <md:OrganizationDisplayName xml:lang="en-US">miniOrange</md:OrganizationDisplayName>
+                <md:OrganizationURL xml:lang="en-US">http://miniorange.com</md:OrganizationURL>
+                </md:Organization>
+                <md:ContactPerson contactType="technical">
+                <md:GivenName>miniOrange</md:GivenName>
+                <md:EmailAddress>info@xecurify.com</md:EmailAddress>
+                </md:ContactPerson>
+                <md:ContactPerson contactType="support">
+                <md:GivenName>miniOrange</md:GivenName> 
+                <md:EmailAddress>info@xecurify.com</md:EmailAddress>
+                </md:ContactPerson>
+                </md:EntityDescriptor>';
+        exit;
+    
     }
 }
