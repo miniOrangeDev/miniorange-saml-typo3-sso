@@ -114,7 +114,7 @@ CREATE TABLE saml (
   idp_name varchar (100) DEFAULT '' NOT NULL ,
   idp_entity_id varchar (100) DEFAULT '' NOT NULL,
   saml_login_url varchar (100) DEFAULT '' NOT NULL,
-  saml_logout_url varchar (100) DEFAULT '' NOT NULL,
+  saml_logout_url varchar (100) DEFAULT '',
   x509_certificate varchar (1500) DEFAULT '',
   login_binding_type varchar (100) DEFAULT 'HttpRedirect' ,
   site_base_url varchar (100) DEFAULT '' NOT NULL,
@@ -128,6 +128,7 @@ CREATE TABLE saml (
   attrobject text DEFAULT '',
   defaultGroup text DEFAULT '',
   countuser int(11) DEFAULT '10' NOT NULL,
+  force_authn smallint(5) unsigned DEFAULT '0',
   PRIMARY KEY (uid)
 );
 
