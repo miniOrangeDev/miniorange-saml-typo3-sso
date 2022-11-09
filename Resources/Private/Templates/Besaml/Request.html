@@ -81,7 +81,7 @@
                         <input type="hidden" name="option" value="upload_metadata_file">
                         <div style="display:inline">
                             <h4><strong>Upload IDP XML Metadata</strong></h4>
-                            
+
                         </div>
                             <hr style="border: 1px solid rgb(131, 128, 128)">
                         <br>
@@ -98,7 +98,7 @@
                         <br>
                         <div style="text-align:center;">
                             <a class="btn btn-primary"  {log} type="submit"  name="submit_upload_metadata" id="submit_upload_metadata" style="margin-right:10px;" onClick="uploadFile()">Upload</a>                </form>
-                            <a class="btn btn-primary" {log} style="background-color:#b82727;"  {log} type="submit"  name="cancel" id="cancel" onClick="cancel()">Cancel</a> 
+                            <a class="btn btn-primary" {log} style="background-color:#b82727;"  {log} type="submit"  name="cancel" id="cancel" onClick="cancel()">Cancel</a>
                         </div>
                     </div>
                 <form method="POST" action="" id="saml_form" >
@@ -188,8 +188,7 @@
         <hr>
         <div class="tile">
         <form action="" method="post" id="sp_settings"  >
-
-            <input type="hidden" name="option" value="save_sp_settings"/>
+            <input type="hidden" name="option" id="metadata_download" value="save_sp_settings" />
             <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
             <div class="form-group">
                 <label for="fesaml"><b> Fesaml plugin page URL</b></label>
@@ -251,7 +250,7 @@
             </div>
 
             <div class="tile-footer form-group">
-                <button class="btn btn-primary" type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
+                <button class="btn btn-primary" type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#metadata_download').attr('value','save_sp_settings');jQuery('#sp_settings').submit();"> Save </button>
                 <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
             </div>
             <hr>
@@ -263,8 +262,7 @@
             <br><br>
 
             <div>
-                <input type="hidden" name="option" id="metadata_download" value="">
-                <label>You can download the metadata XML from here : </label>
+                 <label>You can download the metadata XML from here : </label>
                 <a target="_blank" style="text-decoration:none"><button class="btn btn-primary" {log} type="button" style="margin-right:40px; padding: 7px 25px " name="option" onClick=set_value() id="download_metadata">Download</button></a>
             </div>
             <br>
@@ -445,7 +443,7 @@
           position: relative;
           display: inline-block;
         }
-        
+
         .tooltip_meta .tooltiptext {
           visibility: hidden;
           width: 140px;
@@ -462,7 +460,7 @@
           opacity: 0;
           transition: opacity 0.3s;
         }
-        
+
         .tooltip_meta .tooltiptext::after {
           content: "";
           position: absolute;
@@ -473,7 +471,7 @@
           border-style: solid;
           border-color: #555 transparent transparent transparent;
         }
-        
+
         .tooltip_meta:hover .tooltiptext {
           visibility: visible;
           opacity: 1;
@@ -484,19 +482,19 @@
 
         function ifUserRegistered()
         {
-             
+
             var checkBox=document.getElementById('registered');
             var login=document.getElementById('confirmPasswordDiv');
             if (checkBox.checked == true)
             {
             login.style.display = "none";
             }
-            else 
+            else
             {
             login.style.display = "block";
             }
-            
-        }     
+
+        }
 
         function setMetadata()
         {
@@ -526,7 +524,7 @@
             document.getElementById("sp_entity_id").value = document.getElementById("site_base_url").value;
         }
 
-        function copyURL() 
+        function copyURL()
         {
             var copyText = document.getElementById("metadata_url");
 
@@ -536,7 +534,7 @@
             tooltip.innerHTML = "URL Copied: ";
         }
 
-        function outFunc() 
+        function outFunc()
         {
             var tooltip = document.getElementById("myTooltip");
             tooltip.innerHTML = "Copy to clipboard";
