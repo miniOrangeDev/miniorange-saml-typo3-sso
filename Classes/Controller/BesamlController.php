@@ -104,7 +104,6 @@ class BesamlController extends ActionController
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-            
             if($value1 == 1 && $value2 == 1 && $value3 == 1)
             {
                 $obj = new BesamlController();
@@ -191,7 +190,6 @@ if(!empty($_POST['option'])){
             $this->tab = "Identity_Provider";
         }
     }
-
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
         $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
@@ -211,10 +209,16 @@ if(!empty($_POST['option'])){
     public function higherV(): ResponseInterface
     {
         //-------------Upload Metadata-----------------------
-
         if(isset($_POST['option']) and $_POST['option']=='upload_metadata_file')
         {
-            Self::_handle_upload_metadata();
+            $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
+            if(isset($sp_object['sp_settings_saved']) && $sp_object['sp_settings_saved'] == true)
+            {
+                Self::_handle_upload_metadata();
+            }
+            else{
+                Utilities::showErrorFlashMessage('Please save SP Settings before saving IDP Settings.');
+            }
         }
         //----------- Download metadata---------------
         if(isset($_POST['option']) and $_POST['option']=='mosaml_metadata_download')
@@ -247,13 +251,17 @@ if(!empty($_POST['option'])){
         	$value1 = $this->validateURL($_POST['saml_login_url']);
             $value2 = $this->validateURL($_POST['idp_entity_id']);
             $value3 = Utilities::check_certificate_format($_POST['x509_certificate']);
-            
-            if($value1 == 1 && $value2 == 1 && $value3 == 1)
+            $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
+            if($value1 == 1 && $value2 == 1 && $value3 == 1 && isset($sp_object['sp_settings_saved']))
             {
                 $obj = new BesamlController();
                 $obj->storeToDatabase($_POST);
 				Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
             }else{
+                if(!isset($sp_object['sp_settings_saved']))
+                {
+                    Utilities::showErrorFlashMessage('Please save SP Settings before saving IDP Settings.');
+                }
                 if ($value3 == 0) {
                 	  Utilities::showErrorFlashMessage('Incorrect Certificate Format');
                 }else {
@@ -264,8 +272,7 @@ if(!empty($_POST['option'])){
 
 //------------ VERIFY CUSTOMER---------------
         elseif ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_verify_customer" ) {
-
-			if($_POST['registered'] =='isChecked'){
+			if(isset($_POST['registered']) && $_POST['registered'] =='isChecked'){
                 error_log("registered is checked. Registering User : ");
 			    $this->account($_POST);
             }else{
@@ -290,8 +297,10 @@ if(!empty($_POST['option'])){
                 $value1 = $this->validateURL($_POST['site_base_url']);
                 $value2 = $this->validateURL($_POST['acs_url']);
                 $value3 = $this->validateURL($_POST['sp_entity_id']);
+                $value4 = $this->validateURL($_POST['fesaml']);
+                $value5 = $this->validateURL($_POST['response']);
 
-                if($value1 == 1 && $value2 == 1 && $value3 == 1)
+                if($value1 == 1 && $value2 == 1 && $value3 == 1 && $value4 == 1 && $value5 == 1)
                 {
                     if($this->fetch('uid') == null){
                         $this->save('uid',1,'saml');
@@ -301,6 +310,13 @@ if(!empty($_POST['option'])){
 
                 }else{
                       Utilities::showErrorFlashMessage('Incorrect Input');
+                }
+            }
+
+            if(isset($_POST['option']) and $_POST['option'] == 'mo_saml_contact_us_query_option') {
+                if (isset($_POST['option']) and $_POST['option'] == "mo_saml_contact_us_query_option") {
+                    error_log('Received support query.  ');
+                    $this->support();
                 }
             }
 
@@ -317,6 +333,10 @@ if(!empty($_POST['option'])){
         {
             $this->tab = "Service_Provider";
         }
+        elseif($_POST['option'] == 'upload_metadata_file' || $_POST['option'] =='idp_settings')
+        {
+            $this->tab = 'Identity_Provider';
+        }
         elseif ($_POST['option'] == 'attribute_mapping')
         {
             $this->tab = "Attribute_Mapping";
@@ -331,10 +351,12 @@ if(!empty($_POST['option'])){
         }
         else
         {
-            $this->tab = "Identity_Provider";
+            $this->tab = "Account";
         }
     }
 
+        $idp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_IDP, Constants::TABLE_SAML),true);
+        $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $allUserGroups= $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findAll();
         $allUserGroups->getQuery()->getQuerySettings()->setRespectStoragePage(false);
@@ -348,7 +370,39 @@ if(!empty($_POST['option'])){
         $this->view->assign('tab', $this->tab);
         $this->view->assign('extPath', Utilities::getExtensionRelativePath());
      //   $this->cacheService->clearPageCache([$GLOBALS['TSFE']->id]);
-     GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+
+     //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
+     if($this->fetch_cust(Constants::CUSTOMER_REGSTATUS) == 'logged'){
+        $this->view->assign('status','logged');
+        $this->view->assign('log', '');
+        $this->view->assign('nolog', 'display:none');
+        $this->view->assign('email',$this->fetch_cust('cust_email'));
+        $this->view->assign('key',$this->fetch_cust('cust_key'));
+        $this->view->assign('token',$this->fetch_cust('cust_token'));
+        $this->view->assign('api_key',$this->fetch_cust('cust_api_key'));
+    }else{
+        $this->view->assign('log', 'disabled');
+        $this->view->assign('nolog', 'display:block');
+        $this->view->assign('status','not_logged');
+    }
+    if(isset($sp_object['sp_settings_saved']) && isset($idp_object['idp_settings_saved']))
+    {
+        $this->view->assign('idp_save_enabled','');
+        $this->view->assign('test_enabled','');
+    }
+    else
+    {
+        if(isset($sp_object['sp_settings_saved']) && $sp_object['sp_settings_saved'] == true)
+        {
+            $this->view->assign('idp_save_enabled','');
+        }
+        else
+        {
+            $this->view->assign('idp_save_enabled','disabled');
+        }
+        $this->view->assign('test_enabled','disabled');
+    }
+    GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
 
      return $this->responseFactory->createResponse()
      ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
@@ -372,19 +426,29 @@ if(!empty($_POST['option'])){
     }
 
     public static function generic_update_query($database_name, $updatefieldsarray){
+        $updatefieldsarray['idp_settings_saved'] = true;
         $idp_obj = json_encode($updatefieldsarray);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        foreach ($updatefieldsarray as $key => $value)
-        {
+        //echo print_r($idp_obj,true);exit;
+
+        $uid = $queryBuilder->select('uid')->from('saml')
+					->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)));
+            error_log('query: '.print_r($uid,true));
+            $uid = $uid->execute()->fetchColumn(0);
+            error_log('uid: '.print_r($uid,true));
             //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($key, $value)->execute();
-            if($key == 'idp_entity_id')
+            if($uid == null)
             {
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('idp_entity_id', $value)->execute();
-
+                // comment line 409 and uncomment 410 if error received
+                $affectedRows = $queryBuilder->insert('saml')->values(['object'  => $idp_obj, ])->execute();
+                //$affectedRows = $queryBuilder->insert('saml')->values(['object'  => $idp_obj, ])->executeQuery();
             }
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->execute();
-
-        }
+            else
+            {
+                // comment line 413 and uncomment 414 if error received
+                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->execute();
+                //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->executeQuery();
+            }
 
         Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
     }
@@ -440,11 +504,11 @@ if(!empty($_POST['option'])){
         $customer->email = $email;
         $this->update_cust('cust_email', $email);
         $check_content = json_decode($customer->check_customer($email,$password), true);
-
         if($check_content['status'] == 'CUSTOMER_NOT_FOUND'){
         	   $customer = new CustomerSaml();
                error_log("CUSTOMER_NOT_FOUND.. Creating ...");
         	   $result = $customer->create_customer($email,$password);
+               $result = json_decode($result,true);
         	   if($result['status']== 'SUCCESS' ){
 							 $key_content = json_decode($customer->get_customer_key($email,$password), true);
 							 if($key_content['status'] == 'SUCCESS'){
@@ -457,7 +521,7 @@ if(!empty($_POST['option'])){
         }elseif ($check_content['status'] == 'SUCCESS'){
             $key_content = json_decode($customer->get_customer_key($email,$password), true);
 
-            if($key_content['status'] == 'SUCCESS'){
+            if(isset($key_content) && $key_content['status'] == 'SUCCESS'){
                 $this->save_customer($key_content,$email);
                 Utilities::showSuccessFlashMessage('User retrieved successfully.');
             }
@@ -530,15 +594,24 @@ public function update_saml_setting($column, $value)
      */
     public function defaultSettings($postArray)
     {
+        $postArray['sp_settings_saved'] = true;
 		$this->spobject = json_encode($postArray);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('sp_entity_id', $postArray['sp_entity_id'])->execute();
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('site_base_url', $postArray['site_base_url'])->execute();
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('acs_url', $postArray['acs_url'])->execute();
-		$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('slo_url', $postArray['slo_url'])->execute();
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('fesaml', $postArray['fesaml'])->execute();
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('response', $postArray['response'])->execute();
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('spobject', $this->spobject)->execute();
+        $uid = $queryBuilder->select('uid')->from('saml')
+						                     ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
+						                     ->execute()->fetchColumn(0);
+        if($uid == null)
+        {
+            $affectedRows = $queryBuilder
+                ->insert('saml')
+                ->values([
+                    'spobject' => $this->spobject])
+                ->execute();
+        }
+        else
+        {
+            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('spobject', $this->spobject)->execute();
+        }
     }
 
     /**
@@ -546,7 +619,7 @@ public function update_saml_setting($column, $value)
      */
     public function storeToDatabase($creds)
     {
-
+        $creds['idp_settings_saved'] = true;
         $this->myjson = json_encode($creds);
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
@@ -569,7 +642,8 @@ public function update_saml_setting($column, $value)
                     'x509_certificate' => $creds['x509_certificate'],
                     'force_authn' => $creds['force_authn'],
                     'login_binding_type' => Constants::HTTP_REDIRECT,
-                    'object' => $this->myjson,])
+                    'idp_settings_saved' => $creds['idp_settings_saved'],
+                    'object' => $this->myjson])
                 ->execute();
             error_log("affected rows ".$affectedRows);
         }else {
@@ -599,6 +673,12 @@ public function update_saml_setting($column, $value)
 
     public static function _handle_upload_metadata() {
         $obj1= new BesamlController();
+        if(!isset($_POST['idp_name']) || empty($_POST['idp_name']))
+        {
+            Utilities::showErrorFlashMessage('Please Enter the Identity Provider Name!');
+            return;
+        }
+        $idp_name = $_POST['idp_name'];
         if (isset($_FILES['metadata_file']) || isset($_POST['upload_url'])) {
             if (!empty($_FILES['metadata_file']['tmp_name'])) {
                 $file = @file_get_contents($_FILES['metadata_file']['tmp_name']);
@@ -617,11 +697,11 @@ public function update_saml_setting($column, $value)
                     $file = file_get_contents($url, false, stream_context_create($arrContextOptions));
                 }
             }
-            self::upload_metadata($file);
+            self::upload_metadata($file ,$idp_name);
         } 
 	}
 
-    public static function upload_metadata($file) {
+    public static function upload_metadata($file, $idp_name) {
         $besaml=new BesamlController();
 		$document = new DOMDocument();
         $document->loadXML($file);
@@ -641,6 +721,7 @@ public function update_saml_setting($column, $value)
                 $saml_x509_certificate = $idp->getSigningCertificate();
                 $database_name = 'saml';
                 $updatefieldsarray = array(
+                    'idp_name' => $idp_name,
                     'idp_entity_id' => isset($saml_issuer) ? $saml_issuer : 0,
                     'saml_login_url' => isset($saml_login_url) ? $saml_login_url : 0,
                     'login_binding_type' => 'HttpRedirect',
@@ -652,8 +733,35 @@ public function update_saml_setting($column, $value)
             }
             return;
         } else {
-            
             return;
         }
 	}
+
+    public function support()
+    {
+        if(!$this->mo_saml_is_curl_installed() ) {
+        	    Utilities::showErrorFlashMessage('ERROR: <a href="http://php.net/manual/en/curl.installation.php" target="_blank">PHP cURL extension</a> is not installed or disabled. Query submit failed.');
+            return;
+        }
+        // Contact Us query
+        $email    = $_POST['mo_saml_contact_us_email'];
+        $phone    = $_POST['mo_saml_contact_us_phone'];
+        $query    = $_POST['mo_saml_contact_us_query'];
+
+        $customer = new CustomerSaml();
+
+        if($this->mo_saml_check_empty_or_null( $email ) || $this->mo_saml_check_empty_or_null( $query ) ) {
+          Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
+        }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        	  Utilities::showErrorFlashMessage('Please enter a valid Email address. ');
+        }else {
+            $submitted = json_decode($customer->submit_contact( $email, $phone, $query ), true);
+						if ( $submitted['status'] == 'SUCCESS' ) {
+							Utilities::showSuccessFlashMessage('Support query sent ! We will get in touch with you shortly.');
+						}else {
+											Utilities::showErrorFlashMessage('could not send query. Please try again later or mail us at info@miniorange.com');
+						}
+        }
+
+    }
 }

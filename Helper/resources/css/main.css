@@ -70,8 +70,6 @@ html, body {
     margin: 5px;
 }
 
-<!-- Style the tab -->
-
  body {
      font-family: Arial;
  }
@@ -225,4 +223,52 @@ hr{
     margin: 20px;
 }
 
+.upload_metadata_form {
+    display: none;
+    position: fixed;
+    top: 200px;
+    right: 400px;
+    border: 3px solid #f1f1f1;
+    width: 50%;
+    height:60%;
+    z-index: 9;
+    opacity: 100;
+    background-color: #eeeeee;
+}
+.tooltip_meta {
+  position: relative;
+  display: inline-block;
+}
 
+.tooltip_meta .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip_meta .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip_meta:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

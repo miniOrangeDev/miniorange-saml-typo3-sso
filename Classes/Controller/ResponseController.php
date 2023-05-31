@@ -36,6 +36,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 /**
  * ResponseController
@@ -92,7 +93,6 @@ class ResponseController extends ActionController
                 $this->name_id = current(current($samlResponseObj->getAssertions())->getNameId());
                 $this->ssoemail = current(current($samlResponseObj->getAssertions())->getNameId());
                 $attrs = current($samlResponseObj->getAssertions())->getAttributes();
-                Utilities::log_php_error("idp attribute",$attrs);
 
                 $attrs['NameID'] = ['0' => $this->name_id];
                 $relayStateUrl = array_key_exists('RelayState', $_REQUEST) ? $_REQUEST['RelayState'] : '/';
@@ -106,30 +106,38 @@ class ResponseController extends ActionController
                 $responseAction->execute();
                 $ses_id = current($samlResponseObj->getAssertions())->getSessionIndex();
                 $username = $this->ssoemail;
-                $GLOBALS['TSFE']->fe_user->checkPid = 0;
-
+                $tsfe = self::getTypoScriptFrontendController();
+                $tsfe->fe_user->checkPid = 0;
                 $user = $this->createIfNotExist($username);
+                $_SESSION['ses_id'] = $user['uid'];
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_sessions');
 
+                $version = new Typo3Version();
+                if( $version->getVersion() >=11.0)
+                {
+                    //$queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid',$queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->executeStatement(); 
+                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid',$queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
+                }
                 $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
-                $GLOBALS['TSFE']->fe_user->forceSetCookie = TRUE;
                 $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
+                $tsfe->fe_user->forceSetCookie = TRUE;
+                $tsfe->fe_user->start();
+                $tsfe->fe_user->createUserSession($user);
+                $tsfe->fe_user->user = $user;
 
-                $GLOBALS['TSFE']->fe_user->start();
-                $GLOBALS['TSFE']->fe_user->createUserSession($user);
-                $GLOBALS['TSFE']->initUserGroups();
-                $GLOBALS['TSFE']->fe_user->loginSessionStarted = TRUE;
-                $GLOBALS['TSFE']->fe_user->user = $user;
-                $GLOBALS['TSFE']->fe_user->setKey('user', 'fe_typo_user', $user);
+                $tsfe->initUserGroups();
+                $tsfe->fe_user->loginSessionStarted = TRUE;
 
-                $GLOBALS['TSFE']->fe_user->setAndSaveSessionData('user', TRUE);
-                $ses_id = $GLOBALS['TSFE']->fe_user->fetchUserSession();
-                $reflection = new ReflectionClass($GLOBALS['TSFE']->fe_user);
+                $tsfe->fe_user->setKey('user', 'fe_typo_user', $user);
+                $GLOBALS['TSFE']->fe_user->setKey('ses', 'fe_typo_user', $user);
+                $ses_id = $tsfe->fe_user->fetchUserSession();
+
+                $reflection = new ReflectionClass($tsfe->fe_user);
                 $setSessionCookieMethod = $reflection->getMethod('setSessionCookie');
                 $setSessionCookieMethod->setAccessible(TRUE);
-                $setSessionCookieMethod->invoke($GLOBALS['TSFE']->fe_user);
-                $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = true;
-                $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysAuthUser'] = true;
-                $GLOBALS['TSFE']->fe_user->storeSessionData();
+                $setSessionCookieMethod->invoke($tsfe->fe_user);
+                
+                $tsfe->fe_user->storeSessionData();
 
                 if (!isset($_SESSION)) {
                       session_id('email');
@@ -137,10 +145,7 @@ class ResponseController extends ActionController
                       $_SESSION['email'] = $this->ssoemail;
                       $_SESSION['id'] = $ses_id;
                 }
-
-               $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-               \TYPO3\CMS\Core\Utility\HttpUtility::redirect($actual_link);
-
+                GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
             }
         }
 
@@ -178,6 +183,7 @@ class ResponseController extends ActionController
                     exit("Unable to create User. No UserGroup found.");
                 }
                 $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count-1)->execute();
+                //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count-1)->executeQuery();
                 $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
                 $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
                 $user = Utilities::fetchUserFromUsername($username);
@@ -185,7 +191,7 @@ class ResponseController extends ActionController
             }
             else
             {
-                echo "User limit exceeded!!!";exit;
+                echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";exit;
             }
         }
         else{
@@ -204,6 +210,7 @@ class ResponseController extends ActionController
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->set('custom_attr', $val)->execute();
+        //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->set('custom_attr', $val)->executeQuery();
     }
 
     /**
@@ -251,14 +258,26 @@ class ResponseController extends ActionController
     public function control()
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
-        $this->idp_name = $queryBuilder->select('idp_name')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->acs_url = $queryBuilder->select('acs_url')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->sp_entity_id = $queryBuilder->select('sp_entity_id')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->saml_login_url = $queryBuilder->select('saml_login_url')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->x509_certificate = $queryBuilder->select('x509_certificate')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $this->issuer = $queryBuilder->select('idp_entity_id')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+        $sp_object = $queryBuilder->select('spobject')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+        $idp_object = $queryBuilder->select('object')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
+        $sp_object = json_decode($sp_object,true);
+        $idp_object = json_decode($idp_object,true);
+        $this->idp_name = $idp_object['idp_name'];
+        $this->acs_url = $sp_object['acs_url'];
+        $this->sp_entity_id = $sp_object['sp_entity_id'];
+        $this->saml_login_url = $idp_object['saml_login_url'];
+        $this->x509_certificate = $idp_object['x509_certificate'];
+        $this->issuer = $idp_object['idp_entity_id'];
         $signedAssertion = true;
         $signedResponse = true;
+    }
+
+        /**
+     * @return TypoScriptFrontendController
+     */
+    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
+    {
+        return $GLOBALS['TSFE'];
     }
 
 }
