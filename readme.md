@@ -12,3 +12,8 @@ v2.0.0
  - Added Typo3 v11 Support
  - Added Metadata upload fuctionalities
  - Updated SP certificate
+
+v2.0.2
+ - Typo3 v11.5.27 compatibility
+ - Some security improvements
+ - UI Updates

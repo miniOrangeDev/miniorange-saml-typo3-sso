@@ -81,7 +81,6 @@ class FesamlController extends ActionController
      */
     public function requestAction()
     {
-
         if(isset($_REQUEST['option']) and $_REQUEST['option']=='mosaml_metadata')
         {
             SAMLUtilities::mo_saml_miniorange_generate_metadata();
@@ -96,15 +95,17 @@ class FesamlController extends ActionController
             $relayState = 'testconfig';
         }
 
-
-        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
-
         $this->controlAction();
 
         error_log("relaystate :  ".$relayState);
 
+        if(!isset($this->acs_url) || !isset($this->sp_entity_id) || !isset($this->idp_entity_id) || !isset($this->saml_login_url) || !isset($this->x509_certificate))
+        {
+            Utilities::showErrorFlashMessage('Please make fill all the necessary fields.');
+            return;
+        }
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
-
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
     }
 
     /**

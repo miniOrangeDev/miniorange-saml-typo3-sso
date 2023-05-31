@@ -35,14 +35,12 @@
         public static function getExtensionAbsolutePath()
         {
             $extAbsPath = ExtensionManagementUtility::extPath('miniorange_saml');
-//            error_log("extensionAbsolutePath : " . $extAbsPath);
             return $extAbsPath;
         }
 
         public static function getExtensionRelativePath()
         {
             $extRelativePath = PathUtility::getAbsoluteWebPath(self::getExtensionAbsolutePath());
-//            error_log("extRelativePath : " . $extRelativePath);
             return $extRelativePath;
         }
 
@@ -206,12 +204,9 @@
         public static function desanitize_certificate($certificate)
         {
             $certificate = preg_replace("/[\r\n]+/", "", $certificate);
-            //$certificate = str_replace( "-", "", $certificate );
             $certificate = str_replace("-----BEGIN CERTIFICATE-----", "", $certificate);
             $certificate = str_replace("-----END CERTIFICATE-----", "", $certificate);
             $certificate = str_replace(" ", "", $certificate);
-            //$certificate = chunk_split($certificate, 64, "\r\n");
-            //$certificate = "-----BEGIN CERTIFICATE-----\r\n" . $certificate . "-----END CERTIFICATE-----";
             return $certificate;
         }
 
@@ -226,7 +221,6 @@
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
             )->execute()->fetch();
             if(null == $var_uid){
-//                error_log("uid null: ".print_r($var_uid,true));
                 return false;
             }
             return $var_uid;
@@ -244,10 +238,6 @@
             $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::OK);
             $out = GeneralUtility::makeInstance(ListRenderer ::class)->render([$message]);
             echo $out;
-        }
-
-        public static function log_php_error($msg="",$obj){
-            error_log($msg.": ".print_r($obj,true));
         }
 
     }

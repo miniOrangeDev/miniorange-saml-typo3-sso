@@ -57,11 +57,12 @@
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 
 <div class="tab">
-    <div class="tab_items"><button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab( 'Identity_Provider')">IdP Settings</button></div>
-    <div class="tab_items"><button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab('Service_Provider')">SP Settings</button></div>
-    <div class="tab_items"><button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab('Attribute_Mapping')">Attribute Mapping</button></div>
-    <div class="tab_items"><button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab('Group_Mapping')">Group Mapping</button></div>
-    <div class="tab_items"><button class="tablinks button" id="Premium_Tab" onclick="removeFlashMessage(); openTab('Premium')">Get Premium</button></div>
+    <button class="tablinks button" id="account_tab_btn" onclick="removeFlashMessage(); openTab(event,'Account')">Account</button>
+    <button class="tablinks button" id="Service_Provider_Tab" onclick="removeFlashMessage(); openTab(event,'Service_Provider')">SP Settings</button>
+    <button class="tablinks button" id="Identity_Provider_Tab" onclick="removeFlashMessage(); openTab(event, 'Identity_Provider')">IdP Settings</button>
+    <button class="tablinks button" id="Attribute_Mapping_Tab" onclick="removeFlashMessage(); openTab(event,'Attribute_Mapping')">Attribute Mapping</button>
+    <button class="tablinks button" id="Group_Mapping_Tab" onclick="removeFlashMessage(); openTab(event,'Group_Mapping')">Group Mapping</button>
+    <button class="tablinks button" id="Premium_Tab" onclick="removeFlashMessage(); openTab(event,'Premium')">Get Premium</button>
 </div>
 
 <input type="hidden" name="taby" id="taby" value="{tab}">
@@ -70,10 +71,127 @@
      <f:comment><!--Left Container--></f:comment>
      <div id="leftContainer" class="container">
 
+     <f:comment><!-- Account Tab --></f:comment>   
+
+     <div id="Account" style="margin-left: 20px" class="tabcontent" >
+        <!--    IF USER NOT LOGGED IN -->
+        <f:if condition="{0: status} == {0: 'not_logged'} || {0: status} == {0: ''}">
+            <div>
+              </div>
+            <form name="account" method="post" id="account_form">
+                <input type="hidden" name="option" value="mo_saml_verify_customer"/>
+
+                    <div id="toggle1" class="panel_toggle">
+                        <h3><strong>Register/Login with Miniorange</strong></h3>
+                    </div>
+                    &nbsp;
+                    <h4 style=" color: #545454;"><strong>Why should I register?</strong></h4>
+
+                    <div style="background: aliceblue; padding: 10px 10px 10px 10px; border-radius: 10px; color: #545454;">
+                        You should register so that in case you need help, we can help you with step by step
+                        instructions. We support all known OAuth Providers - ADFS, Okta, Salesforce, Shibboleth,
+                        SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2 etc.
+                        <b>You will also need a miniOrange account to upgrade to the premium version of this extension.</b>
+                        We do not store any information except the email that you will use to register with us.
+                    </div>
+
+                    <p id="att-map-tab-partial">If you already have a miniOrange account, submit your existing credentials.
+                        We will retrieve your existing account for you.</p>
+
+                    <hr>
+                    <div id="panel1" class="" style="height: 70%">
+                        <p><b>Please enter your miniOrange email and password.<br/> <a target="_blank" href="https://login.xecurify.com/moas/idp/resetpassword">Click
+                                here if you forgot your password?</a></b></p>
+                        <div>
+                        <input type="checkbox" id="registered" name="registered" value="isChecked" onclick="ifUserRegistered()"/> Already Registered<br>
+                        <br>
+                        </div>
+
+                        <div class="col-lg-8 tile" style=" height: fit-content">
+
+                            <label color="#FF0000">Email:</label>
+                            <input class="form-control" type="email" name="email"
+                                   required placeholder="person@example.com"
+                                   value="
+                                    "/>
+                            <br>
+                            <label color="#FF0000">Password:</label>
+                            <input class="form-control" required type="password"
+                                   name="password" placeholder="Enter your password"
+                                   minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                   title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                            <br>
+                            <div id="confirmPasswordDiv">
+                                <label color="#FF0000">Confirm Password:</label>
+                                <input class="form-control" type="password"
+                                           name="confirmPassword" placeholder="Confirm your password"
+                                           minlength="6" pattern="^[(\w)*(!@#$.%^&*-_)*]+$"
+                                           title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*) should be present."/>
+                            </div>
+                            <br>
+                            <button type="submit" class="btn btn-primary" name="submit" id="submit" onClick="jQuery('#account_form').submit();">Login</button>
+                            <br>&nbsp;
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                </form>
+                <br>
+                <br>
+        </f:if>
+
+        <!--    IF  USER LOGGED AND VERIFIED-->
+        <f:if condition="{0: status} == {0: 'logged'}">
+            <div id="toggle3" class="panel_toggle">
+                <h3 ><strong>Profile</strong></h3>
+            </div>
+            <hr>
+            <div class="tile">
+
+                <!--    LICENSE VALIDATED-->
+                <table class="profileTable" >
+                    <tr>
+                        <td><strong>Email : </strong></td>
+                        <td>{email}</td>
+                    </tr>
+                    &nbsp
+                    <tr>
+                        <td><strong>ID : </strong></td>
+                        <td>{key}</td>
+                    </tr>
+                    &nbsp
+                    <tr>
+                        <td><strong>Token : </strong></td>
+                        <td>{token}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Api Key : </strong></td>
+                        <td>{api_key}</td>
+                    </tr>
+                </table>
+
+                &nbsp
+
+                <!--   LOGOUT ACCOUNT -->
+                <form name="log_out_form" id="log_out_form" method="post" action="">
+                    <input type="hidden" name="option" value="logout">
+                    <input type="submit"
+                           name="submit"
+                           value="Log out"
+                           class="btn btn-primary" onclick="jQuery('#log_out_form').submit();" />
+                </form>
+
+            </div>
+
+        </f:if>
+
+    </div>
+
      <f:comment><!--   IDENTITY PROVIDER TAB--></f:comment>
      <div id="Identity_Provider" class="tabcontent"  >
         <h3><strong>Identity Provider Settings</strong></h3>
-<!--         <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>-->
+        <h5>[Please Save SP Settings before saving Idp Settings]</h5>
+        <!--         <p class="premiumMessage" style={nolog} >  [Please login to configure settings.]</p>-->
          <hr>
             <div class="tile" >
                 <div type="hidden" style="text-align:center;">
@@ -84,7 +202,10 @@
                             
                         </div>
                             <hr style="border: 1px solid rgb(131, 128, 128)">
-                        <br>
+                        <div class="form-group" >
+                            <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
+                            <input class="form-control" name="idp_name" id="idp_name" {log} type="text" required value="{conf_idp.idp_name}">
+                        </div>
                         <div>
                             <label for="metadata"><b>Upload File: </b></label>
                             <input class="form-control" {log} type="file" name="metadata_file">
@@ -95,29 +216,28 @@
                             <input class="form-control" {log} type="url" name="upload_url">
                         </div>
                         <br>
-                        <br>
                         <div style="text-align:center;">
                             <a class="btn btn-primary"  {log} type="submit"  name="submit_upload_metadata" id="submit_upload_metadata" style="margin-right:10px;" onClick="uploadFile()">Upload</a>                </form>
                             <a class="btn btn-primary" {log} style="background-color:#b82727;"  {log} type="submit"  name="cancel" id="cancel" onClick="cancel()">Cancel</a> 
                         </div>
-                    </div>
+                </div>
                 <form method="POST" action="" id="saml_form" >
                     <input type="hidden" name="option" value="idp_settings">
-                    <a class="btn btn-primary" id="upload_metadata" style="float :right; margin-bottom:1%;" type="button" onclick="uploadMetadata()">Upload IDP Metadata </a>
+                    <a class="btn btn-primary" id="upload_metadata" {log} style="float :right; margin-bottom:1%;" type="button" onclick="uploadMetadata()">Upload IDP Metadata </a>
                             <div class="form-group" >
                                 <label for="idp_name"><b>Identity Provider Name</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control" name="idp_name" id="idp_name" type="text" required value="{conf_idp.idp_name}">
+                                <input class="form-control" name="idp_name" {log} id="idp_name" type="text" required value="{conf_idp.idp_name}">
                             </div>
 
                             <div class="form-group">
                                 <label for="idp_entity_id"><b>IDP Entity ID</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control"  name="idp_entity_id" id="idp_entity_id" type="text"
+                                <input class="form-control"  name="idp_entity_id" {log} id="idp_entity_id" type="text"
                                        required value="{conf_idp.idp_entity_id}">
                             </div>
 
                             <div class="form-group">
                                 <label for="saml_login_url"><b>SAML Login URL</b><span class="premiumMessage">*</span></label>
-                                <input class="form-control"  name="saml_login_url" id="saml_login_url" type="text"
+                                <input class="form-control"  name="saml_login_url" {log} id="saml_login_url" type="text"
                                        required value="{conf_idp.saml_login_url}">
                             </div>
 
@@ -128,14 +248,14 @@
                                             <td style="padding:10px;">
                                                 <div class="animated-radio-button">
                                                     <label>
-                                                        <input class="inputabs" disabled checked type="radio" name="login_binding_type" id="http_redirect_binding" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
+                                                        <input class="inputabs" disabled checked type="radio" {log} name="login_binding_type" id="http_redirect_binding" value="HttpRedirect"><span class="label-text">Http-Redirect</span>
                                                     </label>
                                                 </div>
                                             </td>
                                             <td style="padding:10px;">
                                                 <div class="animated-radio-button">
                                                     <label>
-                                                        <input class="inputabs" disabled  type="radio" name="login_binding_type" id="http_post_binding" value="HttpPost"><span class="label-text">Http-Post</span>
+                                                        <input class="inputabs" disabled  type="radio" {log} name="login_binding_type" id="http_post_binding" value="HttpPost"><span class="label-text">Http-Post</span>
                                                     </label>
                                                 </div>
                                             </td>
@@ -145,7 +265,7 @@
 
                             <div class="form-group" style= "border: black">
                                 <label for="x509_certificate"><b>SAML x509 Certificate</b><span class="premiumMessage">*</span></label>
-                                <textarea required class="form-control"  id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
+                                <textarea required class="form-control" {log} id="x509_certificate" name="x509_certificate" rows="5" >{conf_idp.x509_certificate}</textarea>
                                 <small><b>NOTE:</b> Format of the certificate:<br/><b>-----BEGIN CERTIFICATE-----<br/>XXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>-----END CERTIFICATE-----</b></small><br/>
                             </div>
 
@@ -165,7 +285,7 @@
 
                             <div >
                                 <div class="animated-checkbox">
-                                    <input type="checkbox" disabled  id="force_authn"  name="force_authn" >
+                                    <input type="checkbox" disabled id="force_authn"  name="force_authn" >
                                     <label class="premiumBox"> <span class="label-text">Force Authentication</span> <span class="premiumMessage"> [Premium Feature] </span></label>
                                     &nbsp
                                 </div>
@@ -173,8 +293,8 @@
 
                     &nbsp
                     <div class="tile-footer">
-                        <button class="btn btn-primary" type="submit"  name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
-                        <a   style="text-decoration:none"><button onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');"  class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
+                        <button class="btn btn-primary" type="submit" {log} {idp_save_enabled} name="submit_saml_form" id="submit_saml_form" style="margin-right:10px;" onClick="jQuery('#saml_form').submit();">Save</button>
+                        <a style="text-decoration:none"><button title="Please save the SP Settings and IDP Settings to enable Test Configuration" onClick="window.open('{conf_sp.fesaml}'+'?RelayState=testconfig');" {log} {test_enabled} class="btn btn-primary" name="do_sso" type="button">Test Configuration</button></a>
                     </div><br>
                 <br>
                 </form>
@@ -187,19 +307,17 @@
 <!--        <div class="premiumMessage" style={nolog}> [Please login to configure settings.]</div>-->
         <hr>
         <div class="tile">
-        <form action="" method="post" id="sp_settings"  >
+        <form method="POST" action="" id="sp_settings">
 
-            <input type="hidden" name="option" value="save_sp_settings"/>
+            <input type="hidden" name="option" value="save_sp_settings">
             <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
             <div class="form-group">
-                <label for="fesaml"><b> Fesaml plugin page URL</b></label>
-                   <input class="form-control"  id="fesaml" name="fesaml" type="text" value="{conf_sp.fesaml}"
-                >
+                <label for="fesaml"><b> Fesaml plugin page URL</b><span class="premiumMessage">*</span></label>
+                   <input class="form-control" {log} id="fesaml" required name="fesaml" type="text" value="{conf_sp.fesaml}">
             </div>
-
             <div class="form-group">
-                <label for="response"><b>Response plugin page URL</b></label>
-                <input class="form-control"  id="response" name="response" type="text" value="{conf_sp.response}" >
+                <label for="response"><b>Response plugin page URL</b><span class="premiumMessage">*</span></label>
+                <input class="form-control" {log} id="response" required name="response" type="text" value="{conf_sp.response}">
             </div>
 
             <div class="form-group" >
@@ -208,29 +326,29 @@
             </div>
 
             <div class="form-group">
-                <label for="site_base_url"><b> Base URL</b></label>
+                <label for="site_base_url"><b> Base URL</b><span class="premiumMessage">*</span></label>
                 <input class="form-control"  id="site_base_url"
-                       name="site_base_url" type="text" value="{conf_sp.site_base_url}" >
+                       name="site_base_url" {log} type="text" required value="{conf_sp.site_base_url}" >
             </div>
 
             <div class="form-group">
-                <label for="acs_url"><b>ACS URL</b></label>
-                <input class="form-control"  id="acs_url" name="acs_url" type="text" value="{conf_sp.acs_url}" >
-                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Response plugin URL here.</i>
+                <label for="acs_url"><b>ACS URL</b><span class="premiumMessage">*</span></label>
+                <input class="form-control" {log} required id="acs_url" onClick="set_acs()" name="acs_url" type="text" value="{conf_sp.acs_url}" >
+                <p><i class="fa fa-question-circle" style="color:cadetblue; padding-left:5px;">You can enter Response plugin URL here.</i>
                 <br>
             </div>
 
             <div class="form-group" >
-                <label for="sp_entity_id"><b>Issuer/Entity ID</b></label>
-                <input class="form-control"  id="sp_entity_id" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
-                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">You can enter Base URL here.</i>
+                <label for="sp_entity_id"><b>Issuer/Entity ID</b><span class="premiumMessage">*</span></label>
+                <input class="form-control" {log} id="sp_entity_id" onClick="set_entityid()" name="sp_entity_id" type="text" value="{conf_sp.sp_entity_id}">
+                <p><i class="fa fa-question-circle" style="color:cadetblue; padding-left:5px;">You can enter Base URL here.</i>
                     <br>
             </div>
 
             <div class="form-group">
                 <label for="login_redirect_url" class="premiumBox"><b>Redirect to this page after login</b><span class="premiumMessage">  [Premium Feature] </span></label>
                 <input class="form-control" disabled id="login_redirect_url" name="login_redirect_url" type="text" value="{conf_sp.login_redirect_url}"  >
-                <p><i class="fa fa-question-circle"  style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
+                <p><i class="fa fa-question-circle" style="color:cadetblue; padding-left:5px;">User will be redirected to this URL after successfull login .</i>
                     <br>
             </div>
 
@@ -243,7 +361,7 @@
 
             <div class="form-group" style="margin:20px 0">
                 <label><b>  SP Certificate:</b></label>
-                <a style="padding-left:5px;" target="_blank" href="{extPath}Helper/resources/sp-certificate.crt" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
+                <a style="padding-left:5px;" target="_blank" {log} href="{extPath}Helper/resources/sp-certificate.crt" id="download_sp_cert">Download</a><i class="fa fa-question-circle" id="sp_certificate_help" style="padding-left:5px;"></i>
                 <br/>
                 <div class="help_desc" id="sp_certificate_help_desc" style="display:none;">
                     Provide this certificate to your Identity Provider for encryption or signing.
@@ -251,21 +369,20 @@
             </div>
 
             <div class="tile-footer form-group">
-                <button class="btn btn-primary" type="button" name="sp_settings_form"  id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();"> Save </button>
-                <a href="https://www.miniorange.com/typo3-single-sign-on-(sso)" target="_blank">Click Here for User Guide</a>
+                <button class="btn btn-primary" type="submit" {log} name="sp_settings_form" id="sp_setting_form" style="margin-right:40px; padding: 7px 25px " onClick="jQuery('#sp_settings').submit();">Save</button>  
+                <a href="https://www.miniorange.com/typo3-single-sign-on-sso" {log} target="_blank">Click Here for User Guide</a>
             </div>
             <hr>
             <label><b>  Metadata URL : </b></label>
-            <a target="_blank" href="{conf_sp.fesaml}/?option=mosaml_metadata" id="metadata_url"> Show Metadata &nbsp</a>
+            <a target="_blank" href="{conf_sp.fesaml}/?option=mosaml_metadata" {log} id="metadata_url"> Show Metadata &nbsp</a>
             <div class="tooltip_meta">
-               <a target="_blank" class="btn btn-primary" style="text-decoration:none" style="margin-right:40px; padding: 7px 25px " id="copy" onClick="copyURL()" onmouseout="outFunc()"><span class="tooltiptext" id="myTooltip">Copy to clipboard</span>Copy URL</a>
+               <a target="_blank" class="btn btn-primary" style="text-decoration:none" {log} style="margin-right:40px; padding: 7px 25px " id="copy" onClick="copyURL()" onmouseout="outFunc()"><span class="tooltiptext" id="myTooltip">Copy to clipboard</span>Copy URL</a>
             </div>
             <br><br>
 
             <div>
-                <input type="hidden" name="option" id="metadata_download" value="">
                 <label>You can download the metadata XML from here : </label>
-                <a target="_blank" style="text-decoration:none"><button class="btn btn-primary" {log} type="button" style="margin-right:40px; padding: 7px 25px " name="option" onClick=set_value() id="download_metadata">Download</button></a>
+                <a target="_blank" style="text-decoration:none"><button class="btn btn-primary" {log} {log} type="button" style="margin-right:40px; padding: 7px 25px " name="option" onClick=set_value() id="download_metadata">Download</button></a>
             </div>
             <br>
         </form>
@@ -369,7 +486,7 @@
             <div class="form-group gm-div">
                 <label class="form-control gm-input-label" for="defaultUserGroup">Default UserGroup</label>
                 <f:comment><!--  Populate DropDown--></f:comment>
-                    <select class="form-control gm-input"  name="defaultUserGroup" id="defaultUserGroup" >
+                    <select class="form-control gm-input" {log} name="defaultUserGroup" id="defaultUserGroup" >
                         <f:for each="{allUserGroups}" as="userGroup">
                             <f:if condition="{userGroup.title}=={defaultGroup}" >
                                 <f:then>
@@ -396,7 +513,7 @@
                 </div>
             </f:for>
             <br/>
-            <button type="submit"  class="btn btn-primary gm-submit" >Save Group Mapping</button>
+            <button type="submit" {log} class="btn btn-primary gm-submit" >Save Group Mapping</button>
         </form>
 
     </div>
@@ -423,146 +540,52 @@
              <div class="form-group">
                  <a target="_blank" href="https://www.miniorange.com/contact"><button class="btn btn-primary" >Contact Us</button></a>
              </div>
+        </div>
 
+     </div>
+</div>
+     <!-- Right Container - SUPPORT TAB-->
+    <div id="rightContainer">
+        <div id="Support" class="tabcontent" >
+            <h3><strong>Support</strong></h3>
+            <hr>
+            &nbsp;
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tile">
+                        <div class="row ">
+                            <div class="col-lg-10">
+                                <form id="support_form" method="post" action="">
+                                    <p><b>Need any help? We can help you in configuring the connector with your Identity Provider. Just send us a query and we will get back to you soon.</b></p>
+                                    <input type="hidden" name="option" value="mo_saml_contact_us_query_option"/>
+                                    &nbsp;
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="mo_saml_contact_us_email" placeholder="Enter your email" value="">
+                                    </div>
 
-             </div>
+                                    <div class="form-group">
+                                        <input class="form-control" type="tel" name="mo_saml_contact_us_phone" placeholder="Enter your phone number">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="6" name="mo_saml_contact_us_query" placeholder="Enter your query here"></textarea>
+                                    </div>
+                                    <div class="tile-footer">
+                                        <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
-    <style>
-        .upload_metadata_form {
-            display: none;
-            position: fixed;
-            top: 200px;
-            right: 400px;
-            border: 3px solid #f1f1f1;
-            width: 50%;
-            height:50%;
-            z-index: 9;
-            opacity: 100;
-            background-color: #eeeeee;
-        }
-        .tooltip_meta {
-          position: relative;
-          display: inline-block;
-        }
-        
-        .tooltip_meta .tooltiptext {
-          visibility: hidden;
-          width: 140px;
-          background-color: #555;
-          color: #fff;
-          text-align: center;
-          border-radius: 6px;
-          padding: 5px;
-          position: absolute;
-          z-index: 1;
-          bottom: 150%;
-          left: 50%;
-          margin-left: -75px;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        
-        .tooltip_meta .tooltiptext::after {
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-          margin-left: -5px;
-          border-width: 5px;
-          border-style: solid;
-          border-color: #555 transparent transparent transparent;
-        }
-        
-        .tooltip_meta:hover .tooltiptext {
-          visibility: visible;
-          opacity: 1;
-        }
-        </style>
 
-    <script>
-
-        function ifUserRegistered()
-        {
-             
-            var checkBox=document.getElementById('registered');
-            var login=document.getElementById('confirmPasswordDiv');
-            if (checkBox.checked == true)
-            {
-            login.style.display = "none";
-            }
-            else 
-            {
-            login.style.display = "block";
-            }
-            
-        }     
-
-        function setMetadata()
-        {
-            jQuery('#metadata_download').attr('value','mosaml_metadata');
-            jQuery('#sp_settings').submit();
-        }
-
-        function set_value()
-        {
-            jQuery('#metadata_download').attr('value','mosaml_metadata_download');
-            jQuery('#sp_settings').submit();
-        }
-
-        function save_sp_data()
-        {
-            jQuery('#metadata_download').attr('value','save_sp_settings');
-            jQuery('#sp_settings').submit();
-        }
-
-        function set_acs()
-        {
-            document.getElementById("acs_url").value = document.getElementById("response").value;
-        }
-
-        function set_entityid()
-        {
-            document.getElementById("sp_entity_id").value = document.getElementById("site_base_url").value;
-        }
-
-        function copyURL() 
-        {
-            var copyText = document.getElementById("metadata_url");
-
-            navigator.clipboard.writeText(copyText);
-
-            var tooltip = document.getElementById("myTooltip");
-            tooltip.innerHTML = "URL Copied: ";
-        }
-
-        function outFunc() 
-        {
-            var tooltip = document.getElementById("myTooltip");
-            tooltip.innerHTML = "Copy to clipboard";
-        }
-
-        function uploadMetadata()
-        {
-            document.getElementById("upload_metadata_form").style.display = "block";
-            jQuery('#saml_form').css('opacity', '0.6');
-        }
-
-        function uploadFile()
-        {
-            jQuery('#upload_metadata_form').submit();
-            document.getElementById("upload_metadata_form").style.display = "none";
-            document.getElementById("saml_form").style.display = "block";
-            jQuery('#saml_form').css('opacity', '100');
-        }
-        function cancel()
-        {
-            document.getElementById("saml_form").style.display = "block";
-            document.getElementById("upload_metadata_form").style.display = "none";
-            jQuery('#saml_form').css('opacity', '100');
-        }
-    </script>
-<!--</div>-->
+<script>
+</script>
 
 </body>
 </html>

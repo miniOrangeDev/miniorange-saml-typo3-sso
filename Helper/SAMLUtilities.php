@@ -249,12 +249,10 @@ class SAMLUtilities extends Utilities
                                           array $blacklist = array(), XMLSecurityKey $alternateKey = NULL)
     {
         try {
-            //echo "trying primary";
             return self::doDecryptElement($encryptedData, $inputKey, $blacklist);
         } catch (Exception $e) {
             //Try with alternate key
             try {
-                //echo "trying secondary";
                 return self::doDecryptElement($encryptedData, $alternateKey, $blacklist);
             } catch(Exception $t) {
                 throw new Exception('Failed to decrypt XML element.');
@@ -263,7 +261,6 @@ class SAMLUtilities extends Utilities
              * Something went wrong during decryption, but for security
              * reasons we cannot tell the user what failed.
              */
-            //print_r($e->getMessage());
             throw new Exception('Failed to decrypt XML element.');
         }
     }
@@ -340,7 +337,6 @@ class SAMLUtilities extends Utilities
             $certData = trim($certNode->textContent);
             $certData = str_replace(array("\r", "\n", "\t", ' '), '', $certData);
             $certificates[] = $certData;
-            //echo "CertDate: " . $certData . "<br />";
         }
 
         $ret = array(
@@ -348,7 +344,6 @@ class SAMLUtilities extends Utilities
             'Certificates' => $certificates,
         );
 
-        //echo "Signature validated";
         return $ret;
     }
 

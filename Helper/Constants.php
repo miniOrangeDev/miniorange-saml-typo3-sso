@@ -56,5 +56,6 @@ class Constants
 	 const CUSTOMER_TOKEN = "cust_token";
 	 const CUSTOMER_REGSTATUS = "cust_reg_status";
 	 const AREA_OF_INTEREST = "TYPO3 miniOrange SAML SP";
-
+   const DEFAULT_CUSTOMER_KEY = "16555";
+   const DEFAULT_API_KEY = "fFd2XcvTGDemZvbw1bcUesNJWEqKbbUq";
 }
