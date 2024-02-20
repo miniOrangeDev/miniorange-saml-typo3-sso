@@ -1,25 +1,41 @@
 <?php
-namespace Miniorange\MiniorangeSaml\Controller;
+namespace Miniorange\Sp\Controller;
 
-
-use Exception;
-use Miniorange\Helper\Constants;
-use Miniorange\Helper\SAMLUtilities;
-use Miniorange\Helper\SamlResponse;
-use Miniorange\Helper\Utilities;
-use Miniorange\MiniorangeSaml\Domain\Model\Fesaml;
+use Miniorange\Sp\Helper\Actions\ProcessResponseAction;
+use Miniorange\Sp\Helper\Actions\ReadResponseAction;
+use Miniorange\Sp\Helper\Actions\TestResultActions;
+use Miniorange\Sp\Helper\Constants;
+use Miniorange\Sp\Helper\Messages;
+use Miniorange\Sp\Helper\PluginSettings;
+use Miniorange\Sp\Domain\Model\Fesaml;
+use Miniorange\SSO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Miniorange\Sp\Helper\SAMLUtilities;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
-
 use TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateModuleController;
+use Miniorange\Sp\Helper\Actions;
+use Miniorange\Classes;
+use Miniorange\Sp\Helper\SamlResponse;
+use Miniorange\Sp\Helper;
+use Miniorange\Sp\Helper\Lib\XMLSecLibs\XMLSecurityKey;
+use Miniorange\Sp\Helper\Utilities;
 use TYPO3\CMS\Core\Database\Connection;
+use PDO;
+/***
+ *
+ * This file is part of the "miniOrange SAML" Extension for TYPO3 CMS.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ *  (c) 2019 Miniorange <info@xecurify.com>
+ *
+ ***/
 
 /**
  * FesamlController
  */
-class FesamlController extends ActionController
+class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
     protected $idp_name = null;
@@ -32,11 +48,11 @@ class FesamlController extends ActionController
 
     protected $saml_login_url = null;
 
-    protected $destination = null;
-
     private $idp_entity_id = null;
 
     private $ssoUrl = null;
+
+    private $destination = null;
 
     private $bindingType = null;
 
@@ -48,36 +64,24 @@ class FesamlController extends ActionController
 
     protected $uid = 1;
 
-//    /**
-//     * action list
-//     *
-//     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
-//     * @return void
-//     */
-//    public function listAction()
-//    {
-//        $samlmodels = $this->samlmodelRepository->findAll();
-//        $this->view->assign('samlmodels', $samlmodels);
-//    }
-
-//    /**
-//     * action show
-//     *
-//     * @param Fesaml $fesaml
-//     * @return void
-//     */
-//    public function showAction(Fesaml $fesaml)
-//    {
-//        $samlmodels = $this->samlmodelRepository->findAll();
-//        $this->view->assign('samlmodel', $samlmodels);
-//    }
+    /**
+     * action list
+     * 
+     * @param Miniorange\Sp\Domain\Model\Fesaml
+     * @param Miniorange\Sp\Domain\Model\Fesaml
+     * @return void
+     * @return void
+     */
+    public function listAction()
+    {
+        $samlmodels = $this->samlmodelRepository->findAll();
+        $this->view->assign('samlmodels', $samlmodels);
+    }
 
     /**
      * action print
-     *
-     * @param Miniorange\MiniorangeSaml\Domain\Model\Fesaml
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function requestAction()
     {
@@ -106,6 +110,9 @@ class FesamlController extends ActionController
         }
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+        return $this->responseFactory->createResponse()
+                    ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
+                    ->withBody($this->streamFactory->createStream());
     }
 
     /**
@@ -114,14 +121,27 @@ class FesamlController extends ActionController
      */
     public function findSubstring($request)
     {
-        if (!empty($request["id"]) && strpos($request["id"], 'RelayState') !== false) {
-            return 1;
-        }else{
-            return 0;
+         if(!empty($request["id"]))
+         { 
+            if (strpos($request["id"], 'RelayState') !== false) 
+            {
+                return 1;
+            } else 
+            {
+                return 0;
+            }
         }
+        return 0;
     }
 
-    /**
+    public function fetchBindingType()
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+        $this->bindingType = $queryBuilder->select('login_binding_type')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->execute()->fetch();
+        $this->bindingType = $this->bindingType['login_binding_type'];
+    }
+
+     /**
      * action control
      * 
      * @return void
@@ -235,5 +255,5 @@ class FesamlController extends ActionController
     {
         return openssl_random_pseudo_bytes($length);
     }
-
 }
+
