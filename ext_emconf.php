@@ -12,7 +12,8 @@ $EM_CONF[$_EXTKEY] = [
     ],
     'shy' => '',
     'icon' => 'EXT:sp/Resources/Public/Icons/miniorange.svg',
-    'version' => '2.0.5',
+    'version' => '2.0.6',
+    'state' => 'stable',
     'autoload' => [
         'psr-4' => [
             'Miniorange\\Sp\\' => 'Classes/',
