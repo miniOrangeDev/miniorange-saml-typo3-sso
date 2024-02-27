@@ -1,0 +1,199 @@
+{
+  "modules": [
+    {
+      "config": {
+        "position": [
+          161,
+          165
+        ]
+      },
+      "name": "New Model Object",
+      "value": {
+        "actionGroup": {
+          "_default0_list": false,
+          "_default1_show": false,
+          "_default2_new_create": false,
+          "_default3_edit_update": false,
+          "_default4_delete": false,
+          "customActions": [
+            "print",
+            "control"
+          ]
+        },
+        "name": "Fesaml",
+        "objectsettings": {
+          "addDeletedField": true,
+          "addHiddenField": true,
+          "addStarttimeEndtimeFields": true,
+          "aggregateRoot": true,
+          "categorizable": false,
+          "description": "",
+          "mapToTable": "",
+          "parentClass": "",
+          "skipTypeConfiguration": false,
+          "sorting": false,
+          "type": "Entity",
+          "uid": "706557124312"
+        },
+        "propertyGroup": {
+          "properties": []
+        },
+        "relationGroup": {
+          "relations": []
+        }
+      }
+    },
+    {
+      "config": {
+        "position": [
+          570,
+          203
+        ]
+      },
+      "name": "New Model Object",
+      "value": {
+        "actionGroup": {
+          "_default0_list": true,
+          "_default1_show": true,
+          "_default2_new_create": false,
+          "_default3_edit_update": false,
+          "_default4_delete": false,
+          "customActions": [
+            "request"
+          ]
+        },
+        "name": "Besaml",
+        "objectsettings": {
+          "addDeletedField": true,
+          "addHiddenField": true,
+          "addStarttimeEndtimeFields": true,
+          "aggregateRoot": true,
+          "categorizable": false,
+          "description": "",
+          "mapToTable": "",
+          "parentClass": "",
+          "skipTypeConfiguration": false,
+          "sorting": false,
+          "type": "Entity",
+          "uid": "472572026884"
+        },
+        "propertyGroup": {
+          "properties": []
+        },
+        "relationGroup": {
+          "relations": []
+        }
+      }
+    },
+    {
+      "config": {
+        "position": [
+          590,
+          438
+        ]
+      },
+      "name": "New Model Object",
+      "value": {
+        "actionGroup": {
+          "_default0_list": false,
+          "_default1_show": false,
+          "_default2_new_create": false,
+          "_default3_edit_update": false,
+          "_default4_delete": false,
+          "customActions": [
+            "check"
+          ]
+        },
+        "name": "Response",
+        "objectsettings": {
+          "addDeletedField": true,
+          "addHiddenField": true,
+          "addStarttimeEndtimeFields": true,
+          "aggregateRoot": true,
+          "categorizable": false,
+          "description": "",
+          "mapToTable": "",
+          "parentClass": "",
+          "skipTypeConfiguration": false,
+          "sorting": false,
+          "type": "Entity",
+          "uid": "1452661334871"
+        },
+        "propertyGroup": {
+          "properties": []
+        },
+        "relationGroup": {
+          "relations": []
+        }
+      }
+    }
+  ],
+  "properties": {
+    "backendModules": [
+      {
+        "actions": {
+          "controllerActionCombinations": "Besaml=>request"
+        },
+        "description": "",
+        "key": "besamlkey",
+        "mainModule": "tools",
+        "name": "besaml",
+        "tabLabel": ""
+      }
+    ],
+    "description": "",
+    "emConf": {
+      "category": "plugin",
+      "custom_category": "",
+      "dependsOn": "typo3 => 10.4.3-11.5.0\n",
+      "disableLocalization": false,
+      "disableVersioning": false,
+      "skipGenerateDocumentationTemplate": false,
+      "sourceLanguage": "en",
+      "state": "alpha",
+      "targetVersion": "10.4.3-11.5.0",
+      "version": "1.0.0"
+    },
+    "extensionKey": "sp",
+    "name": "miniOrange SAML",
+    "originalExtensionKey": "sp",
+    "originalVendorName": "Miniorange",
+    "persons": [
+      {
+        "company": "miniOrange",
+        "email": "magentosupport@xecurify.com",
+        "name": "miniOrange",
+        "role": "Developer"
+      }
+    ],
+    "plugins": [
+      {
+        "actions": {
+          "controllerActionCombinations": "Fesaml=>request",
+          "noncacheableActions": "Fesaml=>control",
+          "switchableActions": ""
+        },
+        "description": "",
+        "key": "fesamlkey",
+        "name": "fesaml"
+      },
+      {
+        "actions": {
+          "controllerActionCombinations": "Response=>check",
+          "noncacheableActions": "",
+          "switchableActions": ""
+        },
+        "description": "",
+        "key": "responsekey",
+        "name": "response"
+      }
+    ],
+    "vendorName": "Miniorange"
+  },
+  "wires": [],
+  "log": {
+    "last_modified": "2019-05-10 08:29",
+    "extension_builder_version": "8.10.4",
+    "be_user": " (1)"
+  }
+}

@@ -1,42 +1,36 @@
 <?php
-namespace Miniorange\MiniorangeSaml\Controller;
 
-use Miniorange\Helper\Actions\ProcessResponseAction;
-use Miniorange\Helper\Actions\ReadResponseAction;
-use Miniorange\Helper\Actions\TestResultActions;
-use Miniorange\Helper\Constants;
-use Miniorange\Helper\Exception\InvalidAudienceException;
-use Miniorange\Helper\Exception\InvalidDestinationException;
-use Miniorange\Helper\Exception\InvalidIssuerException;
-use Miniorange\Helper\Exception\InvalidSamlStatusCodeException;
-use Miniorange\Helper\Exception\InvalidSignatureInResponseException;
-use Miniorange\Helper\SAMLUtilities;
-use Miniorange\Helper\Utilities;
+namespace Miniorange\Sp\Controller;
+
+use Exception;
+use Miniorange\Sp\Helper\Actions\ProcessResponseAction;
+use Miniorange\Sp\Helper\Actions\ReadResponseAction;
+use Miniorange\Sp\Helper\Actions\TestResultActions;
+use Miniorange\Sp\Helper\Constants;
+use MiniOrange\Helper\Exception\InvalidAudienceException;
+use MiniOrange\Helper\Exception\InvalidDestinationException;
+use MiniOrange\Helper\Exception\InvalidIssuerException;
+use MiniOrange\Helper\Exception\InvalidSamlStatusCodeException;
+use MiniOrange\Helper\Exception\InvalidSignatureInResponseException;
+use Miniorange\Sp\Helper\SAMLUtilities;
+use Miniorange\Sp\Helper\Utilities;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
-use TYPO3\CMS\Core\Crypto\Random;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Domain\Model\FrontendUser;
-use Miniorange\MiniorangeSaml\Service\LoginUser;
-
-use Exception;
-use TYPO3\CMS\Core\Context\UserAspect;
-use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
-use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityKey;
-use Miniorange\Helper\lib\XMLSecLibs\XMLSecurityDSig;
-use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserGroupRepository;
-use TYPO3\CMS\Extbase\Domain\Repository\FrontendUserRepository;
-use TYPO3\CMS\Extbase\Annotation\Inject;
-use TYPO3\CMS\Core\Utility\HttpUtility;
-
 use Psr\Http\Message\ResponseFactoryInterface;
 use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Core\Information\Typo3Version;
+
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use Miniorange\Sp\Helper\CustomerSaml;
+
 
 /**
  * ResponseController
@@ -45,28 +39,27 @@ class ResponseController extends ActionController
 {
 
     protected $idp_name = null;
-    protected $acs_url = null;
-    protected $sp_entity_id = null;
-    protected $saml_login_url = null;
-    private $issuer = null;
 
-    private $signedAssertion = null;
-    private $signedResponse = null;
+    protected $acs_url = null;
+
+    protected $sp_entity_id = null;
+
+    protected $force_authn = null;
+
+    protected $saml_login_url = null;
     protected $persistenceManager = null;
     protected $frontendUserRepository = null;
-
-    private $name_id = null;
+    protected $responseFactory = null;
+    private $issuer = null;
+    private $signedAssertion = null;
+    private $signedResponse = null;
     private $ssoemail = null;
-    private $x509_certificate;
-
-//    /**
-//     * @inject
-//     * @param FrontendUserRepository $frontendUserRepository
-//     */
-//    public function injectFrontendUserRepository(FrontendUserRepository $frontendUserRepository)
-//    {
-//        $this->frontendUserRepository = $frontendUserRepository;
-//    }
+    private $username = null;
+    private $ses_id = null;
+    private $attrsReceived = null;
+    private $amObject = null;
+    private $idpObject = null;
+    private $spObject = null;
 
     /**
      * action check
@@ -78,10 +71,10 @@ class ResponseController extends ActionController
      * @throws InvalidSamlStatusCodeException
      * @throws InvalidSignatureInResponseException
      * @throws ReflectionException
+     * @throws Exception
      */
     public function responseAction()
     {
-
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 
@@ -108,99 +101,168 @@ class ResponseController extends ActionController
                 $username = $this->ssoemail;
                 $tsfe = self::getTypoScriptFrontendController();
                 $tsfe->fe_user->checkPid = 0;
-                $user = $this->createIfNotExist($username);
+                $user = $this->createOrUpdateUser($username);
                 $_SESSION['ses_id'] = $user['uid'];
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_sessions');
 
                 $version = new Typo3Version();
-                if( $version->getVersion() >=11.0)
-                {
-                    //$queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid',$queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->executeStatement(); 
-                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid',$queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
+                if ($version->getVersion() >= 11.0) {
+                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
                 }
                 $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
                 $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
                 $tsfe->fe_user->forceSetCookie = TRUE;
-                $tsfe->fe_user->start();
                 $tsfe->fe_user->createUserSession($user);
                 $tsfe->fe_user->user = $user;
 
                 $tsfe->initUserGroups();
                 $tsfe->fe_user->loginSessionStarted = TRUE;
-
-                $tsfe->fe_user->setKey('user', 'fe_typo_user', $user);
-                $GLOBALS['TSFE']->fe_user->setKey('ses', 'fe_typo_user', $user);
-                $ses_id = $tsfe->fe_user->fetchUserSession();
-
                 $reflection = new ReflectionClass($tsfe->fe_user);
                 $setSessionCookieMethod = $reflection->getMethod('setSessionCookie');
                 $setSessionCookieMethod->setAccessible(TRUE);
                 $setSessionCookieMethod->invoke($tsfe->fe_user);
-                
-                $tsfe->fe_user->storeSessionData();
 
                 if (!isset($_SESSION)) {
-                      session_id('email');
-                      session_start();
-                      $_SESSION['email'] = $this->ssoemail;
-                      $_SESSION['id'] = $ses_id;
+                    session_id('email');
+                    session_start();
+                    $_SESSION['email'] = $this->ssoemail;
+                    $_SESSION['id'] = $ses_id;
                 }
                 GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
             }
         }
 
+        return $this->responseFactory->createResponse()
+            ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
+            ->withBody($this->streamFactory->createStream());
+
+    }
+
+    public function control()
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
+        $sp_object = $queryBuilder->select('spobject')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
+        $idp_object = $queryBuilder->select('object')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
+        $sp_object = !is_array($sp_object) ? json_decode($sp_object, true) : $sp_object;
+        $idp_object = !is_array($idp_object) ? json_decode($idp_object, true) : $idp_object;
+        $sp_object = is_array($sp_object['spobject']) ? $sp_object['spobject'] : json_decode($sp_object['spobject'], true);
+        $idp_object = is_array($idp_object['object']) ? $idp_object['object'] : json_decode($idp_object['object'], true);
+        $this->acs_url = $sp_object['acs_url'];
+        $this->sp_entity_id = $sp_object['sp_entity_id'];
+        $this->saml_login_url = $idp_object['saml_login_url'];
+        $this->x509_certificate = $idp_object['x509_certificate'];
+        $this->issuer = $idp_object['idp_entity_id'];
+        $signedAssertion = true;
+        $signedResponse = true;
     }
 
     /**
-     *
-     * @param $username
-     * @return bool
+     * @return TypoScriptFrontendController
      */
-    public function createIfNotExist($username)
+    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
     {
-        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $user = Utilities::fetchUserFromUsername($username);
-        if($user == false){
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
-            $count = $queryBuilder->select('countuser')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-            if($count>0)
-            {
-                $frontendUser = new FrontendUser();
-                $frontendUser->setUsername($username);
-                $fnamelname = explode("@", $username);
-                $this->first_name = $fnamelname[0];
-                $this->last_name = $fnamelname[1];
-                $frontendUser->setFirstName($this->first_name);
-                $frontendUser->setLastName($this->last_name);
-                $frontendUser->setEmail($this->ssoemail);
-                $frontendUser->setPassword(SAMLUtilities::generateRandomAlphanumericValue(10));  //Setting Random Password
+        return $GLOBALS['TSFE'];
+    }
 
-                $mappedGroupUid = Utilities::fetchUidFromGroupName(Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT,Constants::TABLE_SAML));
-                $userGroup = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserGroupRepository')->findByUid($mappedGroupUid);
-                if($userGroup!=null){
-                    $frontendUser->addUsergroup($userGroup);
-                }else{
-                    exit("Unable to create User. No UserGroup found.");
-                }
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count-1)->execute();
-                //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count-1)->executeQuery();
-                $this->frontendUserRepository = $objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Repository\\FrontendUserRepository')->add($frontendUser);
-                $this->persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager')->persistAll();
-                $user = Utilities::fetchUserFromUsername($username);
-                return $user;
+    /**
+     * @param $username
+     * @return array
+     */
+    public function createOrUpdateUser($username)
+    {
+        $user = Utilities::fetchUserFromUsername($username);
+        $userExist = false;
+        if ($user == false) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
+            $count = $queryBuilder->select('countuser')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
+            $count = $count['countuser'];
+            if ($count > 0) {
+                Utilities::log_php_error("CREATING USER", $username);
+
+                $newUser = [
+                    'username' => $username,
+                    'password' => SAMLUtilities::generateRandomAlphanumericValue(10),
+                ];
+
+                // Insert the new user into the fe_users table
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
+                $queryBuilder
+                    ->insert('fe_users')
+                    ->values($newUser)
+                    ->execute();
+
+                // Output the UID of the newly created user
+                $uid = $queryBuilder->getConnection()->lastInsertId('fe_users');
+                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count - 1)->execute();
+            } else {
+                $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
+                $version = new Typo3Version();
+                $typo3Version = $version->getVersion();
+                $customer = new CustomerSaml();
+                $customer->submit_to_magento_team_autocreate_limit_exceeded($site, $typo3Version);
+                echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";
+                exit;
             }
-            else
-            {
-                echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";exit;
-            }
-        }
-        else{
-            if($user['disable'] == 1){
+
+        } else {
+            Utilities::log_php_error("USER EXISTS: ", $username);
+            if ($user['disable'] == 1) {
+                Utilities::log_php_error("USER EXISTS BUT IS DISABLED", $username);
                 exit("You are not allowed to login. Please contact your admin.");
             }
-            return $user;
+            $userExist = true;
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
+            $uid = $queryBuilder->select('uid')->from(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR)))->execute()->fetch();
+            $uid = $uid['uid'];
         }
 
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+        // add or assign default group
+        error_log("GroupAttribute not mapped in Attribute Mapping Tab.");
+        if (!$userExist) {
+            error_log("New User: Assigning Default Group.");
+            $mappedTypo3Group = Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT, Constants::TABLE_SAML);
+            Utilities::log_php_error("Assigning DEFAULT group to user: ", $mappedTypo3Group);
+
+            if (!$mappedTypo3Group) {
+                exit("Unable to assign user to default group. Please contact your admin." . $mappedTypo3Group);
+            }
+            $mappedGroupUid = Utilities::fetchUidFromGroupName($mappedTypo3Group);
+            $mappedGroupUid = $mappedGroupUid;
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
+            $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+                ->set('usergroup', $mappedGroupUid)->execute();
+            GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+
+        } else {
+            Utilities::log_php_error("group mapping done");
+            //mapping is Correct Groups are received but No group is assigned to User. Use default group.
+            error_log("No groups received is assigned to User. So assigning Default Group to existing user.");
+            $mappedTypo3Group = Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT, Constants::TABLE_SAML);
+            Utilities::log_php_error("Assigning DEFAULT group to user: ", $mappedTypo3Group);
+
+            if (!$mappedTypo3Group) {
+                exit("Unable to assign user to default group. Please contact your admin." . $mappedTypo3Group);
+            }
+            $mappedGroupUid = Utilities::fetchUidFromGroupName($mappedTypo3Group);
+            $mappedGroupUid = $mappedGroupUid;
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
+            Utilities::log_php_error("assigning default group ");
+            $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+                ->set('usergroup', $mappedGroupUid)->execute();
+            Utilities::log_php_error("assigned default group");
+        }
+        Utilities::log_php_error("fetching user from username: ");
+        $user = Utilities::fetchUserFromUsername($username);
+        Utilities::log_php_error("User fetched");
+        return $user;
+    }
+
+    public function fetchFromTable($col, $table)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->execute()->fetch();
+        return $variable && $variable[$col] ? $variable[$col] : null;
     }
 
     /**
@@ -209,13 +271,11 @@ class ResponseController extends ActionController
     public function setFlag($val)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->set('custom_attr', $val)->execute();
-        //$queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->set('custom_attr', $val)->executeQuery();
+        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->set('custom_attr', $val)->execute();
     }
 
     /**
-     *
-     * @param null $instant
+     * @param $instant
      * @return false|string
      */
     function generateTimestamp($instant = NULL)
@@ -232,7 +292,6 @@ class ResponseController extends ActionController
     }
 
     /**
-     *
      * @param $bytes
      * @return string
      */
@@ -247,37 +306,12 @@ class ResponseController extends ActionController
 
     /**
      * @param $length
+     * @param $fallback
      * @return false|string
      */
-    function generateRandomBytes($length)
+    function generateRandomBytes($length, $fallback = TRUE)
     {
         return openssl_random_pseudo_bytes($length);
-    }
-
-
-    public function control()
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
-        $sp_object = $queryBuilder->select('spobject')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $idp_object = $queryBuilder->select('object')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetchColumn(0);
-        $sp_object = json_decode($sp_object,true);
-        $idp_object = json_decode($idp_object,true);
-        $this->idp_name = $idp_object['idp_name'];
-        $this->acs_url = $sp_object['acs_url'];
-        $this->sp_entity_id = $sp_object['sp_entity_id'];
-        $this->saml_login_url = $idp_object['saml_login_url'];
-        $this->x509_certificate = $idp_object['x509_certificate'];
-        $this->issuer = $idp_object['idp_entity_id'];
-        $signedAssertion = true;
-        $signedResponse = true;
-    }
-
-        /**
-     * @return TypoScriptFrontendController
-     */
-    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
-    {
-        return $GLOBALS['TSFE'];
     }
 
 }

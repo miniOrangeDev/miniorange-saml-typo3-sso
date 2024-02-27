@@ -1,39 +1,37 @@
-<html xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-	<f:be.container>
-		<div class="typo3-fullDoc">
-			<div id="typo3-docheader">
-				<div class="typo3-docheader-functions">
-					<div class="left">
-						<f:be.buttons.csh />
-						<f:be.menus.actionMenu>
-							<f:be.menus.actionMenuItem label="Overview" controller="" action="list" />
-							<f:be.menus.actionMenuItem label="Create new Fesaml" action="new" controller="Fesaml" />
-							<f:be.menus.actionMenuItem label="Create new Besaml" action="new" controller="Besaml" />
-							<f:be.menus.actionMenuItem label="Create new Logout" action="new" controller="Logout" />
-							<f:be.menus.actionMenuItem label="Create new Response" action="new" controller="Response" />
-						</f:be.menus.actionMenu>
-					</div>
-					<div class="right">
-						<f:be.pagePath />
-						<f:be.pageInfo />
-					</div>
-				</div>
-				<div class="typo3-docheader-buttons">
-					<div class="left">
+<html data-namespace-typo3-fluid="true" xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+<f:be.container>
+    <div class="typo3-fullDoc">
+        <div id="typo3-docheader">
+            <div class="typo3-docheader-functions">
+                <div class="left">
+                    <f:be.buttons.csh/>
+                    <f:be.menus.actionMenu>
+                        <f:be.menus.actionMenuItem action="list" controller="" label="Overview"/>
+                        <f:be.menus.actionMenuItem action="new" controller="Besaml" label="Create new Besaml"/>
+                        <f:be.menus.actionMenuItem action="new" controller="Response" label="Create new Response"/>
+                    </f:be.menus.actionMenu>
+                </div>
+                <div class="right">
+                    <f:be.pagePath/>
+                    <f:be.pageInfo/>
+                </div>
+            </div>
+            <div class="typo3-docheader-buttons">
+                <div class="left">
 
-					</div>
-					<div class="right">
-						<f:be.buttons.shortcut />
-					</div>
-				</div>
+                </div>
+                <div class="right">
+                    <f:be.buttons.shortcut/>
+                </div>
+            </div>
 
-			</div>
-			<div id="typo3-docbody">
-				<div id="typo3-inner-docbody">
-					<f:flashMessages />
-					<f:render section="content" />
-				</div>
-			</div>
-		</div>
-	</f:be.container>
+        </div>
+        <div id="typo3-docbody">
+            <div id="typo3-inner-docbody">
+                <f:flashMessages/>
+                <f:render section="content"/>
+            </div>
+        </div>
+    </div>
+</f:be.container>
 </html>

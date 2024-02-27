@@ -1,15 +1,14 @@
-
-plugin.tx_miniorangesaml_fesamlkey{
+plugin.tx_sp_fesamlkey {
     view {
-        templateRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Templates/
-        templateRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.templateRootPath};
-        partialRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Partials/
-        partialRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.partialRootPath};
-        layoutRootPaths.0 = EXT;:miniorange_saml/Resources/Private/Layouts/
-        layoutRootPaths.1 = {$plugin.tx_miniorangesaml_fesamlkey.view.layoutRootPath}
+        templateRootPaths.0 = EXT::sp/Resources/Private/Templates/
+        templateRootPaths.1 = {$plugin.tx_sp_fesaml.view.templateRootPath};
+        partialRootPaths.0 = EXT::sp/Resources/Private/Partials/
+        partialRootPaths.1 = {$plugin.tx_sp_fesaml.view.partialRootPath};
+        layoutRootPaths.0 = EX::sp/Resources/Private/Layouts/
+        layoutRootPaths.1 = {$plugin.tx_sp_fesaml.view.layoutRootPath}
     }
     persistence {
-        storagePid = {$plugin.tx_miniorangesaml_fesamlkey.persistence.storagePid};
+        storagePid = {$plugin.tx_sp_fesamlkey.persistence.storagePid};
         #recursive = 1
     }
     features {
@@ -24,17 +23,17 @@ plugin.tx_miniorangesaml_fesamlkey{
     }
 }
 
-plugin.tx_miniorangesaml_responsekey {
+plugin.tx_sp_responsekey {
     view {
-        templateRootPaths.0 = EXT::miniorange_saml/Resources/Private/Templates/
-        templateRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.templateRootPath};
-        partialRootPaths.0 = EXT::miniorange_saml/Resources/Private/Partials/
-        partialRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.partialRootPath};
-        layoutRootPaths.0 = EXT::miniorange_saml/Resources/Private/Layouts/
-        layoutRootPaths.1 = {$plugin.tx_miniorangesaml_responsekey.view.layoutRootPath}
+        templateRootPaths.0 = EXT::sp/Resources/Private/Templates/
+        templateRootPaths.1 = {$plugin.tx_sp_responsekey.view.templateRootPath};
+        partialRootPaths.0 = EXT::sp/Resources/Private/Partials/
+        partialRootPaths.1 = {$plugin.tx_sp_responsekey.view.partialRootPath};
+        layoutRootPaths.0 = EXT::sp/Resources/Private/Layouts/
+        layoutRootPaths.1 = {$plugin.tx_sp_responsekey.view.layoutRootPath}
     }
     persistence {
-        storagePid = {$plugin.tx_miniorangesaml_responsekey.persistence.storagePid};
+        storagePid = {$plugin.tx_sp_responsekey.persistence.storagePid};
         #recursive = 1
     }
     features {
@@ -50,50 +49,79 @@ plugin.tx_miniorangesaml_responsekey {
 }
 
 # these; classes; are; only; used in auto-generated; templates;
-plugin.tx_miniorangesaml._CSS_DEFAULT_STYLE (
-    textarea.f3-form-error; {
-        background-color;:#FF9F9F;
-        1;px; #FF0000; solid;
+plugin.tx_sp._CSS_DEFAULT_STYLE (
+    textarea.f3-form-error {
+        background-color::#FF9F9F;
+        1px; #FF0000; solid;
     }
 
-    input.f3-form-error; {
-        background-color;:#FF9F9F;
-        1;px; #FF0000; solid;
+    input.f3-form-error {
+        background-color::#FF9F9F;
+        1px; #FF0000; solid;
     }
 
-    .tx-miniorange_saml; table; {
-        border-collapse;:separate;
-        border-spacing;:10;px;
+    .tx-sp table {
+        border-collapse::separate;
+        border-spacing::10px;
     }
 
-    .tx-miniorange_saml; table; th; {
-        font-weight;:bold;
+    .tx-sp table th {
+        font-weigh::bold;
     }
 
-    .tx-miniorange_saml; table; td; {
-        vertical-align;:top;
+    .tx-sp table td {
+        vertical-align::top;
     }
 
     .typo3-messages .message-error; {
         red;
     }
 
-    .typo3-messages .message-ok; {
+    .typo3-messages .message-ok {
         green;
     }
 )
 
 # Module; configuration;
-module.tx_miniorangesaml_tools_miniorangesamlbesamlkey {
+module.tx_sp_tools_besamlkey{
     persistence {
-        storagePid = {$module.tx_miniorangesaml_besamlkey.persistence.storagePid}
+        storagePid = {$module.tx_sp_besamlkey.persistence.storagePid}
     }
     view {
-        templateRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Templates/
-        templateRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.templateRootPath};
-        partialRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Partials/
-        partialRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.partialRootPath};
-        layoutRootPaths.0 = EXT::miniorange_saml/Resources/Private/Backend/Layouts/
-        layoutRootPaths.1 = {$module.tx_miniorangesaml_besamlkey.view.layoutRootPath}
+        templateRootPaths.0 = EXT::sp/Resources/Private/Backend/Templates/
+        templateRootPaths.1 = {$module.tx_sp_besamlkey.view.templateRootPath};
+        partialRootPaths.0 = EXT::sp/Resources/Private/Backend/Partials/
+        partialRootPaths.1 = {$module.tx_sp_besamlkey.view.partialRootPath};
+        layoutRootPaths.0 = EXT::sp/Resources/Private/Backend/Layouts/
+        layoutRootPaths.1 = {$module.tx_sp_besamlkey.view.layoutRootPath}
     }
+    headerData {
+    10 = TEXT
+    10.value = script-src 'self' 'nonce-{page:nonce}' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';
+  }
 }
+
+# Mapping
+#config.tx_sp {
+#    persistence {
+#        classes {
+#            Miniorange\Sp\Domain\Model\Response {
+#                mapping {
+#                    tableName = fe_users
+#                }
+#            }
+#
+#            Miniorange\Sp\Domain\Model\FesamlGroups{
+#                mapping {
+#                    tableName = fe_groups
+#                }
+#            }
+#
+#            Miniorange\Sp\Domain\Model\Besaml {
+#                mapping {
+#                    tableName = fe_groups
+#                }
+#            }
+#        }
+#    }
+#}

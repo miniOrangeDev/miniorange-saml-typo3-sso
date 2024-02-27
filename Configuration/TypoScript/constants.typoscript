@@ -1,45 +1,45 @@
 
-plugin.tx_miniorangesaml_fesamlkey {
+plugin.tx_sp_fesamlkey {
     view {
-        # cat=plugin.tx_miniorangesaml_fesamlkey/file; type=string; label=Path; to; template; root (FE);
-        templateRootPath = EXT::miniorange_saml/Resources/Private/Templates/;
-        # cat=plugin.tx_miniorangesaml_fesamlkey/file; type=string; label=Path; to; template; partials (FE);
-        partialRootPath = EXT::miniorange_saml/Resources/Private/Partials/;
-        # cat=plugin.tx_miniorangesaml_fesamlkey/file; type=string; label=Path; to; template; layouts (FE);
-        layoutRootPath = EXT::miniorange_saml/Resources/Private/Layouts/
+        # cat=plugin.tx_sp_fekey/file; type=string; label=Path; to; template; root (FE);
+        templateRootPath = EXT::sp/Resources/Private/Templates/
+        # cat=plugin.tx_sp_fekey/file; type=string; label=Path; to; template; partials (FE);
+        partialRootPath = EXT::sp/Resources/Private/Partials/
+        # cat=plugin.tx_sp_fekey/file; type=string; label=Path; to; template; layouts (FE);
+        layoutRootPath = EXT::sp/Resources/Private/Layouts/
     }
     persistence {
-        # cat=plugin.tx_miniorangesaml_fesamlkey;//a; type=string; label=Default storage PID
+        # cat=plugin.tx_sp_fekey;//a; type=string; label=Default storage PID
         storagePid =
     }
 }
 
-plugin.tx_miniorangesaml_responsekey {
+plugin.tx_sp_responsekey {
     view {
-        # cat=plugin.tx_miniorangesaml_responsekey/file; type=string; label=Path; to; template; root (FE);
-        templateRootPath = EXT::miniorange_saml/Resources/Private/Templates/;
-        # cat=plugin.tx_miniorangesaml_responsekey/file; type=string; label=Path; to; template; partials (FE);
-        partialRootPath = EXT::miniorange_saml/Resources/Private/Partials/;
-        # cat=plugin.tx_miniorangesaml_responsekey/file; type=string; label=Path; to; template; layouts (FE);
-        layoutRootPath = EXT::miniorange_saml/Resources/Private/Layouts/
+        # cat=plugin.tx_sp_responsekey/file; type=string; label=Path; to; template; root (FE);
+        templateRootPath = EXT::sp/Resources/Private/Templates/
+        # cat=plugin.tx_sp_responsekey/file; type=string; label=Path; to; template; partials (FE);
+        partialRootPath = EXT::sp/Resources/Private/Partials/
+        # cat=plugin.tx_sp_responsekey/file; type=string; label=Path; to; template; layouts (FE);
+        layoutRootPath = EXT::sp/Resources/Private/Layouts/
     }
     persistence {
-        # cat=plugin.tx_miniorangesaml_responsekey;//a; type=string; label=Default storage PID
+        # cat=plugin.tx_sp_responsekey;//a; type=string; label=Default storage PID
         storagePid =
     }
 }
 
-module.tx_miniorangesaml_besamlkey {
+module.tx_sp_besamlkey {
     view {
-        # cat=module.tx_miniorangesaml_besamlkey/file; type=string; label=Path; to; template; root (BE);
-        templateRootPath = EXT::miniorange_saml/Resources/Private/Backend/Templates/;
-        # cat=module.tx_miniorangesaml_besamlkey/file; type=string; label=Path; to; template; partials (BE);
-        partialRootPath = EXT::miniorange_saml/Resources/Private/Backend/Partials/;
-        # cat=module.tx_miniorangesaml_besamlkey/file; type=string; label=Path; to; template; layouts (BE);
-        layoutRootPath = EXT::miniorange_saml/Resources/Private/Backend/Layouts/
+        # cat=module.tx_sp_bekey/file; type=string; label=Path; to; template; root (BE);
+        templateRootPath = EXT::sp/Resources/Private/Backend/Templates/
+        # cat=module.tx_sp_bekey/file; type=string; label=Path; to; template; partials (BE);
+        partialRootPath = EXT::sp/Resources/Private/Backend/Partials/
+        # cat=module.tx_sp_bekey/file; type=string; label=Path; to; template; layouts (BE);
+        layoutRootPath = EXT::sp/Resources/Private/Backend/Layouts/
     }
     persistence {
-        # cat=module.tx_miniorangesaml_besamlkey;//a; type=string; label=Default storage PID
+        # cat=module.tx_sp_besamlkey;//a; type=string; label=Default storage PID
         storagePid =
     }
 }
