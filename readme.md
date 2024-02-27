@@ -17,3 +17,8 @@ v2.0.2
  - Typo3 v11.5.27 compatibility
  - Some security improvements
  - UI Updates
+
+v2.0.6
+ - Typo3 v12 compatibility
+ - Delayed Registration
+ - UI Updates
