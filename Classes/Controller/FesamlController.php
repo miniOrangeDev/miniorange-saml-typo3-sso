@@ -21,6 +21,7 @@ use Miniorange\Sp\Helper\Lib\XMLSecLibs\XMLSecurityKey;
 use Miniorange\Sp\Helper\Utilities;
 use TYPO3\CMS\Core\Database\Connection;
 use PDO;
+use TYPO3\CMS\Core\Information\Typo3Version;
 /***
  *
  * This file is part of the "miniOrange SAML" Extension for TYPO3 CMS.
@@ -85,6 +86,8 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
      */
     public function requestAction()
     {
+        $version = new Typo3Version();
+        $typo3Version = $version->getVersion();
         if(isset($_REQUEST['option']) and $_REQUEST['option']=='mosaml_metadata')
         {
             SAMLUtilities::mo_saml_miniorange_generate_metadata();
@@ -110,9 +113,13 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         }
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
-        return $this->responseFactory->createResponse()
-                    ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
-                    ->withBody($this->streamFactory->createStream());
+
+
+        if ($typo3Version >= 11.5) {
+            return $this->responseFactory->createResponse()
+                ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
+                ->withBody($this->streamFactory->createStream($this->view->render()));
+        }    
     }
 
     /**
