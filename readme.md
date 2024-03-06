@@ -22,3 +22,6 @@ v2.0.6
  - Typo3 v12 compatibility
  - Delayed Registration
  - UI Updates
+
+v2.0.7
+ - Typo3 v10, v11, v12 compatibility

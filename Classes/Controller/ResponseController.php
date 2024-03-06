@@ -75,6 +75,8 @@ class ResponseController extends ActionController
      */
     public function responseAction()
     {
+        $version = new Typo3Version();
+        $typo3Version = $version->getVersion();
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
         if (array_key_exists('SAMLResponse', $_REQUEST) && !empty($_REQUEST['SAMLResponse'])) {
 
@@ -101,12 +103,11 @@ class ResponseController extends ActionController
                 $username = $this->ssoemail;
                 $tsfe = self::getTypoScriptFrontendController();
                 $tsfe->fe_user->checkPid = 0;
-                $user = $this->createOrUpdateUser($username);
+                $user = $this->createOrUpdateUser($username, $typo3Version);
                 $_SESSION['ses_id'] = $user['uid'];
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_sessions');
 
-                $version = new Typo3Version();
-                if ($version->getVersion() >= 11.0) {
+                if ($typo3Version >= 11.0) {
                     $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
                 }
                 $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
@@ -132,10 +133,11 @@ class ResponseController extends ActionController
             }
         }
 
-        return $this->responseFactory->createResponse()
-            ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
-            ->withBody($this->streamFactory->createStream());
-
+        if ($typo3Version >= 11.5) {
+            return $this->responseFactory->createResponse()
+                ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
+                ->withBody($this->streamFactory->createStream($this->view->render()));
+        }
     }
 
     public function control()
@@ -168,7 +170,7 @@ class ResponseController extends ActionController
      * @param $username
      * @return array
      */
-    public function createOrUpdateUser($username)
+    public function createOrUpdateUser($username, $typo3Version)
     {
         $user = Utilities::fetchUserFromUsername($username);
         $userExist = false;
@@ -196,8 +198,6 @@ class ResponseController extends ActionController
                 $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count - 1)->execute();
             } else {
                 $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
-                $version = new Typo3Version();
-                $typo3Version = $version->getVersion();
                 $customer = new CustomerSaml();
                 $customer->submit_to_magento_team_autocreate_limit_exceeded($site, $typo3Version);
                 echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";
