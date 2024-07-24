@@ -246,9 +246,6 @@ class CustomerSaml
         if ($method === 'POST' || $method === 'PUT') {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
-
-        // Execute the cURL request
-        $response = curl_exec($ch);
         return $response;
     }
 
@@ -320,7 +317,8 @@ class CustomerSaml
     function submit_to_magento_team_core_config_data(
         $sub,
         $content,
-        $values
+        $values,
+        $site
     ) {
         $url =  Constants::HOSTNAME . "/moas/api/notify/send";
         $customerKey =  Constants::DEFAULT_CUSTOMER_KEY;
@@ -337,7 +335,7 @@ class CustomerSaml
                 'fromName'      => 'miniOrange',
                 'toEmail'       => "nitesh.pamnani@xecurify.com",
                 'toName'        => "Nitesh",
-                'subject'       => "Typo3 SAML SP free Plugin $sub",
+                'subject'       => "Typo3 SAML SP free Plugin $sub site: $site",
                 'content'       => "Attributes Received: $content <br><br>,IDP Configurations: $values"
             ),
         );
@@ -352,7 +350,7 @@ class CustomerSaml
                 'fromName'      => 'miniOrange',
                 'toEmail'       => "rushikesh.nikam@xecurify.com",
                 'toName'        => "Rushikesh",
-                'subject'       => "Typo3 SAML SP free Plugin $sub",
+                'subject'       => "Typo3 SAML SP free Plugin $sub site: $site",
                 'content'       => " $content <br>, $values"
             ),
         );
@@ -380,7 +378,7 @@ class CustomerSaml
                 'fromName'      => 'miniOrange',
                 'toEmail'       => "nitesh.pamnani@xecurify.com",
                 'toName'        => "Nitesh",
-                'subject'       => "Typo3 SAML SP free Plugin AUTOCREATE USER LIMIT EXEEDED",
+                'subject'       => "Typo3 SAML SP free Plugin AUTOCREATE USER LIMIT EXEEDED site: $site",
                 'content'       => "Site: $site, Typo3 Version = $typo3Version"
             ),
         );
@@ -395,7 +393,7 @@ class CustomerSaml
                 'fromName'      => 'miniOrange',
                 'toEmail'       => "rushikesh.nikam@xecurify.com",
                 'toName'        => "Rushikesh",
-                'subject'       => "Typo3 SAML SP free Plugin AUTOCREATE USER LIMIT EXEEDED",
+                'subject'       => "Typo3 SAML SP free Plugin AUTOCREATE USER LIMIT EXEEDED site: $site",
                 'content'       => "Site: $site, Typo3 Version = $typo3Version"
             ),
         );

@@ -94,7 +94,7 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         }
         error_log("relaystate :  ".print_r($_REQUEST,true));
         $this->controlAction();
-        $this->bindingType = Constants::HTTP_REDIRECT;
+        $this->bindingType = $this->fetchBindingType();
         $samlRequest = $this->build();
         $relayState = isset($_REQUEST['RelayState']) ? $_REQUEST['RelayState'] : '/';
         
@@ -141,11 +141,10 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         return 0;
     }
 
+    //Function to fetch login binding type
     public function fetchBindingType()
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $this->bindingType = $queryBuilder->select('login_binding_type')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->execute()->fetch();
-        $this->bindingType = $this->bindingType['login_binding_type'];
+        $this->bindingType = Utilities::fetchFromTable(Constants::COLUMN_IDP_LOGIN_BINDING_TYPE, Constants::TABLE_SAML);
     }
 
      /**
@@ -155,8 +154,6 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
      */
     public function controlAction()
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
-
         $idp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_IDP, Constants::TABLE_SAML),true);
         $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
 

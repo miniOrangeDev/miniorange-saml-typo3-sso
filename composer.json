@@ -5,15 +5,21 @@
   "license": [
     "GPL-2.0-or-later"
   ],
+  "authors": [
+    {
+      "name": "miniOrange",
+      "role": "Developer"
+    }
+  ],
   "require": {
-    "typo3/cms-core": "^10 || ^11 || ^12"
+    "typo3/cms-core": "^10 || ^11 || ^12 || ^13"
   },
   "autoload": {
     "psr-4": {
       "Miniorange\\Sp\\": "Classes/"
     }
   },
-  "version": "2.0.7",
+  "version": "2.0.9",
   "config": {
     "allow-plugins": {
       "typo3/class-alias-loader": true,

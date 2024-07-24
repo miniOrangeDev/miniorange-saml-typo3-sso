@@ -56,31 +56,25 @@ class BesamlController extends ActionController
         $customer = new CustomerSaml();
         $version = new Typo3Version();
         $typo3Version = $version->getVersion();
-        $send_email= $this->fetch(constants::EMAIL_SENT);
-
+        $send_email= Utilities::fetchFromTable(Constants::EMAIL_SENT, Constants::TABLE_SAML);
+        if(isset($_REQUEST['option']) && $_REQUEST['option'] == 'mosaml_metadata')
+        {
+            Utilities::showErrorFlashMessage('Fill all the fields to use the XML Metadata');
+        }
             if($send_email==NULL)
             {
                 $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
                 $values=array($site);
                 $email = !empty($GLOBALS['BE_USER']->user['email']) ? $GLOBALS['BE_USER']->user['email'] : $GLOBALS['BE_USER']->user['username'];
                 $customer->submit_to_magento_team($email,'Installed Successfully', $values, $typo3Version);
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-                $uid = $queryBuilder->select('uid')->from('saml')
-                ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                ->execute()->fetch();
+                $uid = Utilities::fetchFromTable('uid',Constants::TABLE_SAML);
                 if($uid == null)
                 {
-                    $queryBuilder
-                ->insert('saml')
-                ->values([
-                    'uid' => 1,
-                    'countuser'=> 10,
-                    'isEmailSent' => 1])
-                ->execute();
+                    $this->setCount();
                 }
                 else
                 {
-                    $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set(constants::EMAIL_SENT, 1)->execute();
+                    Utilities::updateTableSaml(Constants::EMAIL_SENT, 1);
                 }
 
                 GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
@@ -152,12 +146,13 @@ class BesamlController extends ActionController
             } //------------ SERVICE PROVIDER SETTINGS---------------
             else if ($_POST['option'] === 'save_sp_settings') {
                 if ($_POST['fesaml'] != null && $_POST['response'] != null && $_POST['site_base_url'] != null && $_POST['acs_url'] != null && $_POST['sp_entity_id'] != null) {
-                    $value1 = $this->validateURL($_POST['site_base_url']);
-                    $value2 = $this->validateURL($_POST['acs_url']);
-                    $value3 = $this->validateURL($_POST['sp_entity_id']);
-
-                    if ($value1 == 1 && $value2 == 1 && $value3 == 1) {
-                        if ($this->fetch('uid') == null) {
+                    $value1 = $this->validateURL($_POST['fesaml']);
+                    $value2 = $this->validateURL($_POST['response']);
+                    $value3 = $this->validateURL($_POST['site_base_url']);
+                    $value4 = $this->validateURL($_POST['acs_url']);
+                    $value5 = $this->validateURL($_POST['sp_entity_id']);
+                    if ($value1 && $value2 && $value3 && $value4 && $value5) {
+                        if (Utilities::fetchFromTable('uid', Constants::TABLE_SAML) == null) {
                             $this->save('uid', 1, Constants::TABLE_SAML);
                         }
                         $this->defaultSettings($_POST);
@@ -217,36 +212,31 @@ class BesamlController extends ActionController
             $this->view->assign('tab', $this->tab);
         }
 
-        $allUserGroups = GeneralUtility::makeInstance('Miniorange\\Sp\\Domain\\Repository\\UserGroup\\FrontendUserGroupRepository')->findAll();
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $query = $queryBuilder->select('*')->from('saml')->execute();
-        $providersArray = [];
-        while ($row = $query->fetch()) {
-            $providersArray[] = $row;
-
-        }
+        $allUserGroups = GeneralUtility::makeInstance('Miniorange\\Sp\\Domain\\Repository\\UserGroup\\FrontendUserGroupRepository')->findAll($typo3Version);
 
         //------------ LOADING SAVED SETTINGS OBJECTS TO BE USED IN VIEW---------------
-        $object = $this->fetch('object') ? json_decode($this->fetch('object'), true) : $this->fetch('object');
-        $spObject = $this->fetch(Constants::SAML_SPOBJECT) && !is_array($this->fetch(Constants::SAML_SPOBJECT)) ? json_decode($this->fetch(Constants::SAML_SPOBJECT), true) : $this->fetch(Constants::SAML_SPOBJECT);
-        $this->view->assign('conf_idp', json_decode($this->fetch('object'), true));
-        $this->view->assign('conf_sp', json_decode($this->fetch('spobject'), true));
+        $object = Utilities::fetchFromTable(Constants::SAML_IDPOBJECT, Constants::TABLE_SAML);
+        $object = !is_array($object) ? json_decode($object, true) : $object;
+        $spObject = Utilities::fetchFromTable(Constants::SAML_SPOBJECT, Constants::TABLE_SAML);
+        $spObject = !is_array($spObject) ? json_decode($spObject, true) : $spObject;
+        $this->view->assign('conf_idp', $object);
+        $this->view->assign('conf_sp', $spObject);
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
 
         $this->view->assign('allUserGroups', $allUserGroups);
         $this->view->assign('defaultGroup', Utilities::fetchFromTable(Constants::COLUMN_GROUP_DEFAULT, Constants::TABLE_SAML));
 
         //------------ LOADING VARIABLES TO BE USED IN VIEW---------------
-        $cust_reg_status = $this->fetch_cust('cust_reg_status');
+        $cust_reg_status = Utilities::fetch_cust('cust_reg_status');
         if ($cust_reg_status == 'logged') {
             $this->view->assign('log', '');
             $this->view->assign('status', 'logged');
-            $this->view->assign('email', $this->fetch_cust('cust_email'));
+            $this->view->assign('email', Utilities::fetch_cust('cust_email'));
             $this->view->assign('nolog', 'display:block');
-            $this->view->assign('email', $this->fetch_cust('cust_email'));
-            $this->view->assign('key', $this->fetch_cust('cust_key'));
-            $this->view->assign('token', $this->fetch_cust('cust_token'));
-            $this->view->assign('api_key', $this->fetch_cust('cust_api_key'));
+            $this->view->assign('email', Utilities::fetch_cust('cust_email'));
+            $this->view->assign('key', Utilities::fetch_cust('cust_key'));
+            $this->view->assign('token', Utilities::fetch_cust('cust_token'));
+            $this->view->assign('api_key', Utilities::fetch_cust('cust_api_key'));
         } else {
             $this->view->assign('log', 'disabled');
             $this->view->assign('status', 'not_logged');
@@ -309,7 +299,11 @@ class BesamlController extends ActionController
     public static function upload_metadata($file, $idp_name)
     {
         $document = new DOMDocument();
+        if(!empty($file))
         $document->loadXML($file);
+        else
+        Utilities::showErrorFlashMessage('Invalid Metadata.');
+    
         restore_error_handler();
         $first_child = $document->firstChild;
         if (!empty($first_child)) {
@@ -346,38 +340,27 @@ class BesamlController extends ActionController
 
     public static function generic_update_query($database_name, $updatefieldsarray)
     {
+        $typo3Version = Utilities::getTypo3Version();
         $updatefieldsarray['idp_settings_saved'] = true;
         $idp_obj = json_encode($updatefieldsarray);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
 
-        $uid = $queryBuilder->select('uid')->from('saml')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)));
-        error_log('query: ' . print_r($uid, true));
-        $uid = $uid->execute()->fetch();
+        $uid = Utilities::fetchFromTable('uid', Constants::TABLE_SAML);
         error_log('uid: ' . print_r($uid, true));
         if ($uid == null) {
-            // comment line 409 and uncomment 410 if error received
-            $affectedRows = $queryBuilder->insert('saml')->values(['object' => $idp_obj,])->execute();
+            if($typo3Version > 12)
+            {
+                $affectedRows = $queryBuilder->insert('saml')->values(['object' => $idp_obj])->executeStatement();
+            }
+            else
+            {
+                $affectedRows = $queryBuilder->insert('saml')->values(['object' => $idp_obj])->execute();
+            }
         } else {
-            // comment line 413 and uncomment 414 if error received
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('object', $idp_obj)->execute();
+            Utilities::updateTableSaml(Constants::SAML_IDPOBJECT, $idp_obj);
         }
 
         Utilities::showSuccessFlashMessage('IDP Setting saved successfully.');
-    }
-
-//    VALIDATE CERTIFICATE
-
-    /**
-     * @param $var
-     * @return bool|string
-     */
-    public function fetch($var)
-    {
-
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $variable = $queryBuilder->select($var)->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
-        return $variable ? $variable[$var] : null;
     }
 
 //    VALIDATE URLS
@@ -396,18 +379,15 @@ class BesamlController extends ActionController
      */
     public function storeToDatabase($creds)
     {
+        $typo3Version = Utilities::getTypo3Version();
         $creds['idp_settings_saved'] = true;
         $this->myjson = json_encode($creds);
-
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $uid = $queryBuilder->select('uid')->from('saml')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-            ->execute()->fetch();
-
+        $uid = Utilities::fetchFromTable('uid', Constants::TABLE_SAML);
         error_log("If Previous_IdP configured : " . $uid);
 
         if ($uid == null) {
             error_log("No Previous_IdP found : " . $uid);
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
             $affectedRows = $queryBuilder
                 ->insert('saml')
                 ->values([
@@ -420,31 +400,30 @@ class BesamlController extends ActionController
                     'force_authn' => $creds['force_authn'],
                     'login_binding_type' => Constants::HTTP_REDIRECT,
                     'idp_settings_saved' => $creds['idp_settings_saved'],
-                    'object' => $this->myjson])
-                ->execute();
+                    'object' => $this->myjson]);
+            if($typo3Version > 12)
+            {
+                $affectedRows->executeStatement();
+            }
+            else
+            {
+                $affectedRows->execute();
+            }
             error_log("affected rows " . $affectedRows);
         } else {
 
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
             if (!empty($creds['idp_name']))
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                    ->set('idp_name', $creds['idp_name'])->execute();
+                Utilities::updateTableSaml(Constants::COLUMN_IDP_NAME, $creds['idp_name']);
             if (!empty($creds['idp_entity_id']))
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                    ->set('idp_entity_id', $creds['idp_entity_id'])->execute();
+                Utilities::updateTableSaml(Constants::COLUMN_IDP_ENTITY_ID, $creds['idp_entity_id']);
             if (!empty($creds['saml_login_url']))
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                    ->set('saml_login_url', $creds['saml_login_url'])->execute();
+                Utilities::updateTableSaml(Constants::COLUMN_IDP_LOGIN_URL, $creds['saml_login_url']);
             if (!empty($creds['saml_logout_url']))
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                    ->set('saml_logout_url', $creds['saml_logout_url'])->execute();
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                ->set('login_binding_type', Constants::HTTP_REDIRECT)->execute();
-            if (!empty($creds['x509_certificate']))
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                    ->set('x509_certificate', $creds['x509_certificate'])->execute();
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-                ->set('object', $this->myjson)->execute();
+                Utilities::updateTableSaml(Constants::COLUMN_SAML_LOGOUT_URL, $creds['saml_logout_url']);
+            Utilities::updateTableSaml(Constants::COLUMN_IDP_LOGIN_BINDING_TYPE, Constants::HTTP_REDIRECT);
+            Utilities::updateTableSaml(Constants::COLUMN_IDP_CERTIFICATE, $creds['x509_certificate']);
+            Utilities::updateTableSaml(Constants::SAML_IDPOBJECT, $this->myjson);
         }
     }
 
@@ -489,8 +468,6 @@ class BesamlController extends ActionController
         }
     }
 
-// FETCH CUSTOMER
-
     public function mo_saml_check_empty_or_null($value)
     {
         if (!isset($value) || empty($value)) {
@@ -499,33 +476,48 @@ class BesamlController extends ActionController
         return false;
     }
 
-// ---- UPDATE CUSTOMER
+// ---- Insert Data in tables
 
     public function save($column, $value, $table)
     {
+        $typo3Version = Utilities::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $queryBuilder->insert($table)->values([$column => $value,])->execute();
+        if($typo3Version > 12)
+        {
+            $queryBuilder->insert($table)->values([$column => $value,])->executeStatement();
+        }
+        else
+        {
+            $queryBuilder->insert($table)->values([$column => $value,])->execute();
+        }
     }
 
     /**
      * @param $postArray
      */
+    //Insert or update SP Settings
     public function defaultSettings($postArray)
     {
+        $typo3Version = Utilities::getTypo3Version();
         $postArray['sp_settings_saved'] = true;
         $this->spobject = json_encode($postArray);
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $uid = $queryBuilder->select('uid')->from('saml')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-            ->execute()->fetch();
+        $uid = Utilities::fetchFromTable('uid', Constants::TABLE_SAML);
         if ($uid == null) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
             $affectedRows = $queryBuilder
                 ->insert('saml')
                 ->values([
-                    'spobject' => $this->spobject])
-                ->execute();
+                    'spobject' => $this->spobject]);
+            if($typo3Version > 12)
+            {
+                $affectedRows->executeStatement();
+            }
+            else
+            {
+                $affectedRows->execute();
+            }
         } else {
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('spobject', $this->spobject)->execute();
+            Utilities::updateTableSaml(Constants::SAML_SPOBJECT, $this->spobject);
         }
     }
 
@@ -572,26 +564,35 @@ class BesamlController extends ActionController
 
     public function update_cust($column, $value)
     {
-        if ($this->fetch_cust('id') == null) {
+        $typo3Version = Utilities::getTypo3Version();
+        if (Utilities::fetch_cust('id') == null) {
             $this->insertValue();
         }
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
         if (is_array($value))
             $value = json_encode($value, true);
-        $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
-    }
-
-    public function fetch_cust($col)
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
-        $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
-        return $variable && $variable[$col] ? $variable[$col] : null;
+        if($typo3Version > 12)
+        {
+            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->executeStatement();
+        }
+        else
+        {
+            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+        }
     }
 
     public function insertValue()
     {
+        $typo3Version = Utilities::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
-        $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
+        if($typo3Version > 12)
+        {
+            $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->executeStatement();
+        }
+        else
+        {
+            $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
+        }
     }
 
     public function save_customer($content, $email)
@@ -612,47 +613,23 @@ class BesamlController extends ActionController
         $this->update_cust('cust_email', '');
     }
 
-    public function validate_cert($saml_x509_certificate)
+    //Function to set Auto Create User Limit
+    public function setCount()
     {
-        $certificate = openssl_x509_parse($saml_x509_certificate);
-        foreach ($certificate as $key => $value) {
-            if (empty($value)) {
-                unset($saml_x509_certificate[$key]);
-                return 0;
-            } else {
-                $saml_x509_certificate[$key] = $this->sanitize_certificate($value);
-                if (!@openssl_x509_read($saml_x509_certificate[$key])) {
-                    return 0;
-                }
-            }
-        }
-
-        if (empty($saml_x509_certificate)) {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    /**
-     * @param $postArray
-     */
-    public function saveSPSettings($postArray)
-    {
-        $postArray['sp_settings_saved'] = true;
-        $this->spobject = json_encode($postArray);
+        $typo3Version = Utilities::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $uid = $queryBuilder->select('uid')->from('saml')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))
-            ->execute()->fetch();
-        if ($uid == null) {
-            $affectedRows = $queryBuilder
-                ->insert('saml')
-                ->values([
-                    'spobject' => $this->spobject])
-                ->execute();
-        } else {
-            $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('spobject', $this->spobject)->execute();
+        $affectedRows = $queryBuilder->insert('saml')
+                     ->values([
+                        'uid' => 1,
+                        Constants::COLUMN_COUNTUSER=> 10,
+                        'isEmailSent' => 1]);
+        if($typo3Version > 12)
+        {
+            $affectedRows->executeStatement();
+        }
+        else
+        {
+            $affectedRows->execute();
         }
     }
 }
