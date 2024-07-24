@@ -32,3 +32,6 @@ v2.0.8
 
 v2.0.9
  - Security Improvements
+
+v5.2.0
+ - Added Auth0 compatibility
