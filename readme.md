@@ -25,3 +25,10 @@ v2.0.6
 
 v2.0.7
  - Typo3 v10, v11, v12 compatibility
+
+v2.0.8
+ - Updated depricated functions
+ - Security Improvements
+
+v2.0.9
+ - Security Improvements

@@ -30,7 +30,11 @@ class ReadResponseAction
         }
 
         $document = new \DOMDocument();
+        if(!empty($samlResponse))
         $document->loadXML($samlResponse);
+        else
+        Utilities::showErrorFlashMessage('Invalid Metadata.');
+
         $samlResponseXML = $document->firstChild;
 
         if ($samlResponseXML->localName == 'LogoutResponse') {

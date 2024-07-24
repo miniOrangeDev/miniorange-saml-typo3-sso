@@ -1,5 +1,4 @@
 <?php
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_sp_domain_model_response');
 
 return [
     'ctrl' => [

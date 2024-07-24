@@ -126,7 +126,9 @@ CREATE TABLE saml
     attrobject         text          DEFAULT '',
     defaultGroup       text          DEFAULT '',
     countuser          int(11) DEFAULT '10' NOT NULL,
-    isEmailSent        int(11) DEFAULT '0' Not NULL,
+    isEmailSent        int(11) DEFAULT '0' NOT NULL,
+    test_config_email_sent int(11) DEFAULT '0' NOT NULL,
+    autocreate_exceed_email_sent int(11) DEFAULT '0' NOT NULL,
     PRIMARY KEY (uid)
 );
 

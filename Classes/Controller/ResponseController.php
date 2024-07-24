@@ -107,7 +107,11 @@ class ResponseController extends ActionController
                 $_SESSION['ses_id'] = $user['uid'];
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_sessions');
 
-                if ($typo3Version >= 11.0) {
+                if ($typo3Version >= 12) {
+                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->executeStatement();
+                }
+                else
+                {
                     $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
                 }
                 $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
@@ -142,13 +146,10 @@ class ResponseController extends ActionController
 
     public function control()
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
-        $sp_object = $queryBuilder->select('spobject')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
-        $idp_object = $queryBuilder->select('object')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
+        $sp_object = Utilities::fetchFromTable(Constants::SAML_SPOBJECT, Constants::TABLE_SAML);
+        $idp_object = Utilities::fetchFromTable(Constants::SAML_IDPOBJECT, Constants::TABLE_SAML);
         $sp_object = !is_array($sp_object) ? json_decode($sp_object, true) : $sp_object;
         $idp_object = !is_array($idp_object) ? json_decode($idp_object, true) : $idp_object;
-        $sp_object = is_array($sp_object['spobject']) ? $sp_object['spobject'] : json_decode($sp_object['spobject'], true);
-        $idp_object = is_array($idp_object['object']) ? $idp_object['object'] : json_decode($idp_object['object'], true);
         $this->acs_url = $sp_object['acs_url'];
         $this->sp_entity_id = $sp_object['sp_entity_id'];
         $this->saml_login_url = $idp_object['saml_login_url'];
@@ -176,8 +177,7 @@ class ResponseController extends ActionController
         $userExist = false;
         if ($user == false) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-            $count = $queryBuilder->select('countuser')->from(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
-            $count = $count['countuser'];
+            $count = Utilities::fetchFromTable(Constants::COLUMN_COUNTUSER,Constants::TABLE_SAML);
             if ($count > 0) {
                 Utilities::log_php_error("CREATING USER", $username);
 
@@ -188,18 +188,33 @@ class ResponseController extends ActionController
 
                 // Insert the new user into the fe_users table
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
-                $queryBuilder
+                if($typo3Version > 12)
+                {
+                    $queryBuilder
+                    ->insert('fe_users')
+                    ->values($newUser)
+                    ->executeStatement();
+                }
+                else
+                {
+                    $queryBuilder
                     ->insert('fe_users')
                     ->values($newUser)
                     ->execute();
+                }
 
                 // Output the UID of the newly created user
                 $uid = $queryBuilder->getConnection()->lastInsertId('fe_users');
-                $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set('countuser', $count - 1)->execute();
+                Utilities::updateTableSaml(Constants::COLUMN_COUNTUSER, $count-1);
             } else {
+                $autocreate_exceed_email_sent = Utilities::fetchFromTable(Constants::AUTOCREATE_EXCEED_EMAIL_SENT, Constants::TABLE_SAML);
                 $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
                 $customer = new CustomerSaml();
-                $customer->submit_to_magento_team_autocreate_limit_exceeded($site, $typo3Version);
+                if($autocreate_exceed_email_sent == NULL)
+                {
+                    $customer->submit_to_magento_team_autocreate_limit_exceeded($site, $typo3Version);
+                    Utilities::updateTableSaml(Constants::AUTOCREATE_EXCEED_EMAIL_SENT, 1);
+                }
                 echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";
                 exit;
             }
@@ -212,8 +227,8 @@ class ResponseController extends ActionController
             }
             $userExist = true;
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
-            $uid = $queryBuilder->select('uid')->from(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR)))->execute()->fetch();
-            $uid = $uid['uid'];
+            $uid = $queryBuilder->select('uid')->from(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR)))->executeQuery()->fetch();
+            $uid = is_array($uid) ? $uid['uid'] : $uid;
         }
 
         GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
@@ -230,8 +245,16 @@ class ResponseController extends ActionController
             $mappedGroupUid = Utilities::fetchUidFromGroupName($mappedTypo3Group);
             $mappedGroupUid = $mappedGroupUid;
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
-            $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+            if($typo3Version > 12)
+            {
+                $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+                ->set('usergroup', $mappedGroupUid)->executeStatement();
+            }
+            else
+            {
+                $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
                 ->set('usergroup', $mappedGroupUid)->execute();
+            }
             GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
 
         } else {
@@ -248,30 +271,22 @@ class ResponseController extends ActionController
             $mappedGroupUid = $mappedGroupUid;
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
             Utilities::log_php_error("assigning default group ");
-            $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+            if($typo3Version > 12)
+            {
+                $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
+                ->set('usergroup', $mappedGroupUid)->executeStatement();
+            }
+            else
+            {
+                $queryBuilder->update(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('uid', $uid))
                 ->set('usergroup', $mappedGroupUid)->execute();
+            }
             Utilities::log_php_error("assigned default group");
         }
         Utilities::log_php_error("fetching user from username: ");
         $user = Utilities::fetchUserFromUsername($username);
         Utilities::log_php_error("User fetched");
         return $user;
-    }
-
-    public function fetchFromTable($col, $table)
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->execute()->fetch();
-        return $variable && $variable[$col] ? $variable[$col] : null;
-    }
-
-    /**
-     * @param $val
-     */
-    public function setFlag($val)
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $queryBuilder->update('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($this->uid, \PDO::PARAM_INT)))->set('custom_attr', $val)->execute();
     }
 
     /**

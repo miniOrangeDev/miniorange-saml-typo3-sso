@@ -27,9 +27,16 @@ abstract class AbstractUserGroupRepository
 
     abstract protected function setTableName(): void;
 
-    public function findAll(): array
+    public function findAll($typo3Version): array
     {
-        return $this->getQueryBuilder()->select('*')->from($this->tableName)->execute()->fetchAll();
+        if($typo3Version > 12)
+        {
+            return $this->getQueryBuilder()->select('*')->from($this->tableName)->executeQuery()->fetchAll();
+        }
+        else
+        {
+            return $this->getQueryBuilder()->select('*')->from($this->tableName)->execute()->fetchAll();
+        }
     }
 
     protected function getQueryBuilder(): QueryBuilder

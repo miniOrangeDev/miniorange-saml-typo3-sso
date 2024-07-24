@@ -662,17 +662,20 @@ class SAMLUtilities extends Utilities
     public static function mo_saml_miniorange_generate_metadata($download = false)
     {
         $spObject = json_decode(self::fetchFromTable(Constants::SAML_SPOBJECT, Constants::TABLE_SAML), true);
-        $spObject = $spObject[Constants::SAML_SPOBJECT];
-        $sp_base_url = $spObject['site_base_url'];
-        $sp_response_url = $spObject['response'];
-        $sp_entity_id = $spObject['sp_entity_id'];
+        if(empty($spObject))
+        {
+            self::showErrorFlashMessage('Please fill all the SP Settings to download SP Metadata');
+        }
+        $sp_base_url = $spObject[Constants::COLUMN_SITE_BASE_URL];
+        $sp_response_url = $spObject[Constants::COLUMN_PLUGIN_RESPONSE_URL];
+        $sp_entity_id = $spObject[Constants::COLUMN_SP_ENTITY_ID];
 
         $entity_id = $sp_entity_id;
         $acs_url = $sp_response_url;
         if (ob_get_contents())
             ob_clean();
 
-        header('Content-Type: text/rss+xml; charset=utf-8');
+        header('Content-Type: text/xml; charset=utf-8');
         if ($download)
             header('Content-Disposition: attachment; filename="Metadata.xml"');
 

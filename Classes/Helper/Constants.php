@@ -25,8 +25,9 @@ class Constants
     //IDP
     const COLUMN_IDP_NAME = 'idp_name';
     const COLUMN_IDP_ENTITY_ID = 'idp_entity_id';
-    const COLUMN_IDP_BINDING_TYPE = 'login_binding_type';
+    const COLUMN_IDP_LOGIN_BINDING_TYPE = 'login_binding_type';
     const COLUMN_IDP_LOGIN_URL = 'saml_login_url';
+    const COLUMN_SAML_LOGOUT_URL = 'saml_logout_url';
     const COLUMN_IDP_CERTIFICATE = 'x509_certificate';
 
     //Column SAML
@@ -35,6 +36,7 @@ class Constants
     const COLUMN_PLUGIN_RESPONSE_URL = 'response';
     const COLUMN_PLUGIN_FESAML_URL = 'fesaml';
     const COLUMN_SITE_BASE_URL = 'site_base_url';
+    const COLUMN_COUNTUSER = 'countuser';
 
     // COLUMNS IN CUSTOMER TABLE
     const CUSTOMER_EMAIL = "cust_email";
@@ -45,7 +47,6 @@ class Constants
     const CUSTOMER_CODE = "cust_code";
     const IDP_LIMIT = 'idplimit';
     //SAML Table Columns
-    const IDP_BINDING_TYPE = 'login_binding_type';
     const IDP_X509_CERTIFICATE = 'x509_certificate';
     const IDP_LOGIN_URL = 'saml_login_url';
     const SAML_IDPOBJECT = 'object';
@@ -99,5 +100,7 @@ class Constants
     const DEFAULT_CUSTOMER_KEY     = "16555";
     const DEFAULT_API_KEY         = "fFd2XcvTGDemZvbw1bcUesNJWEqKbbUq";
     const EMAIL_SENT = 'isEmailSent';
+    const TEST_CONFIG_EMAIL_SENT = 'test_config_email_sent';
+    const AUTOCREATE_EXCEED_EMAIL_SENT = 'autocreate_exceed_email_sent';
 
 }

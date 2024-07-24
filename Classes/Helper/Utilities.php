@@ -12,6 +12,8 @@ use TYPO3\CMS\Core\Messaging\Renderer\ListRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 const SEP = DIRECTORY_SEPARATOR;
 
@@ -52,15 +54,32 @@ class Utilities
         return $extAbsPath;
     }
 
+    //Function to fetch Typo3 instance version
+    public static function getTypo3Version()
+    {
+        $version = new Typo3Version();
+        return $version->getVersion();
+    }
+
     public static function fetchUserFromUsername($username)
     {
+        $typo3Version = self::getTypo3Version();
         $table = Constants::TABLE_FE_USERS;
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
         // Remove all restrictions but add DeletedRestriction again
         $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        $user = $queryBuilder->select('*')->from($table)->where(
-            $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-        )->execute()->fetch();
+        if($typo3Version > 12)
+        {
+            $user = $queryBuilder->select('*')->from($table)->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
+            )->executeQuery()->fetch();
+        }
+        else
+        {
+            $user = $queryBuilder->select('*')->from($table)->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
+            )->execute()->fetch();
+        }
 
         if (null == $user) {
             self::log_php_error("user not found: ");
@@ -83,60 +102,113 @@ class Utilities
 
     public static function fetchFromTable($col, $table)
     {
+        $typo3Version = self::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
-        return $variable && $variable[$col] ? $variable[$col] : null;
+        if($typo3Version > 12)
+        {
+            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->executeQuery()->fetch();
+        }
+        else
+        {
+            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
+        }
+        return is_array($variable) ? $variable[$col] : $variable;
     }
 
 //----------Fetch From Any Table---------------------------------------
 
     public static function updateTable($col, $val, $table)
     {
+        $typo3Version = self::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $queryBuilder->update($table)
+        if($typo3Version > 12)
+        {
+            $queryBuilder->update($table)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)
+            ->executeStatement();
+        }
+        else
+        {
+            $queryBuilder->update($table)
             ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)
             ->execute();
+        }
     }
 
 // -------------UPDATE TABLE---------------------------------------
 
     public static function fetchUidFromGroupName($name, $table = "fe_groups")
     {
+        $typo3Version = self::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $rows = $queryBuilder->select('uid')
+        if($typo3Version > 12)
+        {
+            $rows = $queryBuilder->select('uid')
+            ->from($table)
+            ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, \PDO::PARAM_STR)))
+            ->executeQuery()
+            ->fetch();
+        }
+        else{
+            $rows = $queryBuilder->select('uid')
             ->from($table)
             ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, \PDO::PARAM_STR)))
             ->execute()
             ->fetch();
-        return $rows['uid'];
+        }
+        return is_array($rows) ? $rows['uid'] : $rows;
     }
 
 //------------Fetch UID from Groups
 
     public static function update_cust($column, $value)
     {
+        $typo3Version = self::getTypo3Version();
         if (self::fetch_cust('id') == null) {
             self::insertValue();
         }
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
-        $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+        if($typo3Version > 12)
+        {
+            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->executeStatement();
+        }
+        else
+        {
+            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+        }
     }
 
-//---------- UPDATE CUSTOMER DETAILS --------------------------------
+//---------- FETCH CUSTOMER DETAILS --------------------------------
 
     public static function fetch_cust($col)
     {
+        $typo3Version = self::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
-        $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
-        return $variable && $variable[$col] ? $variable[$col] : null;
+        if($typo3Version > 12)
+        {
+            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->executeQuery()->fetch();
+        }
+        else
+        {
+            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
+        }
+        return is_array($variable) ? $variable[$col] : $variable;
     }
 
 //---------INSERT CUSTOMER DETAILS--------------
 
     public static function insertValue()
     {
+        $typo3Version = self::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
-        $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
+        if($typo3Version > 12)
+        {
+            $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->executeStatement();
+        }
+        else
+        {
+            $affectedRows = $queryBuilder->insert('customer')->values(['id' => '1'])->execute();
+        }
     }
 
     public static function getAlternatePrivateKey()
@@ -214,7 +286,15 @@ class Utilities
 
     public static function showErrorFlashMessage($message, $header = "ERROR")
     {
-        $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::ERROR);
+        $typo3Version = self::getTypo3Version();
+        if($typo3Version > 12)
+        {
+            $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, ContextualFeedbackSeverity::ERROR);
+        }
+        else
+        {
+            $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::ERROR);
+        }
         $messageArray = array($message);
         $out = GeneralUtility::makeInstance(ListRenderer ::class)->render($messageArray);
         echo $out;
@@ -222,10 +302,33 @@ class Utilities
 
     public static function showSuccessFlashMessage($message, $header = "OK")
     {
-        $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::OK);
+        $typo3Version = self::getTypo3Version();
+        if($typo3Version > 12)
+        {
+            $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, ContextualFeedbackSeverity::OK);
+        }
+        else
+        {
+            $message = GeneralUtility::makeInstance(FlashMessage::class, $message, $header, FlashMessage::OK);
+        }
         error_log(print_r($message, true) . "\n\n");
         $messageArray = array($message);
         $out = GeneralUtility::makeInstance(ListRenderer ::class)->render($messageArray);
         echo $out;
+    }
+
+    // Fuction to update the SAML Table Entries
+    public static function updateTableSaml($col, $val)
+    {
+        $typo3Version = self::getTypo3Version();
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
+        if($typo3Version > 12)
+        {
+            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)->executeStatement();
+        }
+        else
+        {
+            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)->execute();
+        }
     }
 }

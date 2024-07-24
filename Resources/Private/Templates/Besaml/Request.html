@@ -215,13 +215,13 @@
 
                     <div class="form-group">
                         <label for="idp_entity_id"><b>IDP Entity ID</b><span class="premiumMessage">*</span></label>
-                        <input class="form-control" id="idp_entity_id" name="idp_entity_id" required type="text"
+                        <input class="form-control" id="idp_entity_id" name="idp_entity_id" required type="url"
                                value="{conf_idp.idp_entity_id}" >
                     </div>
 
                     <div class="form-group">
                         <label for="saml_login_url"><b>SAML Login URL</b><span class="premiumMessage">*</span></label>
-                        <input class="form-control" id="saml_login_url" name="saml_login_url" required type="text"
+                        <input class="form-control" id="saml_login_url" name="saml_login_url" required type="url"
                                value="{conf_idp.saml_login_url}" >
                     </div>
 
@@ -318,31 +318,31 @@
                     <f:comment><!--<div style="width: 40%; display: inline-block">--></f:comment>
                     <div class="form-group">
                         <label for="fesaml"><b> Fesaml plugin page URL</b><span class="premiumMessage">*</span></label>
-                        <input class="form-control" id="fesaml" name="fesaml" required type="text" value="{conf_sp.fesaml}"
+                        <input class="form-control" id="fesaml" name="fesaml" required type="url" value="{conf_sp.fesaml}"
                                >
                     </div>
                     <div class="form-group">
                         <label for="response"><b>Response plugin page URL</b><span
                                 class="premiumMessage">*</span></label>
-                        <input class="form-control" id="response" name="response" required type="text" value="{conf_sp.response}"
+                        <input class="form-control" id="response" name="response" required type="url" value="{conf_sp.response}"
                                >
                     </div>
 
                     <div class="form-group">
                         <label class="premiumBox" for="slo_url"><b>Logout plugin page URL</b><span
                                 class="premiumMessage">  [Premium Feature] </span></label>
-                        <input class="form-control" disabled id="slo_url" name="slo_url" type="text" value="">
+                        <input class="form-control" disabled id="slo_url" name="slo_url" type="url" value="">
                     </div>
 
                     <div class="form-group">
                         <label for="site_base_url"><b> Base URL</b><span class="premiumMessage">*</span></label>
                         <input class="form-control" id="site_base_url"
-                               name="site_base_url" required type="text" value="{conf_sp.site_base_url}" >
+                               name="site_base_url" required type="url" value="{conf_sp.site_base_url}" >
                     </div>
 
                     <div class="form-group">
                         <label for="acs_url"><b>ACS URL</b><span class="premiumMessage">*</span></label>
-                        <input class="form-control" id="acs_url" name="acs_url" onClick="set_acs()" required type="text"
+                        <input class="form-control" id="acs_url" name="acs_url" onClick="set_acs()" required type="url"
                                value="{conf_sp.acs_url}" >
                         <p><i class="fa fa-question-circle" style="color:cadetblue; padding-left:5px;">You can enter
                             Response plugin URL here.</i>
@@ -362,7 +362,7 @@
                         <label class="premiumBox" for="login_redirect_url"><b>Redirect to this page after login</b><span
                                 class="premiumMessage">  [Premium Feature] </span></label>
                         <input class="form-control" disabled id="login_redirect_url" name="login_redirect_url"
-                               type="text" value="{conf_sp.login_redirect_url}">
+                               type="url" value="{conf_sp.login_redirect_url}">
                         <p><i class="fa fa-question-circle" style="color:cadetblue; padding-left:5px;">User will be
                             redirected to this URL after successfull login .</i>
                             <br>
@@ -396,12 +396,12 @@
                         <button class="btn btn-primary" id="sp_setting_form" name="sp_settings_form" onClick="set_save()" style="margin-right:40px; padding: 7px 25px "
                                 type="submit" >Save
                         </button>
-                        <a href="https://www.miniorange.com/typo3-single-sign-on-sso" target="_blank" >Click Here
+                        <a href="https://plugins.miniorange.com/typo3-saml-sso-setup-guides" target="_blank" >Click Here
                             for User Guide</a>
                     </div>
                     <hr>
                     <label><b> Metadata URL : </b></label>
-                    <a href="{conf_sp.fesaml}/?option=mosaml_metadata" id="metadata_url" target="_blank" > Show
+                    <a href="{conf_sp.fesaml}?option=mosaml_metadata" id="metadata_url" target="_blank" > Show
                         Metadata &nbsp</a>
                     <div class="tooltip_meta">
 
@@ -609,8 +609,10 @@
 
                                 <li><s>Support for multiple Identity Providers</s></li>
 
+                                <li><s>Support for multisite</s></li>
+
                                 <li><a class="btn btn-primary"
-                                       href="https://mail.google.com/mail/u/0/?fs=1&amp;tf=cm&amp;source=mailto&amp;su=Query+to+purchase+Typo3+SAML+Premium+Plan+&amp;to=magentosupport@xecurify.com&amp;body=I+would+like+to+inquire+about+purchasing+the+Typo3+SAML+Premium+Plan.+"
+                                       href="https://portal.miniorange.com/initializepayment?requestOrigin=typo3_saml_premium_plan"
                                        target="_blank">Upgrade Now</a></li>
 
                             </ul>
@@ -646,8 +648,10 @@
 
                                 <li>&#10004Support for multiple Identity Providers</li>
 
+                                <li>&#10004Support for multisite</li>
+
                                 <li><a class="btn btn-primary"
-                                       href="https://mail.google.com/mail/u/0/?fs=1&amp;tf=cm&amp;source=mailto&amp;su=Query+to+purchase+Typo3+SAML+Enterprise+Plan+&amp;to=magentosupport@xecurify.com&amp;body=I+would+like+to+inquire+about+purchasing+the+Typo3+SAML+Enterprise+Plan.+"
+                                       href="https://portal.miniorange.com/initializepayment?requestOrigin=typo3_saml_enterprise_plan"
                                        target="_blank">Upgrade Now</a></li>
 
                             </ul>
@@ -1165,14 +1169,17 @@
                 tablinks[i].classList.remove("active");
             }
 
-            if (activeTab !== "Support") {
+            if(activeTab == "Support")
+            {
+                document.getElementById("Account").style.display = "block";
+                document.getElementById("Support").style.display = "block";
+                document.getElementById("Account_Tab").classList.add("active");
+            }
+            else
+            {
                 document.getElementById(activeTab).style.display = "block";
                 document.getElementById("Support").style.display = "block";
                 document.getElementById(activeTab + "_Tab").classList.add("active");
-            } else {
-                document.getElementById(activeTab).style.display = "block";
-                document.getElementById("leftContainer").classList.replace("showElement", "hideElement");
-                document.getElementById("Support_Tab").classList.add("active");
             }
         }
 

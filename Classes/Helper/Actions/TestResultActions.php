@@ -101,11 +101,16 @@ class TestResultActions
         $this->processTemplateFooter();
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-        $idp_object = $queryBuilder->select('object')->from('saml')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
-        $idp_object = $idp_object['object'];
-        $this->status = Utilities::isBlank($this->nameId) ? 'Test Failed' : 'Test SuccessFull';
+        $idp_object = Utilities::fetchFromTable(Constants::SAML_IDPOBJECT, Constants::TABLE_SAML);
+        $test_config_email_sent = Utilities::fetchFromTable(Constants::TEST_CONFIG_EMAIL_SENT, Constants::TABLE_SAML);
+        $this->status = Utilities::isBlank($this->nameId) ? 'Test Failed' : 'Test Successful';
         $customer = new CustomerSaml();
-        $customer->submit_to_magento_team_core_config_data($this->status, $this->attrs ,$idp_object);
+        if($test_config_email_sent == NULL)
+        {
+            $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
+            $customer->submit_to_magento_team_core_config_data($this->status, $this->attrs ,$idp_object, $site);
+            Utilities::updateTableSaml(Constants::TEST_CONFIG_EMAIL_SENT, 1);
+        }
         printf($this->template);
         return;
     }
