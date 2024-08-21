@@ -248,12 +248,9 @@ class BesamlController extends ActionController
                 $this->view->assign('test_enabled', '');
             else
                 $this->view->assign('test_enabled', 'disabled');
-        } else {
-            if (isset($sp_object['sp_settings_saved']) && $sp_object['sp_settings_saved'] == true) {
-                $this->view->assign('idp_save_enabled', '');
-            } else {
-                $this->view->assign('idp_save_enabled', 'disabled');
-            }
+        } else 
+        {
+            $this->view->assign('idp_save_enabled', 'disabled');
             $this->view->assign('test_enabled', 'disabled');
         }
 

@@ -88,17 +88,17 @@ call_user_func(
         $iconRegistry->registerIcon(
             'sp-plugin-fesaml',
             \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
-            ['source' => 'EXT:sp/Resources/Public/Icons/miniorange.png']
+            ['source' => 'EXT:sp/Resources/Public/Icons/Extension.png']
         );
         $iconRegistry->registerIcon(
             'sp-plugin-response',
             \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
-            ['source' => 'EXT:sp/Resources/Public/Icons/miniorange.png']
+            ['source' => 'EXT:sp/Resources/Public/Icons/Extension.png']
         );
         $iconRegistry->registerIcon(
             'sp-plugin-bekey',
             \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
-            ['source' => 'EXT:sp/Resources/Public/Icons/miniorange.png']
+            ['source' => 'EXT:sp/Resources/Public/Icons/Extension.png']
         );
 
     }
