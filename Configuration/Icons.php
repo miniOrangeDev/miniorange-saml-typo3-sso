@@ -18,10 +18,10 @@ use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 return [
     'sp-plugin-fesaml' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:sp/Resources/Public/Icons/miniorange.png',
+        'source' => 'EXT:sp/Resources/Public/Icons/Extension.png',
     ],
     'sp-plugin-response' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:sp/Resources/Public/Icons/miniorange.png',
+        'source' => 'EXT:sp/Resources/Public/Icons/Extension.png',
     ]
 ];

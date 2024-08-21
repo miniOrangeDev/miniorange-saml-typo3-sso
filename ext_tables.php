@@ -22,8 +22,8 @@ call_user_func(
             $cache_actions_besaml,
             [
                 'access' => 'admin,user,group',
-                'icon' => 'EXT:sp/Resources/Public/Icons/miniorange.png',
-                'source' => 'EXT:sp/Resources/Public/Icons/miniorange.svg',
+                'icon' => 'EXT:sp/Resources/Public/Icons/Extension.png',
+                'source' => 'EXT:sp/Resources/Public/Icons/Extension.svg',
                 'labels' => 'LLL:EXT:sp/Resources/Private/Language/locallang_bekey.xlf',
             ]
         );
@@ -32,14 +32,14 @@ call_user_func(
             $extensionName,
             'Fesaml',
             'fesaml',
-            'EXT:sp/Resources/Public/Icons/miniorange.svg'
+            'EXT:sp/Resources/Public/Icons/Extension.svg'
         );
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
             $extensionName,
             'Response',
             'response',
-            'EXT:sp/Resources/Public/Icons/miniorange.svg'
+            'EXT:sp/Resources/Public/Icons/Extension.svg'
         );
 
     }
