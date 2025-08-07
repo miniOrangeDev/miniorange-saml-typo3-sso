@@ -11,7 +11,7 @@ return [
         'position' => [],
         'access' => 'user,group',
         'workspaces' => 'live',
-        'iconIdentifier' => 'sp-plugin-bekey',
+        'iconIdentifier' => 'sp-extension-icon',
         'path' => 'module/tools/besamlkey',
         'labels' => 'LLL:EXT:sp/Resources/Private/Language/locallang_bekey.xlf',
         'extensionName' => 'sp',

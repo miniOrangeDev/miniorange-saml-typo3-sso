@@ -57,31 +57,29 @@ call_user_func(
 
         // wizards
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
-            'mod {
-            wizards.newContentElement.wizardItems.plugins {
+    "mod.wizards.newContentElement.wizardItems.plugins {
                 elements {
-                    Fesamlkey {
-                        iconIdentifier = sp-plugin-fesaml
-                        title = LLL:EXT:sp/Resources/Private/Language/locallang_db.xlf:tx_sp_fesaml.name
-                        description = LLL:EXT:sp/Resources/Private/Language/locallang_db.xlf:tx_sp_fesaml.description
+            fesaml {
+                iconIdentifier = sp-extension-icon
+                title = Fesaml
+                description = For Sending Request
                         tt_content_defValues {
                             CType = list
-                            list_type = Fesaml
+                    list_type = {$extensionName}_fesaml
                         }
                     }
-                    Responsekey {
-                        iconIdentifier = sp-plugin-response
-                        title = LLL:EXT:sp/Resources/Private/Language/locallang_db.xlf:tx_sp_response.name
-                        description = LLL:EXT:sp/Resources/Private/Language/locallang_db.xlf:tx_sp_response.description
+            response {
+                iconIdentifier = sp-extension-icon
+                title = Response
+                description = For Handling Response 
                         tt_content_defValues {
                             CType = list
-                            list_type = Response
+                    list_type = {$extensionName}_response
                         }
                     }
                 }
                 show = *
-            }
-       }'
+    }"
         );
 
         $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);

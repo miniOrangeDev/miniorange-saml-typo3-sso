@@ -1,10 +1,18 @@
-<html data-namespace-typo3-fluid="true"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers">
 
+<!DOCTYPE html>
+<html lang="en" xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+<head>
+    <f:be.pageRenderer />
+    <title><f:render section="title" /></title>
+    <link rel="stylesheet" href="{f:uri.resource(path: 'EXT:sp/Resources/Public/Css/sp/bootstrap.min.css')}" />
+    <link rel="stylesheet" href="{f:uri.resource(path: 'EXT:sp/Resources/Public/Css/sp/custom.css')}" />
+    <script type="module" src="{f:uri.resource(path: 'EXT:sp/Resources/Public/JavaScript/sp/jquery.min.js')}" ></script>
+    <script type="module" src="{f:uri.resource(path: 'EXT:sp/Resources/Public/JavaScript/sp/bootstrap.min.js')}" ></script>
+    <script type="module" src="{f:uri.resource(path: 'EXT:sp/Resources/Public/JavaScript/sp/main.js')}" ></script>
+    <f:render section="head" optional="true" />
+</head>
 <body>
 <f:render section="content"/>
-<f:render section="js"/>
 </body>
 
 </html>

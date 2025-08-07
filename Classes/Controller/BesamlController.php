@@ -35,6 +35,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Backend\Controller\AbstractLinkBrowserController;
 use TYPO3\CMS\Backend\LinkHandler\LinkHandlerInterface;
 use TYPO3\CMS\Core\View\ViewInterface;
+use TYPO3\CMS\Core\Database\Connection;
 
 /**
  * BesamlController
@@ -42,48 +43,65 @@ use TYPO3\CMS\Core\View\ViewInterface;
 class BesamlController extends ActionController
 {
     protected $response = null;
-    protected $responseFactory = null;
     protected $service;
     private $myjson = null;
     private $itemRepository = null;
     private $tab = null;
+    protected $pageRenderer;
+    protected $spobject;
 
-    /**
-     * @throws Exception
-     */
-    public function requestAction()
+    public function injectPageRenderer(PageRenderer $pageRenderer): void
     {
+        $this->pageRenderer = $pageRenderer;
+    }
+
+    public function requestAction(): ResponseInterface
+    {
+        $pluginVersion = ExtensionManagementUtility::getExtensionVersion(Constants::EXTENSION_KEY);
+        $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+    	$pageRenderer->addCssFile('@miniorange/sp/Resources/Public/Css/sp/bootstrap.min.css');
+    	$pageRenderer->addCssFile('@miniorange/sp/Resources/Public/Css/sp/custom.css');
+    	$pageRenderer->loadJavaScriptModule('@miniorange/sp/jquery.min.js');
+    	$pageRenderer->loadJavaScriptModule('@miniorange/sp/bootstrap.min.js');
+    	$pageRenderer->loadJavaScriptModule('@miniorange/sp/main.js');
         $customer = new CustomerSaml();
         $version = new Typo3Version();
         $typo3Version = $version->getVersion();
-        $send_email= Utilities::fetchFromTable(Constants::EMAIL_SENT, Constants::TABLE_SAML);
-        if(isset($_REQUEST['option']) && $_REQUEST['option'] == 'mosaml_metadata')
-        {
-            Utilities::showErrorFlashMessage('Fill all the fields to use the XML Metadata');
-        }
-            if($send_email==NULL)
+        $timestamp = Utilities::fetch_cust(Constants::TIMESTAMP);
+        if($timestamp==NULL)
             {
+                $timestamp = time();
                 $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
-                $values=array($site);
                 $email = !empty($GLOBALS['BE_USER']->user['email']) ? $GLOBALS['BE_USER']->user['email'] : $GLOBALS['BE_USER']->user['username'];
-                $customer->submit_to_magento_team($email,'Installed Successfully', $values, $typo3Version);
+                $values=array($site);
+                $data = [
+                    'timeStamp' => $timestamp,
+                    'adminEmail' => $email,
+                    'domain' => $site,
+                    'pluginName' => 'Typo3 SAML Free',
+                    'pluginVersion' => $pluginVersion,
+                    'pluginFirstPageVisit' => 'SP Settings',
+                    'environmentName' => 'TYPO3',
+                    'environmentVersion' => $typo3Version,
+                    'IsFreeInstalled' => 'Yes',
+                    'FreeInstalledDate' =>  date('Y-m-d H:i:s')
+                ];
+                $customer->syncPluginMetrics($data);
+                $this->update_cust(Constants::TIMESTAMP, $timestamp);
                 $uid = Utilities::fetchFromTable('uid',Constants::TABLE_SAML);
                 if($uid == null)
                 {
                     $this->setCount();
                 }
-                else
-                {
-                    Utilities::updateTableSaml(Constants::EMAIL_SENT, 1);
-                }
-
                 GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
             }
+        if(isset($_REQUEST['option']) && $_REQUEST['option'] == 'mosaml_metadata')
+        {
+            Utilities::showErrorFlashMessage('Fill all the fields to use the XML Metadata');
+        }
 
         //------------ IDENTITY PROVIDER SETTINGS---------------
         if (isset($_POST['option'])) {
-
-            $token = Constants::ENCRYPT_TOKEN;
 
             if ($_POST['option'] == 'mosaml_metadata') {
                 if (!empty($_POST['idp_name']))
@@ -169,28 +187,6 @@ class BesamlController extends ActionController
                 Utilities::showSuccessFlashMessage('Group Mappings saved successfully.');
             }
 
-//------------ VERIFY CUSTOMER---------------
-            if ($_POST['option'] === 'mo_saml_verify_customer') {
-                if (isset($_POST['option']) && $_POST['option'] === "mo_saml_verify_customer") {
-                    if ($_POST['registered'] == 'isChecked') {
-                        error_log("registered is checked. Registering User : ");
-                        $this->account($_POST);
-                    } else {
-                        if ($_POST['password'] == $_POST['confirmPassword']) {
-                            $this->account($_POST);
-                        } else {
-                            Utilities::showErrorFlashMessage('Please enter same password in both password fields.');
-                        }
-                    }
-                }
-            }
-
-//------------ HANDLE LOG OUT ACTION---------------
-            if (isset($_POST['option']) && $_POST['option'] === 'logout') {
-                $this->removeCustomer();
-                $this->view->assign('status', 'not_logged');
-                Utilities::showSuccessFlashMessage('Logged out successfully.');
-            }
             //------------ CHANGING TABS---------------
             if ($_POST['option'] == 'save_sp_settings') {
                 $this->tab = "Service_Provider";
@@ -388,7 +384,7 @@ class BesamlController extends ActionController
             $affectedRows = $queryBuilder
                 ->insert('saml')
                 ->values([
-                    'uid' => $queryBuilder->createNamedParameter(1, PDO::PARAM_INT),
+                    'uid' => $queryBuilder->createNamedParameter(1, Connection::PARAM_INT),
                     'idp_name' => $creds['idp_name'],
                     'idp_entity_id' => $creds['idp_entity_id'],
                     'saml_login_url' => $creds['saml_login_url'],
@@ -518,47 +514,6 @@ class BesamlController extends ActionController
         }
     }
 
-
-// --------------------SUPPORT QUERY---------------------
-
-    public function account($post)
-    {
-        $email = $post['email'];
-        $password = $post['password'];
-        $customer = new CustomerSaml();
-        $customer->email = $email;
-        $this->update_cust('cust_email', $email);
-        $check_content = json_decode($customer->check_customer($email, $password), true);
-        if ($check_content['status'] == 'CUSTOMER_NOT_FOUND') {
-            $customer = new CustomerSaml();
-            error_log("CUSTOMER_NOT_FOUND.. Creating ...");
-            $result = $customer->create_customer($email, $password);
-            $result = json_decode($result, true);
-            if ($result['status'] == 'SUCCESS') {
-                $key_content = json_decode($customer->get_customer_key($email, $password), true);
-                if ($key_content['status'] == 'SUCCESS') {
-                    $this->save_customer($key_content, $email);
-                    Utilities::showSuccessFlashMessage('User retrieved successfully.');
-                } else {
-                    Utilities::showErrorFlashMessage('It seems like you have entered the incorrect password');
-                }
-            }
-            else
-            {
-                Utilities::showErrorFlashMessage('Something went wrong! Please recheck your credentials!');
-            }
-        } elseif ($check_content['status'] == 'SUCCESS') {
-            $key_content = json_decode($customer->get_customer_key($email, $password), true);
-
-            if (isset($key_content) && $key_content['status'] == 'SUCCESS') {
-                $this->save_customer($key_content, $email);
-                Utilities::showSuccessFlashMessage('User retrieved successfully.');
-            } else {
-                Utilities::showErrorFlashMessage('It seems like you have entered the incorrect password');
-            }
-        }
-    }
-
     public function update_cust($column, $value)
     {
         $typo3Version = Utilities::getTypo3Version();
@@ -570,11 +525,11 @@ class BesamlController extends ActionController
             $value = json_encode($value, true);
         if($typo3Version > 12)
         {
-            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->executeStatement();
+            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($column, $value)->executeStatement();
         }
         else
         {
-            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+            $queryBuilder->update('customer')->where((string)$queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($column, $value)->execute();
         }
     }
 
@@ -613,13 +568,13 @@ class BesamlController extends ActionController
     //Function to set Auto Create User Limit
     public function setCount()
     {
+        $count = AESEncryption::encrypt_data(10, Constants::ENCRYPT_TOKEN);
         $typo3Version = Utilities::getTypo3Version();
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $affectedRows = $queryBuilder->insert('saml')
                      ->values([
                         'uid' => 1,
-                        Constants::COLUMN_COUNTUSER=> 10,
-                        'isEmailSent' => 1]);
+                        Constants::COLUMN_COUNTUSER=> $count]);
         if($typo3Version > 12)
         {
             $affectedRows->executeStatement();

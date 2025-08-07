@@ -108,7 +108,12 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
         if(!isset($this->acs_url) || !isset($this->sp_entity_id) || !isset($this->idp_entity_id) || !isset($this->saml_login_url) || !isset($this->x509_certificate))
         {
-            Utilities::showErrorFlashMessage('Please make fill all the necessary fields.');
+            Utilities::showErrorFlashMessage('Please make sure to fill all the necessary fields.');
+            if ($typo3Version >= 11.5) {
+                return $this->responseFactory->createResponse()
+                    ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
+                    ->withBody($this->streamFactory->createStream($this->view->render()));
+            } 
             return;
         }
         $this->sendHTTPRedirectRequest($samlRequest, $relayState, $this->saml_login_url);
@@ -157,19 +162,22 @@ class FesamlController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $idp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_IDP, Constants::TABLE_SAML),true);
         $sp_object = json_decode(Utilities::fetchFromTable(Constants::COLUMN_OBJECT_SP,Constants::TABLE_SAML),true);
 
-         $this->idp_name = $idp_object[Constants::COLUMN_IDP_NAME];
-         $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
-         $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
-         $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
-         $this->force_authn = false;
+        if($idp_object != null)
+        {
+            $this->idp_name = $idp_object[Constants::COLUMN_IDP_NAME];
+            $this->idp_entity_id =$idp_object[Constants::COLUMN_IDP_ENTITY_ID];
+            $this->saml_login_url = $idp_object[Constants::COLUMN_IDP_LOGIN_URL];
+            $this->x509_certificate = $idp_object[Constants::COLUMN_IDP_CERTIFICATE];
+            $this->force_authn = false;
 
-        $this->acs_url = $sp_object[Constants::COLUMN_SP_ACS_URL];
-        $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
+            $this->acs_url = $sp_object[Constants::COLUMN_SP_ACS_URL];
+            $this->sp_entity_id = $sp_object[Constants::COLUMN_SP_ENTITY_ID];
 
-        $this->signedAssertion = true;
-        $this->signedResponse = true;
+            $this->signedAssertion = true;
+            $this->signedResponse = true;
 
-        $this->destination = $this->saml_login_url;
+            $this->destination = $this->saml_login_url;
+        }
     }
 
     public function build()

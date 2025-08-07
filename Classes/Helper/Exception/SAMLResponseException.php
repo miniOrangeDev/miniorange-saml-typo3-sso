@@ -13,6 +13,7 @@ class SAMLResponseException extends \Exception
 {
     private $samlResponse;
     private $isCertError;
+    private $xml;
 
     public function __construct($message, $code, $xml, $isCertError)
     {

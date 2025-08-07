@@ -125,23 +125,29 @@ CREATE TABLE saml
     spobject           text          DEFAULT '',
     attrobject         text          DEFAULT '',
     defaultGroup       text          DEFAULT '',
-    countuser          int(11) DEFAULT '10' NOT NULL,
-    isEmailSent        int(11) DEFAULT '0' NOT NULL,
-    test_config_email_sent int(11) DEFAULT '0' NOT NULL,
-    autocreate_exceed_email_sent int(11) DEFAULT '0' NOT NULL,
+    countuser          text          DEFAULT '',
     PRIMARY KEY (uid)
 );
 
 CREATE TABLE customer
 (
-
-    id              int(11) NOT NULL auto_increment,
-    cust_email      varchar(100) DEFAULT '',
-    cust_key        varchar(100) DEFAULT '',
-    cust_api_key    varchar(100) DEFAULT '',
-    cust_token      varchar(100) DEFAULT '',
-    cust_reg_status varchar(100) DEFAULT '',
-    cust_object     varchar(100) DEFAULT '',
+    id                        int(11) NOT NULL auto_increment,
+    cust_email                varchar(100) DEFAULT '',
+    cust_key                  varchar(100) DEFAULT '',
+    cust_api_key              varchar(100) DEFAULT '',
+    cust_token                varchar(100) DEFAULT '',
+    cust_reg_status           varchar(100) DEFAULT '',
+    cust_object               text         DEFAULT '',
+    cust_code                 varchar(100) DEFAULT '',
+    license_key               varchar(100) DEFAULT '',
+    proxy_needed              binary       DEFAULT 0,
+    proxy_settings            text         DEFAULT '',
+    execution_date            text         DEFAULT '',
+    timestamp                 text         DEFAULT '',
+    sent_expired_email        text         DEFAULT '',
+    is_trial_extended         text         DEFAULT '',
+    trial_extended_email_sent text         DEFAULT '',
+    user_count                text         DEFAULT '',
+    idp_limit                 varchar(100) DEFAULT 'og==',
     PRIMARY KEY (id)
-
 );

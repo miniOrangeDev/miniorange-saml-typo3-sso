@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
     ],
     'shy' => '',
     'icon' => 'EXT:sp/Resources/Public/Icons/Extension.svg',
-    'version' => '5.5.0',
+    'version' => '5.6.0',
     'state' => 'stable',
     'autoload' => [
         'psr-4' => [
