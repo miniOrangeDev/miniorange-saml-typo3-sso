@@ -29,6 +29,7 @@ class ProcessResponseAction
     private $assertionSigned;
     private $issuer;
     private $spEntityId;
+    private $issuerReceived;
 
     public function __construct(SamlResponse $samlResponseXML, $acs_url, $issuer, $sp_entity_id, $signedResponse, $signedAssertion, $x509_certificate)
     {

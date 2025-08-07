@@ -16,12 +16,8 @@
 use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
 return [
-    'sp-plugin-fesaml' => [
+    'sp-extension-icon' => [ 
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:sp/Resources/Public/Icons/Extension.png',
+        'source' => 'EXT:sp/Resources/Public/Icons/Extension.svg', 
     ],
-    'sp-plugin-response' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:sp/Resources/Public/Icons/Extension.png',
-    ]
 ];

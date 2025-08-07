@@ -26,11 +26,18 @@ use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Core\Information\Typo3Version;
-
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use Miniorange\Sp\Helper\CustomerSaml;
-
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Context\User\FrontendUserAspect;
+use TYPO3\CMS\Core\Session\Frontend\AnonymousSession;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Session\SessionManager;
+use TYPO3\CMS\Core\Session\UserSession;
+use Psr\Http\Message\ResponseInterface;
+use Miniorange\Sp\Helper\AESEncryption;
 
 /**
  * ResponseController
@@ -49,10 +56,11 @@ class ResponseController extends ActionController
     protected $saml_login_url = null;
     protected $persistenceManager = null;
     protected $frontendUserRepository = null;
-    protected $responseFactory = null;
     private $issuer = null;
     private $signedAssertion = null;
     private $signedResponse = null;
+    private $name_id;
+    private $status;
     private $ssoemail = null;
     private $username = null;
     private $ses_id = null;
@@ -60,6 +68,8 @@ class ResponseController extends ActionController
     private $amObject = null;
     private $idpObject = null;
     private $spObject = null;
+    protected $x509_certificate;
+    protected $fe_user;
 
     /**
      * action check
@@ -101,47 +111,67 @@ class ResponseController extends ActionController
                 $responseAction->execute();
                 $ses_id = current($samlResponseObj->getAssertions())->getSessionIndex();
                 $username = $this->ssoemail;
-                $tsfe = self::getTypoScriptFrontendController();
-                $tsfe->fe_user->checkPid = 0;
                 $user = $this->createOrUpdateUser($username, $typo3Version);
-                $_SESSION['ses_id'] = $user['uid'];
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_sessions');
-
-                if ($typo3Version >= 12) {
-                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->executeStatement();
-                }
-                else
-                {
-                    $queryBuilder->delete('fe_sessions')->where($queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \PDO::PARAM_INT)))->execute();
-                }
-                $context = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class);
-                $context->getPropertyFromAspect('frontend.user', 'isLoggedIn');
-                $tsfe->fe_user->forceSetCookie = TRUE;
-                $tsfe->fe_user->createUserSession($user);
-                $tsfe->fe_user->user = $user;
-
-                $tsfe->initUserGroups();
-                $tsfe->fe_user->loginSessionStarted = TRUE;
-                $reflection = new ReflectionClass($tsfe->fe_user);
-                $setSessionCookieMethod = $reflection->getMethod('setSessionCookie');
-                $setSessionCookieMethod->setAccessible(TRUE);
-                $setSessionCookieMethod->invoke($tsfe->fe_user);
-
-                if (!isset($_SESSION)) {
-                    session_id('email');
-                    session_start();
-                    $_SESSION['email'] = $this->ssoemail;
-                    $_SESSION['id'] = $ses_id;
-                }
-                GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+                $this->login_user($user, $relayStateUrl);
             }
         }
 
         if ($typo3Version >= 11.5) {
-            return $this->responseFactory->createResponse()
+            $responseFactory = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class);
+            $streamFactory = GeneralUtility::makeInstance(\Psr\Http\Message\StreamFactoryInterface::class);
+            $response = $responseFactory->createResponse()
                 ->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
-                ->withBody($this->streamFactory->createStream($this->view->render()));
+                ->withBody($streamFactory->createStream($this->view->render()));
+            return $response;
         }
+    }
+
+        /**
+     * This function handles frontend user login.
+     * @param mixed $username
+     * @param mixed $id_token
+     * @param mixed $apptype
+     * @param mixed $currentapp
+     * @return void
+     */
+    function login_user($user, $relayStateUrl)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('fe_sessions');
+
+        $queryBuilder->delete('fe_sessions')
+            ->where(
+                $queryBuilder->expr()->eq('ses_userid', $queryBuilder->createNamedParameter($user['uid'], \Doctrine\DBAL\ParameterType::INTEGER))
+            );
+
+        $queryBuilder->executeStatement(); 
+        $frontendUser = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication::class);
+        $frontendUser->start($this->request);
+        $data = [
+            'nameId' => $this->ssoemail
+        ];
+
+        // Create user session (this handles all internal properties correctly)
+        $session = $frontendUser->createUserSession($user);
+        $sessionId = $session->getIdentifier();
+
+        // Get session manager to update the session with data
+        $sessionManager = GeneralUtility::makeInstance(SessionManager::class);
+        $sessionBackend = $sessionManager->getSessionBackend('FE');
+
+        // Get current session data and add your data
+        $currentSessionData = $session->getData();
+        $currentSessionData['ses_data'] = serialize($data);
+
+        // Update the session
+        $sessionBackend->update($sessionId, $currentSessionData);
+
+        // Store session data (this also handles internal state)
+        $frontendUser->storeSessionData();
+        
+        // Create a secure cookie with HttpOnly, Secure, and SameSite parameters
+        setcookie("fe_typo_user", $session->getJwt(), 0, '/');
+        header('location: ' . $relayStateUrl);
     }
 
     public function control()
@@ -177,7 +207,8 @@ class ResponseController extends ActionController
         $userExist = false;
         if ($user == false) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
-            $count = Utilities::fetchFromTable(Constants::COLUMN_COUNTUSER,Constants::TABLE_SAML);
+            $encryptedCount = Utilities::fetchFromTable(Constants::COLUMN_COUNTUSER,Constants::TABLE_SAML);
+            $count = AESEncryption::decrypt_data($encryptedCount, Constants::ENCRYPT_TOKEN);
             if ($count > 0) {
                 Utilities::log_php_error("CREATING USER", $username);
 
@@ -205,16 +236,15 @@ class ResponseController extends ActionController
 
                 // Output the UID of the newly created user
                 $uid = $queryBuilder->getConnection()->lastInsertId('fe_users');
-                Utilities::updateTableSaml(Constants::COLUMN_COUNTUSER, $count-1);
+                Utilities::updateTableSaml(Constants::COLUMN_COUNTUSER, AESEncryption::encrypt_data((int)$count-1, Constants::ENCRYPT_TOKEN));
             } else {
-                $autocreate_exceed_email_sent = Utilities::fetchFromTable(Constants::AUTOCREATE_EXCEED_EMAIL_SENT, Constants::TABLE_SAML);
-                $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
                 $customer = new CustomerSaml();
-                if($autocreate_exceed_email_sent == NULL)
-                {
-                    $customer->submit_to_magento_team_autocreate_limit_exceeded($site, $typo3Version);
-                    Utilities::updateTableSaml(Constants::AUTOCREATE_EXCEED_EMAIL_SENT, 1);
-                }
+                $timestamp = Utilities::fetch_cust(Constants::TIMESTAMP);
+                $data = [
+                    'timeStamp' => $timestamp,
+                    'autoCreateLimit' => 'Yes'
+                ];
+                $customer->syncPluginMetrics($data);
                 echo "User limit exceeded!!! Please upgrade to the Premium Plan in order to continue the services";
                 exit;
             }
@@ -227,7 +257,7 @@ class ResponseController extends ActionController
             }
             $userExist = true;
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('fe_users');
-            $uid = $queryBuilder->select('uid')->from(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR)))->executeQuery()->fetch();
+            $uid = $queryBuilder->select('uid')->from(Constants::TABLE_FE_USERS)->where($queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, Connection::PARAM_STR)))->executeQuery()->fetchAssociative();
             $uid = is_array($uid) ? $uid['uid'] : $uid;
         }
 

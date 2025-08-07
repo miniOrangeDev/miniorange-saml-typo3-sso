@@ -64,7 +64,7 @@ $(document).ready(function () {
     } else if (session == "Group_Mapping") {
         openTab('Group_Mapping');
     } else {
-        openTab('Account');
+        openTab('Service_Provider');
     }
 
 });

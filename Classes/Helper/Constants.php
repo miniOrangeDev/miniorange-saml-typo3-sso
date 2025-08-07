@@ -57,6 +57,7 @@ class Constants
     const SAML_GMOBJECT = 'gmobject';
     const SAML_ATTROBJECT = 'attrobject';
     const SAML_CUSTOM_ATTROBJECT = 'cattrobject';
+    const TIMESTAMP = 'timestamp';
 
     //ATTRIBUTE TABLE COLUMNS
     const ATTRIBUTE_USERNAME = 'saml_am_username';
@@ -102,5 +103,8 @@ class Constants
     const EMAIL_SENT = 'isEmailSent';
     const TEST_CONFIG_EMAIL_SENT = 'test_config_email_sent';
     const AUTOCREATE_EXCEED_EMAIL_SENT = 'autocreate_exceed_email_sent';
+
+    const EXTENSION_KEY = 'sp';
+    const PLUGIN_METRICS_API = 'https://magento.shanekatear.in/plugin-portal/api/tracking';
 
 }

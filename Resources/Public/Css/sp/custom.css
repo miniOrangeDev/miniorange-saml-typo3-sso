@@ -1,0 +1,340 @@
+.container {
+    width: 100%;
+    float: left
+}
+
+.container-page {
+    border: 1px solid #c1bdbd;
+    border-top-color: transparent;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    transition: width 2s, height 4s
+}
+
+
+html, body {
+    overflow: auto;
+    height: 100%;
+}
+
+ .button {
+    display: inline-block;
+    border-radius: 2px;
+    background-color: #f2f2f2;
+    border: none;
+    color: white;
+    text-shadow: 2px 2px 4px #0f0e0e;
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    padding: 5px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+ .button:hover span {
+    padding-right: 25px;
+}
+
+.button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.same-row {
+    float: left;
+}
+
+.new-row {
+    clear: both;
+}
+
+.hmargin {
+    margin: 0 10px;
+}
+
+.vmargin {
+    margin: 10px 0;
+}
+
+.margin10 {
+    margin: 10px;
+}
+
+.margin5 {
+    margin: 5px;
+}
+
+
+/* Style the tab */
+
+body {
+    font-family: Arial;
+}
+
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background: #002b36;
+    box-shadow: 2px 2px 2px darkgrey;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 14px;
+    transition: 0.3s;
+    font-size: 18px;
+}
+
+ /* Change background color of buttons on hover */
+.tab button:hover {
+    background: #afcee9;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #428bca;;
+    color: white;
+    font-weight: bolder;
+}
+
+/* Style the tab content */
+.tabcontent {
+    /* display: none; */
+    padding: 3px 6px;
+    border-top: none;
+}
+
+
+.profileTable {
+    width: 95%;
+    background: #f1f1f1;
+    border: solid 2px black;
+}
+
+.profileTable tbody td {
+    text-align: center;
+    padding: 15px;
+    border: solid 2px black;
+}
+
+#topContainer {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+    justify-content: space-evenly /*justify-content: space-between;*/
+}
+
+#leftContainer {
+    order: 1;
+    flex: 0.2 1 45%;
+}
+
+#rightContainer {
+    order: 2;
+    flex: 0.2 1 30%;
+}
+
+.hideElement {
+    display: none;
+}
+
+.showElement {
+    display: block;
+}
+
+hr {
+    border-top: 2px solid grey;
+}
+
+.helpButton {
+    background: #428bca;
+    color: white;
+    font-weight: bold;
+    box-shadow: 2px 2px 2px darkgrey;
+    text-shadow: 2px 2px 4px black;
+    border-radius: 5px;
+}
+
+.premiumMessage {
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.premiumBox {
+    font-weight: bold;
+    background: #ffe6e6;
+}
+
+.gm-div {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    margin: 15px 0;
+}
+
+.gm-input-label {
+    order: 1;
+    justify-self: left;
+    flex: 0.2 1 40%;
+    background: lightgrey;
+    margin-right: 2%;
+}
+
+.gm-input {
+    order: 2;
+    flex: 0.2 1 50%;
+    margin-left: 2%;
+    justify-self: right;
+}
+
+.gm-submit {
+    margin-left: 2%;
+}
+
+.upload_metadata_form {
+    display: none;
+    position: fixed;
+    top: 200px;
+    right: 400px;
+    border: 3px solid #f1f1f1;
+    width: 50%;
+    height: 60%;
+    z-index: 9;
+    opacity: 100;
+    background-color: #eeeeee;
+}
+
+
+.tooltip_meta {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip_meta .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip_meta .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip_meta:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+table {
+    border-collapse: collapse; /* Collapse borders to create a single border */
+    width: 100%; /* Set table width */
+}
+
+th, td {
+    border: 1px solid #ccc; /* Add a 1px solid border to header cells and data cells */
+    padding: 8px; /* Add padding for spacing */
+    text-align: center; /* Align text to the left within cells */
+}
+
+thead {
+    background-color: #f2f2f2; /* Optional: Add a background color to the header row */
+}
+
+
+.columns {
+    float: left;
+    width: 50%;
+    padding: 5px;
+}
+
+.price {
+    list-style-type: none;
+    border: 1px solid #eee;
+    margin: 0;
+    padding: 0;
+    -webkit-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.price:hover {
+    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.2)
+}
+
+.price .header {
+    background-color: #428bca;
+    color: white;
+    font-size: 25px;
+}
+
+.price li {
+    border-bottom: 1px solid #eee;
+    padding: 20px;
+    text-align: center;
+}
+
+.price .grey {
+    background-color: #eee;
+    font-size: 14px;
+}
+
+
+.pull-right > .dropdown-menu {
+    right: 0;
+    left: auto
+}
+
+.media > .pull-right {
+    padding-left: 10px
+}
+
+.pull-right {
+    float: right !important
+}
+
+.row {
+    margin-right: -15px;
+    margin-left: -15px
+}

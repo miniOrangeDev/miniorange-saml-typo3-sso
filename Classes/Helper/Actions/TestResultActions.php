@@ -25,7 +25,7 @@ class TestResultActions
     private $samlException;
     private $hasExceptionOccurred;
     private $nameId;
-
+    private $status;
     private $template = '<div style="font-family:Calibri;padding:0 3%%;">{{header}}{{commonbody}}{{footer}}</div>';
     private $successHeader = ' <div style="color: #3c763d;background-color: #dff0d8; padding:2%%;margin-bottom:20px;text-align:center; 
                                     border:1px solid #AEDB9A; font-size:18pt;">TEST SUCCESSFUL
@@ -102,15 +102,26 @@ class TestResultActions
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('saml');
         $idp_object = Utilities::fetchFromTable(Constants::SAML_IDPOBJECT, Constants::TABLE_SAML);
-        $test_config_email_sent = Utilities::fetchFromTable(Constants::TEST_CONFIG_EMAIL_SENT, Constants::TABLE_SAML);
         $this->status = Utilities::isBlank($this->nameId) ? 'Test Failed' : 'Test Successful';
         $customer = new CustomerSaml();
-        if($test_config_email_sent == NULL)
+        $timestamp = Utilities::fetch_cust(Constants::TIMESTAMP);
+        $decoded_idp_object = json_decode($idp_object, true);
+        $idp_name = $decoded_idp_object['idp_name'];
+        if($this->status == 'Test Successful')
         {
-            $site = GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST');
-            $customer->submit_to_magento_team_core_config_data($this->status, $this->attrs ,$idp_object, $site);
-            Utilities::updateTableSaml(Constants::TEST_CONFIG_EMAIL_SENT, 1);
+            $data = [
+                'timeStamp' => $timestamp,
+                'IdentityProvider' => $idp_name,
+                'testSuccessful' => $this->attrs
+            ];
+        } else {
+            $data = [
+                'timeStamp' => $timestamp,
+                'IdentityProvider' => $idp_name,
+                'testFailed' => $this->attrs
+            ];
         }
+        $customer->syncPluginMetrics($data);
         printf($this->template);
         return;
     }

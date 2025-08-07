@@ -14,6 +14,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Database\Connection;
 
 const SEP = DIRECTORY_SEPARATOR;
 
@@ -72,13 +73,13 @@ class Utilities
         {
             $user = $queryBuilder->select('*')->from($table)->where(
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-            )->executeQuery()->fetch();
+            )->executeQuery()->fetchAssociative();
         }
         else
         {
             $user = $queryBuilder->select('*')->from($table)->where(
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-            )->execute()->fetch();
+            )->executeQuery()->fetchAssociative();
         }
 
         if (null == $user) {
@@ -100,19 +101,16 @@ class Utilities
 
 //---------------------FETCH UID_FROM_USERNAME--------------------------
 
-    public static function fetchFromTable($col, $table)
+    public static function fetchFromTable(string $col, string $table): mixed
     {
-        $typo3Version = self::getTypo3Version();
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        if($typo3Version > 12)
-        {
-            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->executeQuery()->fetch();
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $col)) {
+            throw new \InvalidArgumentException('Invalid column name: ' . var_export($col, true));
         }
-        else
-        {
-            $variable = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)))->execute()->fetch();
-        }
-        return is_array($variable) ? $variable[$col] : $variable;
+
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
+        $result = $queryBuilder->select($col)->from($table)->where($queryBuilder->expr()->eq('uid',$queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->executeQuery()->fetchAssociative();
+        return is_array($result) ? $result[$col] : null;
     }
 
 //----------Fetch From Any Table---------------------------------------
@@ -124,13 +122,13 @@ class Utilities
         if($typo3Version > 12)
         {
             $queryBuilder->update($table)
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($col, $val)
             ->executeStatement();
         }
         else
         {
             $queryBuilder->update($table)
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($col, $val)
             ->execute();
         }
     }
@@ -145,16 +143,16 @@ class Utilities
         {
             $rows = $queryBuilder->select('uid')
             ->from($table)
-            ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, \PDO::PARAM_STR)))
+            ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, Connection::PARAM_STR)))
             ->executeQuery()
-            ->fetch();
+            ->fetchAssociative();
         }
         else{
             $rows = $queryBuilder->select('uid')
             ->from($table)
-            ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, \PDO::PARAM_STR)))
+            ->where($queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter($name, Connection::PARAM_STR)))
             ->execute()
-            ->fetch();
+            ->fetchAssociative();
         }
         return is_array($rows) ? $rows['uid'] : $rows;
     }
@@ -170,11 +168,11 @@ class Utilities
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
         if($typo3Version > 12)
         {
-            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->executeStatement();
+            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($column, $value)->executeStatement();
         }
         else
         {
-            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($column, $value)->execute();
+            $queryBuilder->update('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($column, $value)->execute();
         }
     }
 
@@ -186,11 +184,11 @@ class Utilities
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('customer');
         if($typo3Version > 12)
         {
-            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->executeQuery()->fetch();
+            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->executeQuery()->fetchAssociative();
         }
         else
         {
-            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->execute()->fetch();
+            $variable = $queryBuilder->select($col)->from('customer')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->execute()->fetchAssociative();
         }
         return is_array($variable) ? $variable[$col] : $variable;
     }
@@ -324,11 +322,11 @@ class Utilities
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Constants::TABLE_SAML);
         if($typo3Version > 12)
         {
-            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)->executeStatement();
+            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($col, $val)->executeStatement();
         }
         else
         {
-            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)))->set($col, $val)->execute();
+            $queryBuilder->update(Constants::TABLE_SAML)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)))->set($col, $val)->execute();
         }
     }
 }

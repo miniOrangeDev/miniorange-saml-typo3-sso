@@ -15,17 +15,5 @@ call_user_func(
             $cache_actions_besaml = ['Besaml' => 'request'];
         }
 
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            $extensionName,
-            'Fesaml',
-            'fesaml'
-        );
-
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            $extensionName,
-            'Response',
-            'response'
-        );
-
     }
 );
