@@ -6,14 +6,14 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'miniOrange',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.30-13.2.1',
+            'typo3' => '8.7.30-13.4.99',
         ],
         'conflicts' => [],
         'suggests' => [],
     ],
     'shy' => '',
     'icon' => 'EXT:sp/Resources/Public/Icons/Extension.svg',
-    'version' => '5.6.0',
+    'version' => '5.6.1',
     'state' => 'stable',
     'autoload' => [
         'psr-4' => [
