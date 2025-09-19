@@ -19,7 +19,7 @@
       "Miniorange\\Sp\\": "Classes/"
     }
   },
-  "version": "5.6.0",
+  "version": "5.6.1",
   "config": {
     "allow-plugins": {
       "typo3/class-alias-loader": true,
